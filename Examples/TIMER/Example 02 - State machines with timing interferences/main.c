@@ -37,15 +37,15 @@
 
 //! Loop: State Machine
 /*!
-              main 
+              main
                 |
                 v
-  #---->  vMasterFunction 
+  #---->  vMasterFunction
   |             |
   |             v
   |     vSubTimerAFunction
   |             |
-  |             v 
+  |             v
   #-----vSubTimerBFunction
 */
 
@@ -67,7 +67,7 @@ void vMasterFunction(void* vpArgs){
     else{
       ui8BlinkCounter++;
     }
-    vToggleGPIOPin(IO_GROUP_F, 0);                                              // Toggle LED pin...
+    vToggleGPIOPin(IO_GROUP_B, 7);                                              // Toggle LED pin...
   }
   else{
     ui16Timer++;
@@ -90,7 +90,7 @@ void vSubTimerAFunction(void* vpArgs){
     else{
       ui8BlinkCounter++;
     }
-    vToggleGPIOPin(IO_GROUP_F, 1);                                              // Toggle LED pin...
+    vToggleGPIOPin(IO_GROUP_B, 6);                                              // Toggle LED pin...
   }
   else{
     ui16Timer++;
@@ -113,7 +113,7 @@ void vSubTimerBFunction(void* vpArgs){
     else{
       ui8BlinkCounter++;
     }
-    vToggleGPIOPin(IO_GROUP_F, 3);                                              // Toggle LED pin...
+    vToggleGPIOPin(IO_GROUP_B, 5);                                              // Toggle LED pin...
   }
   else{
     ui16Timer++;
@@ -125,9 +125,9 @@ void vSubTimerBFunction(void* vpArgs){
 */
 int main(void){
   uint8_t ui8TimeBase = 10;
-  vSetGPIOPinMode(IO_GROUP_F, 0, OUTPUT_MODE);
-  vSetGPIOPinMode(IO_GROUP_F, 1, OUTPUT_MODE);
-  vSetGPIOPinMode(IO_GROUP_F, 3, OUTPUT_MODE);
+  vSetGPIOPinMode(IO_GROUP_B, 7, OUTPUT_MODE);
+  vSetGPIOPinMode(IO_GROUP_B, 6, OUTPUT_MODE);
+  vSetGPIOPinMode(IO_GROUP_B, 5, OUTPUT_MODE);
   vTIMERInit(TIMER_1);
   vSetTIMERPeriodMS(TIMER_1, ui8TimeBase);                                      // Setting time-base (10 ms)
   vAttachTIMERInterrupt(TIMER_1, MASTER_TIMER, &vMasterFunction, NULL);
