@@ -18,9 +18,12 @@
                                                               usrGroup == USART_1 ? 1 :\
                                                               usrGroup == USART_2 ? 2 : 3
 #else
-  isr_usart_t isrDataRegisterEmpty[1] = NULL;
-  isr_usart_t isrRXComplete[1] = NULL;
-  isr_usart_t isrTXComplete[1] = NULL;
+  isr_usart_t* isrDataRegisterEmpty = NULL;
+  isr_usart_t* isrRXComplete = NULL;
+  isr_usart_t* isrTXComplete = NULL;
+  args_usart_t* argDataRegisterEmpty = NULL;
+  args_usart_t* argRXComplete = NULL;
+  args_usart_t* argTXComplete = NULL;
   #define   usrGetUSARTNumber(usrGroup)                       0
 #endif
 
@@ -151,25 +154,25 @@ void vDettachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8Interruption
 /*!
   Callbacks of USART hardware interruptions.
 */
-ISR(USART0_RX_vect){
-  if (isrRXComplete[0] != NULL){
-    isrRXComplete[0](argRXComplete[0]);
-  }
-}
-
-ISR(USART0_TX_vect){
-  if (isrTXComplete[0] != NULL){
-    isrTXComplete[0](argTXComplete[0]);
-  }
-}
-
-ISR(USART0_UDRE_vect){
-  if (isrDataRegisterEmpty[0] != NULL){
-    isrDataRegisterEmpty[0](argDataRegisterEmpty[0]);
-  }
-}
-
 #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
+  ISR(USART0_RX_vect){
+    if (isrRXComplete[0] != NULL){
+      isrRXComplete[0](argRXComplete[0]);
+    }
+  }
+
+  ISR(USART0_TX_vect){
+    if (isrTXComplete[0] != NULL){
+      isrTXComplete[0](argTXComplete[0]);
+    }
+  }
+
+  ISR(USART0_UDRE_vect){
+    if (isrDataRegisterEmpty[0] != NULL){
+      isrDataRegisterEmpty[0](argDataRegisterEmpty[0]);
+    }
+  }
+  
   ISR(USART1_RX_vect){
     if (isrRXComplete[1] != NULL){
       isrRXComplete[1](argRXComplete[1]);
@@ -221,6 +224,24 @@ ISR(USART0_UDRE_vect){
   ISR(USART3_UDRE_vect){
     if (isrDataRegisterEmpty[3] != NULL){
       isrDataRegisterEmpty[3](argDataRegisterEmpty[3]);
+    }
+  }
+#else
+  ISR(USART_RX_vect){
+    if (isrRXComplete[0] != NULL){
+      isrRXComplete[0](argRXComplete[0]);
+    }
+  }
+
+  ISR(USART_TX_vect){
+    if (isrTXComplete[0] != NULL){
+      isrTXComplete[0](argTXComplete[0]);
+    }
+  }
+
+  ISR(USART_UDRE_vect){
+    if (isrDataRegisterEmpty[0] != NULL){
+      isrDataRegisterEmpty[0](argDataRegisterEmpty[0]);
     }
   }
 #endif
