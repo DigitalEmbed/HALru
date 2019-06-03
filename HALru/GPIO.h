@@ -54,12 +54,12 @@
 #define   LOW_LEVEL                                     0
 #define   HIGH_LEVEL                                    1
 
-#define   IO_GROUP_A                                    &PINA
 #define   IO_GROUP_B                                    &PINB
 #define   IO_GROUP_C                                    &PINC
+#define   IO_GROUP_D                                    &PIND
 
 #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
-  #define   IO_GROUP_D                                  &PIND
+  #define   IO_GROUP_A                                  &PINA
   #define   IO_GROUP_E                                  &PINE
   #define   IO_GROUP_F                                  &PINF
   #define   IO_GROUP_G                                  &PING
