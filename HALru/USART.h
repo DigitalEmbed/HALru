@@ -99,7 +99,7 @@
 
 #define     NO_PARITY                                         0
 #define     PAIR                                              2
-#define     ODD							                                  3
+#define     ODD                                               3
 
 #define     SERIAL_INITIALIZED                                1
 #define     SERIAL_NOT_INITIALIZED                            0
