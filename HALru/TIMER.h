@@ -59,29 +59,35 @@
   #define     TIMER_5                                         &TCCR5A
 #endif
 
-#define     regTCCRA(usrGroup)                                (usrGroup)
-#define     regTCCRB(usrGroup)                                ((volatile uint8_t*) usrGroup + 1)
-#define     regTCCRC(usrGroup)                                (usrGroup != TIMER_0 && usrGroup != TIMER_2) ? ((volatile uint8_t*) usrGroup + 2) : NULL
-#define     regTCNTL(usrGroup)                                (usrGroup != TIMER_0 && usrGroup != TIMER_2) ? ((volatile uint8_t*) usrGroup + 4) : ((volatile uint8_t*) usrGroup + 2)
-#define     regTCNTH(usrGroup)                                (usrGroup != TIMER_0 && usrGroup != TIMER_2) ? ((volatile uint8_t*) usrGroup + 5) : NULL
-#define     regICRL(usrGroup)                                 (usrGroup != TIMER_0 && usrGroup != TIMER_2) ? ((volatile uint8_t*) usrGroup + 6) : NULL
-#define     regICRH(usrGroup)                                 (usrGroup != TIMER_0 && usrGroup != TIMER_2) ? ((volatile uint8_t*) usrGroup + 7) : NULL
-#define     regOCRAL(usrGroup)                                (usrGroup != TIMER_0 && usrGroup != TIMER_2) ? ((volatile uint8_t*) usrGroup + 8) : ((volatile uint8_t*) usrGroup + 3)
-#define     regOCRAH(usrGroup)                                (usrGroup != TIMER_0 && usrGroup != TIMER_2) ? ((volatile uint8_t*) usrGroup + 9) : NULL
-#define     regOCRBL(usrGroup)                                (usrGroup != TIMER_0 && usrGroup != TIMER_2) ? ((volatile uint8_t*) usrGroup + 10) : ((volatile uint8_t*) usrGroup + 4)
-#define     regOCRBH(usrGroup)                                (usrGroup != TIMER_0 && usrGroup != TIMER_2) ? ((volatile uint8_t*) usrGroup + 11) : NULL
+#if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
+  #define   AMOUNT_OF_TIMERS    6
+#else
+  #define   AMOUNT_OF_TIMERS    3
+#endif
+
+#define     regTCCRA(tmrGroup)                                (tmrGroup)
+#define     regTCCRB(tmrGroup)                                ((volatile uint8_t*) tmrGroup + 1)
+#define     regTCCRC(tmrGroup)                                (tmrGroup != TIMER_0 && tmrGroup != TIMER_2) ? ((volatile uint8_t*) tmrGroup + 2) : NULL
+#define     regTCNTL(tmrGroup)                                (tmrGroup != TIMER_0 && tmrGroup != TIMER_2) ? ((volatile uint8_t*) tmrGroup + 4) : ((volatile uint8_t*) tmrGroup + 2)
+#define     regTCNTH(tmrGroup)                                (tmrGroup != TIMER_0 && tmrGroup != TIMER_2) ? ((volatile uint8_t*) tmrGroup + 5) : NULL
+#define     regICRL(tmrGroup)                                 (tmrGroup != TIMER_0 && tmrGroup != TIMER_2) ? ((volatile uint8_t*) tmrGroup + 6) : NULL
+#define     regICRH(tmrGroup)                                 (tmrGroup != TIMER_0 && tmrGroup != TIMER_2) ? ((volatile uint8_t*) tmrGroup + 7) : NULL
+#define     regOCRAL(tmrGroup)                                (tmrGroup != TIMER_0 && tmrGroup != TIMER_2) ? ((volatile uint8_t*) tmrGroup + 8) : ((volatile uint8_t*) tmrGroup + 3)
+#define     regOCRAH(tmrGroup)                                (tmrGroup != TIMER_0 && tmrGroup != TIMER_2) ? ((volatile uint8_t*) tmrGroup + 9) : NULL
+#define     regOCRBL(tmrGroup)                                (tmrGroup != TIMER_0 && tmrGroup != TIMER_2) ? ((volatile uint8_t*) tmrGroup + 10) : ((volatile uint8_t*) tmrGroup + 4)
+#define     regOCRBH(tmrGroup)                                (tmrGroup != TIMER_0 && tmrGroup != TIMER_2) ? ((volatile uint8_t*) tmrGroup + 11) : NULL
 
 #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
-  #define     regOCRCL(usrGroup)                              (usrGroup != TIMER_0 && usrGroup != TIMER_2) ? ((volatile uint8_t*) usrGroup + 12) : NULL
-  #define     regOCRCH(usrGroup)                              (usrGroup != TIMER_0 && usrGroup != TIMER_2) ? ((volatile uint8_t*) usrGroup + 13) : NULL
-  #define     regTIMSK(usrGroup)                              (usrGroup == TIMER_0) ? &TIMSK0 :\
-                                                              (usrGroup == TIMER_1) ? &TIMSK1 :\
-                                                              (usrGroup == TIMER_2) ? &TIMSK2 :\
-                                                              (usrGroup == TIMER_3) ? &TIMSK3 :\
-                                                              (usrGroup == TIMER_4) ? &TIMSK4 : &TIMSK5
+  #define     regOCRCL(tmrGroup)                              (tmrGroup != TIMER_0 && tmrGroup != TIMER_2) ? ((volatile uint8_t*) tmrGroup + 12) : NULL
+  #define     regOCRCH(tmrGroup)                              (tmrGroup != TIMER_0 && tmrGroup != TIMER_2) ? ((volatile uint8_t*) tmrGroup + 13) : NULL
+  #define     regTIMSK(tmrGroup)                              (tmrGroup == TIMER_0) ? &TIMSK0 :\
+                                                              (tmrGroup == TIMER_1) ? &TIMSK1 :\
+                                                              (tmrGroup == TIMER_2) ? &TIMSK2 :\
+                                                              (tmrGroup == TIMER_3) ? &TIMSK3 :\
+                                                              (tmrGroup == TIMER_4) ? &TIMSK4 : &TIMSK5
 #else
-  #define     regTIMSK(usrGroup)                              (usrGroup == TIMER_0) ? &TIMSK0 :\
-                                                              (usrGroup == TIMER_1) ? &TIMSK1 : &TIMSK2
+  #define     regTIMSK(tmrGroup)                              (tmrGroup == TIMER_0) ? &TIMSK0 :\
+                                                              (tmrGroup == TIMER_1) ? &TIMSK1 : &TIMSK2
 #endif
 
 #define     COMnA1                                            7

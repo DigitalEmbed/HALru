@@ -79,7 +79,12 @@
   \param ui8Pin is an undefined parameter. It's the pin number of a GPIO group (0 to 7).
   \param ui8Mode is an undefined parameter. It's OUTPUT_MODE or INPUT_MODE.
 */
-#define   vSetGPIOPinMode(ioGroup, ui8Pin, ui8Mode)     (ui8Mode == OUTPUT_MODE) ? vSetBit(*regDDR(ioGroup), ui8Pin) : vEraseBit(*regDDR(ioGroup), ui8Pin)
+#define   vSetGPIOPinMode(ioGroup, ui8Pin, ui8Mode)     if (ui8Mode == OUTPUT_MODE){\
+                                                          vSetBit(*regDDR(ioGroup), ui8Pin);\
+                                                        }\
+                                                        else{\
+                                                          vEraseBit(*regDDR(ioGroup), ui8Pin);\
+                                                        }
 
 //! Macro: Set GPIO Pin
 /*!
@@ -87,6 +92,7 @@
   \param ioGroup is an undefined parameter. It's the GPIO group pin (IO_GROUP_X).
   \param ui8Pin is an undefined parameter. It's the pin number of a GPIO group (0 to 7).
 */
+
 #define   vSetGPIOPin(ioGroup, ui8Pin)                  vSetBit(*regPORT(ioGroup), ui8Pin)
 
 //! Macro: Unset GPIO Pin

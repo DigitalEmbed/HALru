@@ -33,41 +33,29 @@
   to jorge_henrique_123@hotmail.com to talk.
 */
 
-#ifndef HALru_H
-#define HALru_H
+#ifndef PWM_H
+#define PWM_H
 
 #ifdef __cplusplus
   extern "C" {
 #endif
 
-/*!
-  MemoryManager system libraries.
-*/
-#include <stdio.h>
-#include "EmbeddedTools.h"
-#include "Print.h"
+#include <stdint.h>
+#include <string.h>
 #include "GPIO.h"
-#include "USART.h"
 #include "TIMER.h"
-#include "PWM.h"
 
-//! Configuration: Micro controler configurations
-/*!
-  Configure the micro controler here.
-*/
-#define   DEVICE_CLOCK_HZ             16000000
+typedef struct{
+  volatile uint8_t* ioGroup;
+  volatile uint8_t* tmrGroup;
+  volatile uint8_t ui8TickCounter;
+  volatile uint8_t ui8pActivedPinsVector[8];
+  volatile uint8_t ui8pDutyCicleVector[8];
+} pwm_t;
 
-//! Macro: Enable All Interrupts
-/*!
-  Enable all interrupts.
-*/
-#define   vEnableAllInterrupts()      sei()
-
-//! Macro: Disable All Interrupts
-/*!
-  Disable all interrupts.
-*/
-#define   vDisableAllInterrupts()     cli()
+void vInitPWM(pwm_t* pwmGroup, volatile uint8_t* ioGroup, volatile uint8_t* tmrGroup);
+void vSetPWMPeriodUS(pwm_t* pwmGroup, uint32_t ui32PeriodUS);
+void vSetPWMPin(pwm_t* pwmGroup, uint8_t ui8Pin, uint8_t ui8DutyCicle);
 
 #ifdef __cplusplus
   }
