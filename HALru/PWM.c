@@ -39,8 +39,11 @@ void vPWMInterrupt(void* vpArgs){
   pwm_t* pwmGroup = (pwm_t*) vpArgs;
   pwmGroup->ui8TickCounter++;
   for(ui8Counter = 0 ; pwmGroup->ui8pActivedPinsVector[ui8Counter] != 255 ; ui8Counter++){
-    if (pwmGroup->ui8pDutyCicleVector[ui8Counter] == pwmGroup->ui8TickCounter || pwmGroup->ui8TickCounter == 0){
-      vToggleGPIOPin(pwmGroup->ioGroup, pwmGroup->ui8pActivedPinsVector[ui8Counter]);
+    if (pwmGroup->ui8pDutyCicleVector[ui8Counter] == pwmGroup->ui8TickCounter){
+      vUnsetGPIOPin(pwmGroup->ioGroup, pwmGroup->ui8pActivedPinsVector[ui8Counter]);
+    }
+    else if (pwmGroup->ui8TickCounter == 0){
+      vSetGPIOPin(pwmGroup->ioGroup, pwmGroup->ui8pActivedPinsVector[ui8Counter]);
     }
   }
 }
