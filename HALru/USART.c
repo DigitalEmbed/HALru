@@ -83,7 +83,7 @@ void vUSARTSendByte(volatile uint8_t* ui8pGroup, uint8_t ui8Data){
 //! Function: USART Interrupt Attacher
 /*!
   Attach a USART interruption function.
-  \param ui8pGroup is a volatile 8-bit pointer integer. It's the TIEMR group (USART_X).
+  \param ui8pGroup is a volatile 8-bit pointer integer. It's the USART group (USART_X).
   \param ui8InterruptionType is a 8-bit integer. It's the interruption type.
   \param vInterruptFunction is a function pointer. It's the callback interruption.
   \param vpArgument is a void pointer. It's the callback argument.
@@ -119,7 +119,7 @@ void vAttachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8InterruptionT
 //! Function: USART Interrupt Dettacher
 /*!
   Dettach a USART interruption function.
-  \param ui8pGroup is a volatile 8-bit pointer integer. It's the TIEMR group (USART_X).
+  \param ui8pGroup is a volatile 8-bit pointer integer. It's the USART group (USART_X).
   \param ui8InterruptionType is a 8-bit integer. It's the interruption type.
 */
 void vDettachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8InterruptionType){
@@ -172,7 +172,7 @@ void vDettachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8Interruption
       isrDataRegisterEmpty[0](argDataRegisterEmpty[0]);
     }
   }
-  
+
   ISR(USART1_RX_vect){
     if (isrRXComplete[1] != NULL){
       isrRXComplete[1](argRXComplete[1]);

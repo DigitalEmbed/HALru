@@ -33,8 +33,8 @@
   to jorge_henrique_123@hotmail.com to talk.
 */
 
-#ifndef PWM_H
-#define PWM_H
+#ifndef SoftPWM_H
+#define SoftPWM_H
 
 #ifdef __cplusplus
   extern "C" {
@@ -45,17 +45,23 @@
 #include "GPIO.h"
 #include "TIMER.h"
 
+//! Type Definition: pwm_group_t struct.
+/*!
+  This struct creates a pwm group "object".
+*/
 typedef struct{
   volatile uint8_t* ioGroup;
   volatile uint8_t* tmrGroup;
   volatile uint8_t ui8TickCounter;
   volatile uint8_t ui8pActivedPinsVector[8];
   volatile uint8_t ui8pDutyCicleVector[8];
-} pwm_t;
+} pwm_group_t;
 
-void vInitPWM(pwm_t* pwmGroup, volatile uint8_t* ioGroup, volatile uint8_t* tmrGroup);
-void vSetPWMPeriodUS(pwm_t* pwmGroup, uint32_t ui32PeriodUS);
-void vSetPWMPin(pwm_t* pwmGroup, uint8_t ui8Pin, uint8_t ui8DutyCicle);
+void vInitSoftPWM(pwm_group_t* pwmGroup, volatile uint8_t* ioGroup, volatile uint8_t* tmrGroup);      /*!< Void type function. */
+void vDisableSoftPWM(pwm_group_t* pwmGroup);                                                          /*!< Void type function. */
+void vSetSoftPWMPeriodUS(pwm_group_t* pwmGroup, uint32_t ui32PeriodUS);                               /*!< Void type function. */
+void vSetSoftPWMFrequencyHZ(pwm_group_t* pwmGroup, uint16_t ui16FrequencyHZ);                         /*!< Void type function. */
+void vSetSoftPWMPin(pwm_group_t* pwmGroup, uint8_t ui8Pin, uint8_t ui8DutyCicle);                     /*!< Void type function. */
 
 #ifdef __cplusplus
   }

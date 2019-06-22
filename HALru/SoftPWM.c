@@ -1,8 +1,15 @@
-#include "PWM.h"
+#include "SoftPWM.h"
 
-void vPWMInterrupt(void* vpArgs);
+void vSoftPWMInterrupt(void* vpArgs);                                               /*!< Void type function. */
 
-void vInitPWM(pwm_t* pwmGroup, volatile uint8_t* ioGroup, volatile uint8_t* tmrGroup){
+//! Function: SoftPWM Group Initializer
+/*!
+  Initialize a SoftPWM group.
+  \param pwmGroup is a pwm_group_t pointer. It's the pwm group configurations.
+  \param ioGroup is a volatile 8-bit pointer integer. It's the GPIO group (IO_GROUP_X).
+  \param tmrGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
+*/
+void vInitSoftPWM(pwm_group_t* pwmGroup, volatile uint8_t* ioGroup, volatile uint8_t* tmrGroup){
   pwmGroup->ioGroup = ioGroup;
   pwmGroup->tmrGroup = tmrGroup;
   pwmGroup->ui8TickCounter = 0;
@@ -11,13 +18,47 @@ void vInitPWM(pwm_t* pwmGroup, volatile uint8_t* ioGroup, volatile uint8_t* tmrG
   vTIMERInit(pwmGroup->tmrGroup);
 }
 
-void vSetPWMPeriodUS(pwm_t* pwmGroup, uint32_t ui32PeriodUS){
+//! Function: SoftPWM Disabler
+/*!
+  Disable a SoftPWM group.
+  \param pwmGroup is a pwm_group_t pointer. It's the pwm group configurations.
+*/
+void vDisableSoftPWM(pwm_group_t* pwmGroup){
+  vDisableTIMER(pwmGroup->tmrGroup, MASTER_TIMER);
+  *regPORT(pwmGroup->ioGroup) = 0;
+}
+
+//! Function: SoftPWM Period (us) Seter
+/*!
+  Set SoftPWM period (in us).
+  \param pwmGroup is a pwm_group_t pointer. It's the pwm group configurations.
+  \param ui32PeriodUS is a 32-bit integer. It's the period value, in microseconds.
+*/
+void vSetSoftPWMPeriodUS(pwm_group_t* pwmGroup, uint32_t ui32PeriodUS){
   vSetTIMERPeriodUS(pwmGroup->tmrGroup, (ui32PeriodUS >> 8));
-  vAttachTIMERInterrupt(pwmGroup->tmrGroup, MASTER_TIMER, &vPWMInterrupt, pwmGroup);
+  vAttachTIMERInterrupt(pwmGroup->tmrGroup, MASTER_TIMER, &vSoftPWMInterrupt, pwmGroup);
   vEnableTIMER(pwmGroup->tmrGroup, MASTER_TIMER);
 }
 
-void vSetPWMPin(pwm_t* pwmGroup, uint8_t ui8Pin, uint8_t ui8DutyCicle){
+//! Function: SoftPWM Period (us) Seter
+/*!
+  Set SoftPWM period (in us).
+  \param pwmGroup is a pwm_group_t pointer. It's the pwm group configurations.
+  \param ui16FrequencyHZ is a 16-bit integer. It's the frequency value, in hertz.
+*/
+void vSetSoftPWMFrequencyHZ(pwm_group_t* pwmGroup, uint16_t ui16FrequencyHZ){
+  uint32_t ui32PeriodUS = 1000000/ui16FrequencyHZ;
+  vSetSoftPWMPeriodUS(pwmGroup, ui32PeriodUS);
+}
+
+//! Function: SoftPWM Pin Setter
+/*!
+  Set a pwm value on a SoftPWM pin.
+  \param pwmGroup is a pwm_group_t pointer. It's the pwm group configurations.
+  \param ui8Pin is a 8-bit integer. It's the pin number of a GPIO group (0 to 7).
+  \param ui8DutyCicle is a 8-bit integer. It's the pwm duty cicle of the pin (0 to 255).
+*/
+void vSetSoftPWMPin(pwm_group_t* pwmGroup, uint8_t ui8Pin, uint8_t ui8DutyCicle){
   uint8_t ui8Counter = 0;
   if (ui8Pin > 7){
     return;
@@ -34,9 +75,14 @@ void vSetPWMPin(pwm_t* pwmGroup, uint8_t ui8Pin, uint8_t ui8DutyCicle){
   pwmGroup->ui8pDutyCicleVector[ui8Counter] = ui8DutyCicle;
 }
 
-void vPWMInterrupt(void* vpArgs){
+//! Callback: SoftPWM Interruption
+/*!
+  It's a callback function used in SoftPWM.
+  \param vpArgs is a void pointer.
+*/
+void vSoftPWMInterrupt(void* vpArgs){
   uint8_t ui8Counter = 0;
-  pwm_t* pwmGroup = (pwm_t*) vpArgs;
+  pwm_group_t* pwmGroup = (pwm_group_t*) vpArgs;
   pwmGroup->ui8TickCounter++;
   for(ui8Counter = 0 ; pwmGroup->ui8pActivedPinsVector[ui8Counter] != 255 ; ui8Counter++){
     if (pwmGroup->ui8pDutyCicleVector[ui8Counter] == pwmGroup->ui8TickCounter){

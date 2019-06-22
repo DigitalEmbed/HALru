@@ -170,7 +170,7 @@ void vSetTIMERPeriodMS(volatile uint8_t* ui8pGroup, uint16_t ui16PeriodMS){
 /*!
   Set TIMER period (in us).
   \param ui8pGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
-  \param ui32PeriodUS is a 16-bit integer. It's the period value, in microseconds.
+  \param ui32PeriodUS is a 32-bit integer. It's the period value, in microseconds.
 */
 void vSetTIMERPeriodUS(volatile uint8_t* ui8pGroup, uint32_t ui32PeriodUS){
   uint8_t ui8PrescalerCounter = 0;

@@ -3,7 +3,7 @@
   This code file was written by Jorge Henrique Moreira Santana and is under
   the GNU GPLv3 license. All legal rights are reserved.
 
-  Permissions of this copy left license are conditioned on making available
+  Permissions of this copyleft license are conditioned on making available
   complete source code of licensed works and modifications under the same
   license or the GNU GPLv3. Copyright and license notices must be preserved.
   Contributors provide an express grant of patent rights. However, a larger
@@ -12,29 +12,29 @@
   the larger work.
 
   * Permissions:
-    -" Commercial use;
-    -" Modification;
-    -" Distribution;
-    -" Patent Use;
-    -" Private Use;
+    -> Commercial use;
+    -> Modification;
+    -> Distribuition;
+    -> Patent Use;
+    -> Private Use;
 
   * Limitations:
-    -" Liability;
-    -" Warranty;
+    -> Liability;
+    -> Warranty;
 
   * Conditions:
-    -" License and copyright notice;
-    -" Disclose source;
-    -" State changes;
-    -" Same license (library);
+    -> License and copyright notice;
+    -> Disclose source;
+    -> State changes;
+    -> Same license (library);
 
   For more informations, check the LICENSE document. If you want to use a
   commercial product without having to provide the source code, send an email
   to jorge_henrique_123@hotmail.com to talk.
 */
 
-#ifndef Print_H
-#define Print_H
+#ifndef Atomic_H
+#define Atomic_H
 
 #ifdef __cplusplus
   extern "C" {
@@ -42,14 +42,12 @@
 
 #include "HALru.h"
 
-//! Type Definition: print_t
+//! Macro: Atomic Macros
 /*!
-  This typedef exist for organization purpose.
+  This macros are for facilitate the use of this library.
 */
-typedef void (*print_t)(volatile uint8_t*, uint8_t);
-
-void vAttachPrintOutput(volatile uint8_t* ui8pOutput, print_t vSendByteFunction);     /*!< Void type function. */
-void vDettachPrintOutput(void);                                                       /*!< Void type function. */
+#define   Atomic          vDisableAllInterrupts();
+#define   EndAtomic       vEnableAllInterrupts();
 
 #ifdef __cplusplus
   }

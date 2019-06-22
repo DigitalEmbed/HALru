@@ -45,11 +45,12 @@
 */
 #include <stdio.h>
 #include "EmbeddedTools.h"
+#include "Atomic.h"
 #include "Print.h"
 #include "GPIO.h"
 #include "USART.h"
 #include "TIMER.h"
-#include "PWM.h"
+#include "SoftPWM.h"
 
 //! Configuration: Micro controler configurations
 /*!
