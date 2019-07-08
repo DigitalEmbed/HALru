@@ -85,9 +85,16 @@
                                                               (tmrGroup == TIMER_2) ? &TIMSK2 :\
                                                               (tmrGroup == TIMER_3) ? &TIMSK3 :\
                                                               (tmrGroup == TIMER_4) ? &TIMSK4 : &TIMSK5
+  #define     regTIFR(tmrGroup)                               (tmrGroup == TIMER_0) ? &TIFR0 :\
+                                                              (tmrGroup == TIMER_1) ? &TIFR1 :\
+                                                              (tmrGroup == TIMER_2) ? &TIFR2 :\
+                                                              (tmrGroup == TIMER_3) ? &TIFR3 :\
+                                                              (tmrGroup == TIMER_4) ? &TIFR4 : &TIFR5
 #else
   #define     regTIMSK(tmrGroup)                              (tmrGroup == TIMER_0) ? &TIMSK0 :\
                                                               (tmrGroup == TIMER_1) ? &TIMSK1 : &TIMSK2
+  #define     regTIFR(tmrGroup)                               (tmrGroup == TIMER_0) ? &TIFR0 :\
+                                                              (tmrGroup == TIMER_1) ? &TIFR1 : &TIFR2
 #endif
 
 #define     COMnA1                                            7
@@ -139,6 +146,14 @@
 #define     SUBTIMER_B                                        2
 #define     SUBTIMER_C                                        3
 
+//! Function: TIMER Interrupt Rester
+/*!
+  Reset a TIMER counter.
+  \param ui8pGroup is a is an undefined parameter. It's the TIMER group (TIMER_X).
+*/
+#define   vResetTIMERCounter(tmrGroup)                        *(regTCNTL(tmrGroup)) = 0;\
+                                                              *(regTCNTH(tmrGroup)) = 0
+
 //! Type Definition: isr_timer_t and args_timer_t
 /*!
   This typedef exist for organization purpose.
@@ -153,6 +168,8 @@ void vSetTIMERPrescaler(volatile uint8_t* ui8pGroup, uint8_t ui8TIMERPrescaler);
 void vSetTIMERCounterLimit(volatile uint8_t* ui8pGroup, uint16_t ui16TIMERLimit);                                                     /*!< Void type function. */
 void vSetTIMERPeriodMS(volatile uint8_t* ui8pGroup, uint16_t ui16PeriodMS);                                                           /*!< Void type function. */
 void vSetTIMERPeriodUS(volatile uint8_t* ui8pGroup, uint32_t ui32PeriodUS);                                                           /*!< Void type function. */
+void vIgnoreTIMERRequest(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer);                                                           /*!< Void type function. */
+void vForceTIMERInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer);                                                          /*!< Void type function. */
 void vAttachTIMERInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer, isr_timer_t vInterruptFunction, void* vpArgument);       /*!< Void type function. */
 void vDettachTIMERInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer);                                                        /*!< Void type function. */
 
