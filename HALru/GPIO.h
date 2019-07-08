@@ -86,6 +86,14 @@
                                                           vEraseBit(*regDDR(ioGroup), ui8Pin);\
                                                         }
 
+//! Macro: Enable GPIO PullUp Resistor
+/*!
+  Enable PullUp resistor on a GPIO Pin.
+  \param ioGroup is an undefined parameter. It's the GPIO group pin (IO_GROUP_X).
+  \param ui8Pin is an undefined parameter. It's the pin number of a GPIO group (0 to 7).
+*/
+#define   vEnablePullUp(ioGroup, ui8Pin)                vSetBit(*regPORT(ioGroup), ui8Pin)
+    
 //! Macro: Set GPIO Pin
 /*!
   Write high logic-level on a GPIO Pin.
