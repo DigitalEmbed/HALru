@@ -189,7 +189,7 @@ void vSetTIMERPeriodUS(volatile uint8_t* ui8pGroup, uint32_t ui32PeriodUS){
 //! Function: TIMER Interrupt Attacher
 /*!
   Attach a TIMER interruption function.
-  \param ui8pGroup is a volatile 8-bit pointer integer. It's the TIEMR group (TIMER_X).
+  \param ui8pGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
   \param ui8SubTimer is a 8-bit integer. It's the prescaler timer.
   \param vInterruptFunction is a function pointer. It's the callback interruption.
   \param vpArgument is a void pointer. It's the callback argument.
@@ -234,7 +234,7 @@ void vAttachTIMERInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer, isr
 //! Function: TIMER Interrupt Dettacher
 /*!
   Dettach a TIMER interruption function.
-  \param ui8pGroup is a volatile 8-bit pointer integer. It's the TIEMR group (TIMER_X).
+  \param ui8pGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
   \param ui8SubTimer is a 8-bit integer. It's the prescaler timer.
 */
 void vDettachTIMERInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer){
@@ -271,6 +271,96 @@ void vDettachTIMERInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer){
       }
     #endif
 
+  }
+}
+
+//! Function: TIMER Interrupt Ignorer
+/*!
+  Ignore a TIMER interruption flag.
+  \param ui8pGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
+  \param ui8SubTimer is a 8-bit integer. It's the prescaler timer.
+*/
+void vIgnoreTIMERRequest(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer){
+  if (ui8pGroup == TIMER_0 || ui8pGroup == TIMER_2){
+    if (ui8SubTimer == MASTER_TIMER){
+      vSetBit(*(regTIFR(ui8pGroup)), OCFnA);
+    }
+    else{
+      vSetBit(*(regTIFR(ui8pGroup)), OCFnB);
+    }
+  }
+  else{
+    switch (ui8SubTimer) {
+      case MASTER_TIMER:
+      {
+        vSetBit(*(regTIFR(ui8pGroup)), ICFn);
+      }
+      break;
+
+      case SUBTIMER_A:
+      {
+        vSetBit(*(regTIFR(ui8pGroup)), OCFnA);
+      }
+      break;
+
+      case SUBTIMER_B:
+      {
+        vSetBit(*(regTIFR(ui8pGroup)), OCFnB);
+      }
+      break;
+
+      case SUBTIMER_C:
+      {
+        vSetBit(*(regTIFR(ui8pGroup)), OCFnC);
+      }
+      break;
+
+    }
+  }
+}
+
+//! Function: TIMER Interrupt Forcer
+/*!
+  Force a TIMER interruption.
+  \param ui8pGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
+  \param ui8SubTimer is a 8-bit integer. It's the prescaler timer.
+*/
+void vForceTIMERInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer){
+  if (ui8pGroup == TIMER_0 || ui8pGroup == TIMER_2){
+    if (ui8SubTimer == MASTER_TIMER){
+      vEraseBit(*(regTIFR(ui8pGroup)), OCFnA);
+    }
+    else{
+      vEraseBit(*(regTIFR(ui8pGroup)), OCFnB);
+    }
+  }
+  else{
+    switch (ui8SubTimer) {
+      case MASTER_TIMER:
+      {
+        vEraseBit(*(regTIFR(ui8pGroup)), ICFn);
+      }
+      break;
+
+      case SUBTIMER_A:
+      {
+        vEraseBit(*(regTIFR(ui8pGroup)), OCFnA);
+      }
+      break;
+
+      case SUBTIMER_B:
+      {
+        vEraseBit(*(regTIFR(ui8pGroup)), OCFnB);
+      }
+      break;
+
+      case SUBTIMER_C:
+      {
+        vEraseBit(*(regTIFR(ui8pGroup)), OCFnC);
+      }
+      break;
+
+    }
   }
 }
 
