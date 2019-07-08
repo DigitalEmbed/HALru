@@ -51,6 +51,7 @@
 #include "USART.h"
 #include "TIMER.h"
 #include "SoftPWM.h"
+#include "EXTINT.h"
 
 //! Configuration: Micro controler configurations
 /*!
