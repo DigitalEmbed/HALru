@@ -44,8 +44,8 @@ void vToggleLEDInterrupt(void* vpArgs){
   vDisableEXTINT(EXTINT_4);                                                     //Disabling external interruption on PINE4.
   vToggleGPIOPin(IO_GROUP_B, 7);                                                //Toggling LED.
   vResetTIMERCounter(TIMER_1);                                                  //Reseting TIMER_1 counter.
-  vIgnoreTIMERRequest(TIMER_1, MASTER_TIMER_1);                                 //Ignoring all TIMER_1 interruptions.
-  vEnableTIMER(TIMER_1, MASTER_TIMER_1);                                        //Enabling TIMER_1 interrupt.
+  vIgnoreTIMERRequest(TIMER_1, MASTER_TIMER);                                   //Ignoring all TIMER_1 interruptions.
+  vEnableTIMER(TIMER_1, MASTER_TIMER);                                          //Enabling TIMER_1 interrupt.
 }
 
 /*!
@@ -54,7 +54,7 @@ void vToggleLEDInterrupt(void* vpArgs){
 void vDebouncingButton(void* vpArgs){
   vIgnoreEXTINTRequest(EXTINT_4);                                               //Ignoring all external interrutions on PINE4 while EXTINT_4 is disabled.
   vEnableEXTINT(EXTINT_4);                                                      //Enabling external interruption on PINE4.
-  vDisableTIMER(TIMER_1, MASTER_TIMER_1);                                       //Disabling TIMER_1 interrupt.
+  vDisableTIMER(TIMER_1, MASTER_TIMER);                                         //Disabling TIMER_1 interrupt.
 }
 
 /*!
@@ -80,8 +80,8 @@ int main(void){
   */
   vTIMERInit(TIMER_1);                                                          //Initializing TIMER_1.
   vSetTIMERPeriodMS(TIMER_1, 500);                                              //Setting TIMER_1 period.
-  vAttachTIMERInterrupt(TIMER_1, MASTER_TIMER_1, &vDebouncingButton, NULL);     //Attaching TIMER_1 interruption function.
-  vDisableTIMER(TIMER_1, MASTER_TIMER_1);                                       //Disabling TIMER_1.
+  vAttachTIMERInterrupt(TIMER_1, MASTER_TIMER, &vDebouncingButton, NULL);       //Attaching TIMER_1 interruption function.
+  vDisableTIMER(TIMER_1, MASTER_TIMER);                                         //Disabling TIMER_1.
 
   /*!
     Enabling all interruptions.
