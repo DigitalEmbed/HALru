@@ -61,10 +61,10 @@ uint16_t ui16Counter = 0;                                                       
 void vSwitchInterrupt(void* vpArgs){
   configs_t* cPIN = (configs_t*) vpArgs;                                                                      //Getting pin configurations.
   vDisableEXTINT(cPIN->ui8EXTINT);                                                                            //Disabling external interruption on PINX.
-  if (cPIN->ui8EXTINT == EXTINT_4 && ui16BlinkTime < (BLINK_LED_MAX_TIME_MS/BLINK_LED_BASE_TIME_MS)){         //If the ui16BlinkTime is between BLINK_LED_MAX_TIME_MS and BLINK_LED_MIN_TIME_MS
+  if (cPIN->ui8EXTINT == EXTINT_0 && ui16BlinkTime < (BLINK_LED_MAX_TIME_MS/BLINK_LED_BASE_TIME_MS)){         //If the ui16BlinkTime is between BLINK_LED_MAX_TIME_MS and BLINK_LED_MIN_TIME_MS
     ui16BlinkTime++;
   }
-  else if (cPIN->ui8EXTINT == EXTINT_5 && ui16BlinkTime > (BLINK_LED_MIN_TIME_MS/BLINK_LED_BASE_TIME_MS)){    //If the ui16BlinkTime is between BLINK_LED_MAX_TIME_MS and BLINK_LED_MIN_TIME_MS
+  else if (cPIN->ui8EXTINT == EXTINT_1 && ui16BlinkTime > (BLINK_LED_MIN_TIME_MS/BLINK_LED_BASE_TIME_MS)){    //If the ui16BlinkTime is between BLINK_LED_MAX_TIME_MS and BLINK_LED_MIN_TIME_MS
     ui16BlinkTime--;
   }
   ui16Counter = 0;                                                                                            //Reseting Blink time counter.
@@ -105,8 +105,8 @@ int main(void){
   /*!
     Storing configurations of buttons.
   */
-  configs_t cPINE4 = {EXTINT_4, TIMER_0, 0};
-  configs_t cPINE5 = {EXTINT_5, TIMER_2, 0};
+  configs_t cPINE4 = {EXTINT_0, TIMER_0, 0};
+  configs_t cPINE5 = {EXTINT_1, TIMER_2, 0};
 
   /*!
     Setting TIMER_1 for PINB7 blinking.
@@ -126,9 +126,9 @@ int main(void){
   */
   vSetGPIOPinMode(IO_GROUP_E, 4, INPUT_MODE);                                                                 //Setting PINE4 to input mode (Button).
   vEnablePullUp(IO_GROUP_E, 4);                                                                               //Enabling pullup resistor on PINE4.
-  vDefineEXTINTActivationMode(EXTINT_4, RISING_BOARD_INTERRUPT);                                              //Setting interrupt activation mode on EXTINT_4 (PINE4... View on Pinout map of your ATMega).
-  vAttachEXTINTInterrupt(EXTINT_4, &vSwitchInterrupt, &cPINE4);                                               //Attaching external interruption function.
-  vEnableEXTINT(EXTINT_4);                                                                                    //Enabling external interruption.
+  vDefineEXTINTActivationMode(EXTINT_0, RISING_BOARD_INTERRUPT);                                              //Setting interrupt activation mode on EXTINT_0 (PINE4... View on Pinout map of your ATMega).
+  vAttachEXTINTInterrupt(EXTINT_0, &vSwitchInterrupt, &cPINE4);                                               //Attaching external interruption function.
+  vEnableEXTINT(EXTINT_0);                                                                                    //Enabling external interruption.
 
   /*!
     Setting TIMER_0 for PINE4 debouncing.
@@ -143,9 +143,9 @@ int main(void){
   */
   vSetGPIOPinMode(IO_GROUP_E, 5, INPUT_MODE);                                                                 //Setting PINE5 to input mode (Button).
   vEnablePullUp(IO_GROUP_E, 5);                                                                               //Enabling pullup resistor on PINE5.
-  vDefineEXTINTActivationMode(EXTINT_5, RISING_BOARD_INTERRUPT);                                              //Setting interrupt activation mode on EXTINT_5 (PINE5... View on Pinout map of your ATMega).
-  vAttachEXTINTInterrupt(EXTINT_5, &vSwitchInterrupt, &cPINE5);                                               //Attaching external interruption function.
-  vEnableEXTINT(EXTINT_5);                                                                                    //Enabling external interruption.
+  vDefineEXTINTActivationMode(EXTINT_1, RISING_BOARD_INTERRUPT);                                              //Setting interrupt activation mode on EXTINT_1 (PINE5... View on Pinout map of your ATMega).
+  vAttachEXTINTInterrupt(EXTINT_1, &vSwitchInterrupt, &cPINE5);                                               //Attaching external interruption function.
+  vEnableEXTINT(EXTINT_1);                                                                                    //Enabling external interruption.
 
   /*!
     Setting TIMER_2 for PINE5 debouncing.
