@@ -59,8 +59,10 @@ typedef struct{
 
 void vInitSoftPWM(pwm_group_t* pwmGroup, volatile uint8_t* ioGroup, volatile uint8_t* tmrGroup);      /*!< Void type function. */
 void vDisableSoftPWM(pwm_group_t* pwmGroup);                                                          /*!< Void type function. */
+void vEnableSoftPWM(pwm_group_t* pwmGroup);                                                           /*!< Void type function. */
 void vSetSoftPWMPeriodUS(pwm_group_t* pwmGroup, uint32_t ui32PeriodUS);                               /*!< Void type function. */
 void vSetSoftPWMFrequencyHZ(pwm_group_t* pwmGroup, uint16_t ui16FrequencyHZ);                         /*!< Void type function. */
+void vUnsetSoftPWMPin(pwm_group_t* pwmGroup, uint8_t ui8Pin);                                         /*!< Void type function. */
 void vSetSoftPWMPin(pwm_group_t* pwmGroup, uint8_t ui8Pin, uint8_t ui8DutyCicle);                     /*!< Void type function. */
 
 #ifdef __cplusplus

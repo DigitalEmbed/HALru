@@ -28,6 +28,15 @@ void vDisableSoftPWM(pwm_group_t* pwmGroup){
   *regPORT(pwmGroup->ioGroup) = 0;
 }
 
+//! Function: SoftPWM Enabler
+/*!
+  Enable a SoftPWM group.
+  \param pwmGroup is a pwm_group_t pointer. It's the pwm group configurations.
+*/
+void vEnableSoftPWM(pwm_group_t* pwmGroup){
+  vEnableTIMER(pwmGroup->tmrGroup, MASTER_TIMER);
+}
+
 //! Function: SoftPWM Period (us) Seter
 /*!
   Set SoftPWM period (in us).
@@ -37,7 +46,6 @@ void vDisableSoftPWM(pwm_group_t* pwmGroup){
 void vSetSoftPWMPeriodUS(pwm_group_t* pwmGroup, uint32_t ui32PeriodUS){
   vSetTIMERPeriodUS(pwmGroup->tmrGroup, (ui32PeriodUS >> 8));
   vAttachTIMERInterrupt(pwmGroup->tmrGroup, MASTER_TIMER, &vSoftPWMInterrupt, pwmGroup);
-  vEnableTIMER(pwmGroup->tmrGroup, MASTER_TIMER);
 }
 
 //! Function: SoftPWM Period (us) Seter
@@ -73,6 +81,39 @@ void vSetSoftPWMPin(pwm_group_t* pwmGroup, uint8_t ui8Pin, uint8_t ui8DutyCicle)
     pwmGroup->ui8pActivedPinsVector[ui8Counter] = ui8Pin;
   }
   pwmGroup->ui8pDutyCicleVector[ui8Counter] = ui8DutyCicle;
+  vIgnoreTIMERRequest(pwmGroup->tmrGroup, MASTER_TIMER);
+  vResetTIMERCounter(pwmGroup->tmrGroup);
+  vEnableTIMER(pwmGroup->tmrGroup, MASTER_TIMER);
+}
+
+//! Function: SoftPWM Pin Unsetter
+/*!
+  Unset a SoftPWM pin.
+  \param pwmGroup is a pwm_group_t pointer. It's the pwm group configurations.
+  \param ui8Pin is a 8-bit integer. It's the pin number of a GPIO group (0 to 7).
+*/
+void vUnsetSoftPWMPin(pwm_group_t* pwmGroup, uint8_t ui8Pin){
+  uint8_t ui8Counter = 0;
+  if (ui8Pin > 7){
+    return;
+  }
+  for (ui8Counter = 0 ; pwmGroup->ui8pActivedPinsVector[ui8Counter] != ui8Pin && ui8Counter < 8 ; ui8Counter++);
+  if (ui8Counter == 8){
+    return;
+  }
+  vDisableTIMER(pwmGroup->tmrGroup, MASTER_TIMER);
+  *regPORT(pwmGroup->ioGroup) = 0;
+  for (ui8Counter = ui8Counter ; ui8Counter != 7 && pwmGroup->ui8pActivedPinsVector[ui8Counter + 1] != 255 ; ui8Counter++){
+    pwmGroup->ui8pActivedPinsVector[ui8Counter] = pwmGroup->ui8pActivedPinsVector[ui8Counter + 1];
+    pwmGroup->ui8pDutyCicleVector[ui8Counter] = pwmGroup->ui8pDutyCicleVector[ui8Counter + 1];
+  }
+  pwmGroup->ui8pActivedPinsVector[ui8Counter] = 255;
+  pwmGroup->ui8pDutyCicleVector[ui8Counter] = 0;
+  vIgnoreTIMERRequest(pwmGroup->tmrGroup, MASTER_TIMER);
+  vResetTIMERCounter(pwmGroup->tmrGroup);
+  if (ui8Counter > 0){
+    vEnableTIMER(pwmGroup->tmrGroup, MASTER_TIMER);
+  }
 }
 
 //! Callback: SoftPWM Interruption
