@@ -42,6 +42,13 @@
 
 #include "HALru.h"
 
+//! Macro: Float Numbers
+/*!
+  This macro is to use float types in print functions on AVR microcontrolers.
+*/
+#define ftoa(fNumber)   (uint16_t)(fNumber), (uint16_t)(100*(fNumber))%100
+#define dtoa(fNumber)   (uint16_t)(fNumber), (uint16_t)(10000*(fNumber))%10000    
+
 //! Type Definition: print_t
 /*!
   This typedef exist for organization purpose.
