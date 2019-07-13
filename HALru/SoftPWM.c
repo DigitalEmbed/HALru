@@ -71,6 +71,15 @@ void vSetSoftPWMPin(pwm_group_t* pwmGroup, uint8_t ui8Pin, uint8_t ui8DutyCicle)
   if (ui8Pin > 7){
     return;
   }
+  if (ui8DutyCicle == 0){
+    vUnsetSoftPWMPin(pwmGroup, ui8Pin);
+    return;
+  }
+  if (ui8DutyCicle == 255){
+    vUnsetSoftPWMPin(pwmGroup, ui8Pin);
+    vSetGPIOPin(pwmGroup->ioGroup, ui8Pin);
+    return;
+  }
   for (ui8Counter = 0 ; pwmGroup->ui8pActivedPinsVector[ui8Counter] != 255 ; ui8Counter++){
     if (pwmGroup->ui8pActivedPinsVector[ui8Counter] == ui8Pin){
       break;
