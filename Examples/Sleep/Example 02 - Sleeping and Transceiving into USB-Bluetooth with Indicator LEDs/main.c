@@ -1,4 +1,4 @@
-//! Example 02 - Sleeping and Transceiving into USB-Bluetooth With Indicator LEDs
+//! Example 02 - Sleeping and Transceiving into USB-Bluetooth with Indicator LEDs
 /*!
   This simply example demonstrates the use of HALru.
 
