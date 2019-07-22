@@ -47,6 +47,7 @@
 #include "EmbeddedTools.h"
 #include "Atomic.h"
 #include "Print.h"
+#include "Sleep.h"
 #include "GPIO.h"
 #include "USART.h"
 #include "TIMER.h"
