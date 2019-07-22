@@ -56,7 +56,7 @@ int main(void){
   vTurnOffAllPeripherals();                                             //Turning off all peripherals
   vTurnOnPeripheral(PERIPHERAL_TIMER_2);                                //Timer 2 turning on
   vSetGPIOPinMode(IO_GROUP_B, 7, OUTPUT_MODE);
-  vSetSleepMode(SLEEP_POWER_SAVE_MODE);                                 //Seting sleep mode
+  vSetSleepMode(SLEEP_POWER_SAVE_MODE);                                 //Setting sleep mode
   vTIMERInit(TIMER_2);
   vSetTIMERPeriodMS(TIMER_2, 10);
   vAttachTIMERInterrupt(TIMER_2, MASTER_TIMER, &vBlink, NULL);
