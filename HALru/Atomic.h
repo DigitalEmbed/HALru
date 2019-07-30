@@ -46,8 +46,11 @@
 /*!
   This macros are for facilitate the use of this library.
 */
-#define   Atomic          vDisableAllInterrupts();
-#define   EndAtomic       vEnableAllInterrupts();
+#define   Atomic              vDisableAllInterrupts();
+#define   EndAtomic           vEnableAllInterrupts();
+
+#define   FrontBurnerMode     {vEnableAllInterrupts();
+#define   EndFrontBurner      }
 
 #ifdef __cplusplus
   }
