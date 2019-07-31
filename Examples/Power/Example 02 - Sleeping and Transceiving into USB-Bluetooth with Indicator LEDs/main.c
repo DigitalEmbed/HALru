@@ -138,10 +138,7 @@ int main(void){
   vAttachUSARTInterrupt(USART_1, RX_COMPLETE, vBluetooth, NULL);
 
   /*!
-    Enabling all interruptions.
+    Sleeping and waiting for interruptions...
   */
-  vEnableAllInterrupts();
-  while(1){
-    vSleepEnable();                                                             //Sleeping and waiting for interruptions...
-  }
+  vWaitingForInterrupts();
 }
