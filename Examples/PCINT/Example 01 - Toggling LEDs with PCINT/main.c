@@ -71,7 +71,7 @@ int main(void){
   vEnablePCINTPin(PCINT_4);
 
   /*!
-    Enabling goup B GPIOs PCINT interruptions.
+    Enabling group B GPIOs PCINT interruptions.
   */
   vEnablePCINTGroup(IO_GROUP_B);
 
