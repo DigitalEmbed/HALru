@@ -66,6 +66,7 @@
   #define   IO_GROUP_H                                  &PINH
   #define   IO_GROUP_K                                  &PINK
   #define   IO_GROUP_L                                  &PINL
+  #define   IO_GROUP_J                                  &PINJ
 #endif
 
 #define   regPIN(ioGroup)                               (ioGroup)
@@ -93,7 +94,7 @@
   \param ui8Pin is an undefined parameter. It's the pin number of a GPIO group (0 to 7).
 */
 #define   vEnablePullUp(ioGroup, ui8Pin)                vSetBit(*regPORT(ioGroup), ui8Pin)
-    
+
 //! Macro: Set GPIO Pin
 /*!
   Write high logic-level on a GPIO Pin.

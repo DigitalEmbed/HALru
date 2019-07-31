@@ -49,8 +49,8 @@
 #define   Atomic              vDisableAllInterrupts();
 #define   EndAtomic           vEnableAllInterrupts();
 
-#define   FrontBurnerMode     {vEnableAllInterrupts();
-#define   EndFrontBurner      }
+#define   FrontBurnerMode     {vEnableAllInterrupts(); static uint8_t ui8FlagFrontBurnerActived = 0;
+#define   EndFrontBurner      ui8FlagFrontBurnerActived++;}
 
 #ifdef __cplusplus
   }

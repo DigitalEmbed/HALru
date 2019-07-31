@@ -40,19 +40,29 @@
   extern "C" {
 #endif
 
+typedef void (*pfunc_t)(void*);
+typedef struct {
+  pfunc_t vInterruptFunction;
+  void* vpArgument;
+} isr_t;
+
 /*!
   MemoryManager system libraries.
 */
 #include <stdio.h>
+#include <avr/io.h>
+#include <avr/interrupt.h>
 #include "EmbeddedTools.h"
 #include "Atomic.h"
 #include "Print.h"
-#include "Sleep.h"
+#include "Power.h"
 #include "GPIO.h"
 #include "USART.h"
 #include "TIMER.h"
 #include "SoftPWM.h"
 #include "EXTINT.h"
+#include "PCINT.h"
+#include "ADC.h"
 
 //! Configuration: Micro controler configurations
 /*!

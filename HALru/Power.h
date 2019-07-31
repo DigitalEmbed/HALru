@@ -33,8 +33,8 @@
   to jorge_henrique_123@hotmail.com to talk.
 */
 
-#ifndef Sleep_H
-#define Sleep_H
+#ifndef Power_H
+#define Power_H
 
 #ifdef __cplusplus
   extern "C" {
@@ -97,6 +97,8 @@
   #define   vTurnOnPeripheral(ui8Peripheral)      vEraseBit(PRR0, ui8Peripheral)
   #define   vTurnOnAllPeripherals()               PRR0 &= 192
 #endif
+
+#define   vWaitingForInterrupts()                 vEnableAllInterrupts(); while(1) { vSleepEnable(); }
 
 #ifdef __cplusplus
   }
