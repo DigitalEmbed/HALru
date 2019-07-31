@@ -73,7 +73,7 @@
                                                                                   vCopyBits(EICRA, (uiDouble(ui8InterruptPin)), ui8ActivationMode, 0, 2);\
                                                                                 }\
                                                                                 else{\
-                                                                                  vCopyBits(EICRB, (uiDouble(ui8InterruptPin - 4)), ui8ActivationMode, 0, 2);\
+                                                                                  vCopyBits(EICRB, (uiDouble(uiModule(ui8InterruptPin - 4))), ui8ActivationMode, 0, 2);\
                                                                                 }
 #else
   #define   vDefineEXTINTActivationMode(ui8InterruptPin, ui8ActivationMode)     vCopyBits(EICRA, (uiDouble(ui8InterruptPin)), ui8ActivationMode, 0, 2)
