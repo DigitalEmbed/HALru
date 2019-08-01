@@ -88,6 +88,9 @@ void vCheckMessage(void* vpArgs){
   }
 }
 
+/*!
+  Main function.
+*/
 int main(void){
   /*!
     Configuring GPIO B7.
