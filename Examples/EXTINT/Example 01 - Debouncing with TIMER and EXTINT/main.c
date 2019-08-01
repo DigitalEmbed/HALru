@@ -69,8 +69,8 @@ int main(void){
   /*!
     Setting external interrupt mode.
   */
-  vSetGPIOPinMode(IO_GROUP_E, 4, INPUT_MODE);                                   //Setting PINE4 to input mode (Button).
-  vEnablePullUp(IO_GROUP_E, 4);                                                 //Enabling pullup resistor on PINE4.
+  vSetGPIOPinMode(IO_GROUP_D, 0, INPUT_MODE);                                   //Setting PINE4 to input mode (Button).
+  vEnablePullUp(IO_GROUP_D, 0);                                                 //Enabling pullup resistor on PINE4.
   vDefineEXTINTActivationMode(EXTINT_0, FALLING_BOARD_INTERRUPT);               //Setting interrupt activation mode on EXTINT_4 (PINE4... View on Pinout map of your ATMega).
   vAttachEXTINTInterrupt(EXTINT_0, &vToggleLEDInterrupt, NULL);                 //Attaching external interruption function.
   vEnableEXTINT(EXTINT_0);                                                      //Enabling external interruption.
