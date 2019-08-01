@@ -60,8 +60,13 @@ void vEcho(void* vpArgs) FrontBurnerMode{
   vUSARTSendByte(USART_0, cReceivedChar);
 } EndFrontBurner;
 
+/*!
+  Main function.
+*/
 int main(void){
-
+  /*!
+    Configuring GPIO B7.
+  */
   vSetGPIOPinMode(IO_GROUP_B, 7, OUTPUT_MODE);
 
   /*!
