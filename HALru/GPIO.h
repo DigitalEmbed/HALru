@@ -127,8 +127,13 @@
   \param ui8Pin is an undefined parameter. It's the pin number of a GPIO group (0 to 7).
   \param ui8Mode is an undefined parameter. It's HIGH_LEVEL or LOW_LEVEL.
 */
-#define   vGPIODigitalWrite(ioGroup, ui8Pin, ui8Mode)   (ui8Mode == HIGH_LEVEL) ? vSetPin(ioGroup, ui8Pin) : vUnsetPin (ioGroup, ui8Pin)
-
+#define   vGPIODigitalWrite(ioGroup, ui8Pin, ui8Mode)   if (ui8Mode == HIGH_LEVEL){\
+                                                          vSetGPIOPin(ioGroup, ui8Pin);\
+                                                        }\
+                                                        else{\
+                                                          vUnsetGPIOPin (ioGroup, ui8Pin);\
+                                                        }
+                                                        
 //! Macro: Digital Read on a GPIO Pin
 /*!
   Read a logic-level on a GPIO Pin.

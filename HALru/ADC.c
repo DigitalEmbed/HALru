@@ -32,10 +32,11 @@
                                                         }
 #else
   #define   vSetADCInput(ui8ADC)                        vCopyBits(ADMUX, MUX0, ui8ADC, 0, 4)
+  #define   vEnableGPIOPin(ui8ADCInput)                 vEraseBit(DIDR0, ui8ADCInput)
   #define   vDisableGPIOPin(ui8ADCInput)                vSetBit(DIDR0, ui8ADCInput)
 #endif
 
-volatile isr_t isrADCInterruptVector[AMOUNT_OF_ADCS] = {{NULL, NULL}};
+volatile hal_isr_t isrADCInterruptVector[AMOUNT_OF_ADCS] = {{NULL, NULL}};
 volatile uint16_t ui16ADCValuesVector[AMOUNT_OF_ADCS] = {65535};
 volatile uint8_t ui8SelectedADCInput = 255;
 volatile uint8_t ui8SafePrescaler = 0;
@@ -67,7 +68,7 @@ void vSetADCSamplingRate(uint32_t ui32SamplingRate){
   }
 }
 
-void vAttachADCInterrupt(uint8_t ui8ADCInput, pfunc_t vInterruptFunction, void* vpArgument){
+void vAttachADCInterrupt(uint8_t ui8ADCInput, isr_pfunc_t vInterruptFunction, void* vpArgument){
   if (ui8ADCInput < AMOUNT_OF_ADCS){
     isrADCInterruptVector[ui8ADCInput].vInterruptFunction = vInterruptFunction;
     isrADCInterruptVector[ui8ADCInput].vpArgument = vpArgument;

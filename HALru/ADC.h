@@ -135,7 +135,7 @@
                                                         vSetADCResolution(ADC_RESOLUTION_10BITS)
 
 void vSetADCSamplingRate(uint32_t ui32SamplingRate);
-void vAttachADCInterrupt(uint8_t ui8ADCInput, pfunc_t vInterruptFunction, void* vpArgument);
+void vAttachADCInterrupt(uint8_t ui8ADCInput, isr_pfunc_t vInterruptFunction, void* vpArgument);
 void vDettachADCInterrupt(uint8_t ui8ADCInput);
 uint16_t ui16GetADCValue(uint8_t ui8ADCInput);
 void vSelectADCInput(uint8_t ui8ADCInput);

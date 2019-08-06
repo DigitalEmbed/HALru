@@ -8,7 +8,7 @@
   volatile uint8_t ui8ActualStatePCINT[3] = {0};
 #endif
 
-isr_t isrPCINTArray[3][8] = {{{NULL, NULL}}};
+hal_isr_t isrPCINTArray[3][8] = {{{NULL, NULL}}};
 
 void vEnablePCINTPin(uint8_t ui8InterruptPin){
   if (ui8InterruptPin <= 7 && ui8ReadBit(PCMSK0, ui8InterruptPin) == 0){
@@ -34,7 +34,7 @@ void vDisablePCINTPin(uint8_t ui8InterruptPin){
   }
 }
 
-void vAttachPCINTInterrupt(uint8_t ui8InterruptPin, pfunc_t vInterruptFunction, void* vpArgument){
+void vAttachPCINTInterrupt(uint8_t ui8InterruptPin, isr_pfunc_t vInterruptFunction, void* vpArgument){
   if (ui8InterruptPin <= 7){
     isrPCINTArray[0][ui8InterruptPin].vInterruptFunction = vInterruptFunction;
     isrPCINTArray[0][ui8InterruptPin].vpArgument = vpArgument;

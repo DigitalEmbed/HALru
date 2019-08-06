@@ -40,11 +40,11 @@
   extern "C" {
 #endif
 
-typedef void (*pfunc_t)(void*);
+typedef void (*isr_pfunc_t)(void*);
 typedef struct {
-  pfunc_t vInterruptFunction;
+  isr_pfunc_t vInterruptFunction;
   void* vpArgument;
-} isr_t;
+} hal_isr_t;
 
 /*!
   MemoryManager system libraries.

@@ -119,7 +119,7 @@
 
 void vEnablePCINTPin(uint8_t ui8InterruptPin);
 void vDisablePCINTPin(uint8_t ui8InterruptPin);
-void vAttachPCINTInterrupt(uint8_t ui8InterruptPin, pfunc_t vInterruptFunction, void* vpArgument);
+void vAttachPCINTInterrupt(uint8_t ui8InterruptPin, isr_pfunc_t vInterruptFunction, void* vpArgument);
 void vDettachPCINTInterrupt(uint8_t ui8InterruptPin);
 
 #ifdef __cplusplus
