@@ -38,7 +38,6 @@ void vUSARTInit(volatile uint8_t* ui8pGroup){
   *regUCSRC(ui8pGroup) = 0;
   *regUBRRL(ui8pGroup) = 0;
   *regUBRRH(ui8pGroup) = 0;
-  *regUDR(ui8pGroup) = 0;
   vSetUSARTSync(ui8pGroup, ASYNCHRONOUS);
   vSetUSARTActivationEdge(ui8pGroup, RISING);
   vSetUSARTParity(ui8pGroup, NO_PARITY);
@@ -76,8 +75,16 @@ void vSetUSARTBaudRate(volatile uint8_t* ui8pGroup, uint32_t ui32BaudRate){
   \param ui8Data is a 8-bit integer.
 */
 void vUSARTSendByte(volatile uint8_t* ui8pGroup, uint8_t ui8Data){
-  while (!(*regUCSRA(ui8pGroup) & (1 << UDREn)));
-  *regUDR(ui8pGroup) = ui8Data;
+  if (ui8ReadBit(SREG, 7) == 1){
+    vDisableAllInterrupts();
+    while (!(*regUCSRA(ui8pGroup) & (1 << UDREn)));
+    (*regUDR(ui8pGroup)) = ui8Data;
+    vEnableAllInterrupts();
+  }
+  else{
+    while (!(*regUCSRA(ui8pGroup) & (1 << UDREn)));
+    (*regUDR(ui8pGroup)) = ui8Data;
+  }
 }
 
 //! Function: USART Interrupt Attacher

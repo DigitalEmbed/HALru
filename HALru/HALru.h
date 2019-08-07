@@ -40,18 +40,35 @@
   extern "C" {
 #endif
 
+/*!
+  Type Definition: Interruptions
+*/
 typedef void (*isr_pfunc_t)(void*);
 typedef struct {
   isr_pfunc_t vInterruptFunction;
   void* vpArgument;
 } hal_isr_t;
 
+
 /*!
-  MemoryManager system libraries.
+  Standard C Libraries
 */
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <string.h>
+
+/*!
+  Standard AVR Libraries
+*/
 #include <avr/io.h>
+#include <util/delay.h>
 #include <avr/interrupt.h>
+
+/*!
+  Interface Libraries
+*/
 #include "EmbeddedTools.h"
 #include "Atomic.h"
 #include "Print.h"
@@ -74,13 +91,13 @@ typedef struct {
 /*!
   Enable all interrupts.
 */
-#define   vEnableAllInterrupts()      sei()
+#define   vEnableAllInterrupts()      vSetBit(SREG, 7);
 
 //! Macro: Disable All Interrupts
 /*!
   Disable all interrupts.
 */
-#define   vDisableAllInterrupts()     cli()
+#define   vDisableAllInterrupts()     vEraseBit(SREG, 7);
 
 #ifdef __cplusplus
   }

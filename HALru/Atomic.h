@@ -46,11 +46,35 @@
 /*!
   This macros are for facilitate the use of this library.
 */
-#define   Atomic              vDisableAllInterrupts();
-#define   EndAtomic           vEnableAllInterrupts();
+#define   Atomic              static volatile uint8_t ui8GlobalInterrupts = 0;\
+                              static volatile uint8_t ui8FlagAtomicActived = 0;\
+                              if (ui8FlagAtomicActived != 0) {\
+                                return;\
+                              }\
+                              ui8GlobalInterrupts = ui8ReadBit(SREG, 7);\
+                              ui8FlagAtomicActived = 1;\
+                              if (ui8GlobalInterrupts == 1){\
+                                vDisableAllInterrupts();\
+                              }{
 
-#define   FrontBurnerMode     {vEnableAllInterrupts(); static uint8_t ui8FlagFrontBurnerActived = 0;
-#define   EndFrontBurner      ui8FlagFrontBurnerActived++;}
+#define   EndAtomic           }\
+                              ui8FlagAtomicActived = 0;\
+                              if (ui8GlobalInterrupts == 1){\
+                                vEnableAllInterrupts();\
+                              }
+
+#define   NestedMode          {\
+                                vEnableAllInterrupts();\
+                                static uint8_t ui8FlagFrontBurnerActived = 1;\
+                                if (ui8FlagFrontBurnerActived != 1){\
+                                  return;\
+                                }\
+                                ui8FlagFrontBurnerActived = 0;\
+                                {
+
+#define   EndNestedMode         }\
+                                ui8FlagFrontBurnerActived = 1;\
+                              }
 
 #ifdef __cplusplus
   }
