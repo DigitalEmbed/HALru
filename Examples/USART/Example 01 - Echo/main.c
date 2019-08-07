@@ -82,6 +82,8 @@ int main(void){
   vAttachUSARTInterrupt(USART_0, TX_COMPLETE, &vToggleLEDInterruption, NULL);
   vEnableTX(USART_0);
   vEnableRX(USART_0);
+  vEnableRXInterrupt(USART_0);
+  vEnableTXInterrupt(USART_0);
 
   /*!
     Enabling all interruptions.
