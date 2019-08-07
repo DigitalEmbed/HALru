@@ -120,28 +120,70 @@ typedef void* args_usart_t;
   Enable RX for a USART comunication.
   \param usrGroup is an undefined parameter. It's the gpio group pin (USART_X).
 */
-#define     vEnableRX(usrGroup)                               vSetBit(*regUCSRB(usrGroup), RXCIEn), vSetBit(*regUCSRB(usrGroup), RXENn)
+#define     vEnableRX(usrGroup)                               vSetBit(*regUCSRB(usrGroup), RXENn)
 
 //! Macro: Disable RX
 /*!
   Disable RX for a USART comunication.
   \param usrGroup is an undefined parameter. It's the gpio group pin (USART_X).
 */
-#define     vDisableRX(usrGroup)                              vEraseBit(*regUCSRB(usrGroup), RXCIEn), vEraseBit(*regUCSRB(usrGroup), RXENn)
+#define     vDisableRX(usrGroup)                              vEraseBit(*regUCSRB(usrGroup), RXENn)
 
 //! Macro: Enable TX
 /*!
   Enable TX for a USART comunication.
   \param usrGroup is an undefined parameter. It's the gpio group pin (USART_X).
 */
-#define     vEnableTX(usrGroup)                               vSetBit(*regUCSRB(usrGroup), TXCIEn), vSetBit(*regUCSRB(usrGroup), TXENn)
+#define     vEnableTX(usrGroup)                               vSetBit(*regUCSRB(usrGroup), TXENn)
 
 //! Macro: Disable TX
 /*!
   Disable TX for a USART comunication.
   \param usrGroup is an undefined parameter. It's the gpio group pin (USART_X).
 */
-#define     vDisableTX(usrGroup)                              vEraseBit(*regUCSRB(usrGroup), TXCIEn), vEraseBit(*regUCSRB(usrGroup), TXENn)
+#define     vDisableTX(usrGroup)                              vEraseBit(*regUCSRB(usrGroup), TXENn)
+
+//! Macro: Enable RX Interrupt
+/*!
+  Enable RX interrupt for a USART comunication.
+  \param usrGroup is an undefined parameter. It's the gpio group pin (USART_X).
+*/
+#define     vEnableRXInterrupt(usrGroup)                      vSetBit(*regUCSRB(usrGroup), RXCIEn)
+
+//! Macro: Disable RX Interrupt
+/*!
+  Disable RX interrupt for a USART comunication.
+  \param usrGroup is an undefined parameter. It's the gpio group pin (USART_X).
+*/
+#define     vDisableRXInterrupt(usrGroup)                     vEraseBit(*regUCSRB(usrGroup), RXCIEn)
+
+//! Macro: Enable TX Interrupt
+/*!
+  Enable TX interrupt for a USART comunication.
+  \param usrGroup is an undefined parameter. It's the gpio group pin (USART_X).
+*/
+#define     vEnableTXInterrupt(usrGroup)                      vSetBit(*regUCSRB(usrGroup), TXCIEn)
+
+//! Macro: Disable TX Interrupt
+/*!
+  Disable TX interrupt for a USART comunication.
+  \param usrGroup is an undefined parameter. It's the gpio group pin (USART_X).
+*/
+#define     vDisableTXInterrupt(usrGroup)                     vEraseBit(*regUCSRB(usrGroup), TXCIEn)
+
+//! Macro: Enable TX Interrupt
+/*!
+  Enable TX interrupt for a USART comunication.
+  \param usrGroup is an undefined parameter. It's the gpio group pin (USART_X).
+*/
+#define     vEnableDataEmptyInterrupt(usrGroup)               vSetBit(*regUCSRB(usrGroup), UDREn)
+
+//! Macro: Disable TX Interrupt
+/*!
+  Disable TX interrupt for a USART comunication.
+  \param usrGroup is an undefined parameter. It's the gpio group pin (USART_X).
+*/
+#define     vDisableDataEmptyInterrupt(usrGroup)              vEraseBit(*regUCSRB(usrGroup), UDREn)
 
 //! Macro: Set USART Data Size
 /*!
