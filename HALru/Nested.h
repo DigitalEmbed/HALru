@@ -33,8 +33,8 @@
   to jorge_henrique_123@hotmail.com to talk.
 */
 
-#ifndef Atomic_H
-#define Atomic_H
+#ifndef Nested_H
+#define Nested_H
 
 #ifdef __cplusplus
   extern "C" {
@@ -42,21 +42,24 @@
 
 #include "HALru.h"
 
-//! Macro: Atomic Macros
+//! Macro: Nested Macros
 /*!
   This macros are for facilitate the use of this library.
 */
-#define   Atomic                              static volatile uint8_t ui8GlobalInterrupts = 0;\
-                                              ui8GlobalInterrupts = ui8ReadBit(SREG, 7);\
-                                              if (ui8GlobalInterrupts == 1){\
-                                                vDisableAllInterrupts();\
-                                              }{
-
-#define   EndAtomic                           }\
-                                              if (ui8GlobalInterrupts == 1){\
+#define   NestedMode                          {\
                                                 vEnableAllInterrupts();\
+                                                static uint8_t ui8FlagFrontBurnerActived = 1;\
+                                                if (ui8FlagFrontBurnerActived != 1){\
+                                                  return;\
+                                                }\
+                                                ui8FlagFrontBurnerActived = 0;\
+                                                {
+
+#define   EndNestedMode                         }\
+                                                ui8FlagFrontBurnerActived = 1;\
+                                                vDisableAllInterrupts();\
                                               }
-                                              
+
 #ifdef __cplusplus
   }
 #endif

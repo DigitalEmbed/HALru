@@ -71,6 +71,7 @@ typedef struct {
 */
 #include "EmbeddedTools.h"
 #include "Atomic.h"
+#include "Nested.h"
 #include "Print.h"
 #include "Power.h"
 #include "GPIO.h"

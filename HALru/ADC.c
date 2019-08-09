@@ -108,7 +108,9 @@ ISR(ADC_vect){
       ui16ADCValuesVector[ui8ActualADCInput] = (ui16ADCValuesVector[ui8ActualADCInput] << 8) + ADCL;
     }
     if (isrADCInterruptVector[ui8ActualADCInput].vInterruptFunction != NULL){
+      vEraseBit(ADCSRA, ADIE);
       isrADCInterruptVector[ui8ActualADCInput].vInterruptFunction(isrADCInterruptVector[ui8ActualADCInput].vpArgument);
+      vSetBit(ADCSRA, ADIE);
     }
     if (ui8ActualADCInput != ui8SelectedADCInput){
       vStopADConvertion();

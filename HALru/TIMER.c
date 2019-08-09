@@ -238,40 +238,7 @@ void vAttachTIMERInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer, isr
   \param ui8SubTimer is a 8-bit integer. It's the prescaler timer.
 */
 void vDettachTIMERInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer){
-  uint8_t ui8TIMERNumber = usrGetTIMERNumber(ui8pGroup);
-  switch(ui8SubTimer){
-
-    case MASTER_TIMER:
-    {
-      isrMasterTimer[ui8TIMERNumber] = NULL;
-      argMasterTimer[ui8TIMERNumber] = NULL;
-      break;
-    }
-
-    case SUBTIMER_A:
-    {
-      isrSubTimerA[ui8TIMERNumber] = NULL;
-      argSubTimerA[ui8TIMERNumber] = NULL;
-      break;
-    }
-
-    case SUBTIMER_B:
-    {
-      isrSubTimerB[ui8TIMERNumber] = NULL;
-      argSubTimerB[ui8TIMERNumber] = NULL;
-      break;
-    }
-
-    #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
-      case SUBTIMER_C:
-      {
-        isrSubTimerC[ui8TIMERNumber] = NULL;
-        argSubTimerC[ui8TIMERNumber] = NULL;
-        break;
-      }
-    #endif
-
-  }
+  vAttachTIMERInterrupt(ui8pGroup, ui8SubTimer, NULL, NULL);
 }
 
 //! Function: TIMER Interrupt Ignorer
@@ -370,122 +337,162 @@ void vForceTIMERInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer){
 */
 ISR(TIMER0_COMPA_vect){
   if (isrMasterTimer[0] != NULL){
+    vDisableTIMER(TIMER_0, MASTER_TIMER);
     isrMasterTimer[0](argMasterTimer[0]);
+    vEnableTIMER(TIMER_0, MASTER_TIMER);
   }
 }
 
 ISR(TIMER0_COMPB_vect){
   if (isrSubTimerA[0] != NULL){
+    vDisableTIMER(TIMER_0, SUBTIMER_A);
     isrSubTimerA[0](argSubTimerA[0]);
+    vEnableTIMER(TIMER_0, SUBTIMER_A);
   }
 }
 
 ISR(TIMER1_CAPT_vect){
   if (isrMasterTimer[1] != NULL){
+    vDisableTIMER(TIMER_1, MASTER_TIMER);
     isrMasterTimer[1](argMasterTimer[1]);
+    vEnableTIMER(TIMER_1, MASTER_TIMER);
   }
 }
 
 ISR(TIMER1_COMPA_vect){
   if (isrSubTimerA[1] != NULL){
+    vDisableTIMER(TIMER_1, SUBTIMER_A);
     isrSubTimerA[1](argSubTimerA[1]);
+    vEnableTIMER(TIMER_1, SUBTIMER_A);
   }
 }
 
 ISR(TIMER1_COMPB_vect){
   if (isrSubTimerB[1] != NULL){
+    vDisableTIMER(TIMER_1, SUBTIMER_B);
     isrSubTimerB[1](argSubTimerB[1]);
+    vEnableTIMER(TIMER_1, SUBTIMER_B);
   }
 }
 
 ISR(TIMER2_COMPA_vect){
   if (isrMasterTimer[2] != NULL){
+    vDisableTIMER(TIMER_2, MASTER_TIMER);
     isrMasterTimer[2](argMasterTimer[2]);
+    vEnableTIMER(TIMER_2, MASTER_TIMER);
   }
 }
 
 ISR(TIMER2_COMPB_vect){
   if (isrSubTimerA[2] != NULL){
+    vDisableTIMER(TIMER_2, SUBTIMER_A);
     isrSubTimerA[2](argSubTimerA[2]);
+    vEnableTIMER(TIMER_2, SUBTIMER_A);
   }
 }
 
 #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
   ISR(TIMER1_COMPC_vect){
     if (isrSubTimerC[1] != NULL){
+      vDisableTIMER(TIMER_1, SUBTIMER_C);
       isrSubTimerC[1](argSubTimerC[1]);
+      vEnableTIMER(TIMER_1, SUBTIMER_C);
     }
   }
 
   ISR(TIMER3_CAPT_vect){
     if (isrMasterTimer[3] != NULL){
+      vDisableTIMER(TIMER_3, MASTER_TIMER);
       isrMasterTimer[3](argMasterTimer[3]);
+      vEnableTIMER(TIMER_3, MASTER_TIMER);
     }
   }
 
   ISR(TIMER3_COMPA_vect){
     if (isrSubTimerA[3] != NULL){
+      vDisableTIMER(TIMER_3, SUBTIMER_A);
       isrSubTimerA[3](argSubTimerA[3]);
+      vEnableTIMER(TIMER_3, SUBTIMER_A);
     }
   }
 
   ISR(TIMER3_COMPB_vect){
     if (isrSubTimerB[3] != NULL){
+      vDisableTIMER(TIMER_3, SUBTIMER_B);
       isrSubTimerB[3](argSubTimerB[3]);
+      vEnableTIMER(TIMER_3, SUBTIMER_B);
     }
   }
 
   ISR(TIMER3_COMPC_vect){
     if (isrSubTimerC[3] != NULL){
+      vDisableTIMER(TIMER_3, SUBTIMER_C);
       isrSubTimerC[3](argSubTimerC[3]);
+      vEnableTIMER(TIMER_3, SUBTIMER_C);
     }
   }
 
   ISR(TIMER4_CAPT_vect){
     if (isrMasterTimer[4] != NULL){
+      vDisableTIMER(TIMER_4, MASTER_TIMER);
       isrMasterTimer[4](argMasterTimer[4]);
+      vEnableTIMER(TIMER_4, MASTER_TIMER);
     }
   }
 
   ISR(TIMER4_COMPA_vect){
     if (isrSubTimerA[4] != NULL){
+      vDisableTIMER(TIMER_4, SUBTIMER_A);
       isrSubTimerA[4](argSubTimerA[4]);
+      vEnableTIMER(TIMER_4, SUBTIMER_A);
     }
   }
 
   ISR(TIMER4_COMPB_vect){
     if (isrSubTimerB[4] != NULL){
+      vDisableTIMER(TIMER_4, SUBTIMER_B);
       isrSubTimerB[4](argSubTimerB[4]);
+      vEnableTIMER(TIMER_4, SUBTIMER_B);
     }
   }
 
   ISR(TIMER4_COMPC_vect){
     if (isrSubTimerC[4] != NULL){
+      vDisableTIMER(TIMER_4, SUBTIMER_C);
       isrSubTimerC[4](argSubTimerC[4]);
+      vEnableTIMER(TIMER_4, SUBTIMER_C);
     }
   }
 
   ISR(TIMER5_CAPT_vect){
     if (isrMasterTimer[5] != NULL){
+      vDisableTIMER(TIMER_5, MASTER_TIMER);
       isrMasterTimer[5](argMasterTimer[5]);
+      vEnableTIMER(TIMER_5, MASTER_TIMER);
     }
   }
 
   ISR(TIMER5_COMPA_vect){
     if (isrSubTimerA[5] != NULL){
+      vDisableTIMER(TIMER_5, SUBTIMER_A);
       isrSubTimerA[5](argSubTimerA[5]);
+      vEnableTIMER(TIMER_5, SUBTIMER_A);
     }
   }
 
   ISR(TIMER5_COMPB_vect){
     if (isrSubTimerB[5] != NULL){
+      vDisableTIMER(TIMER_5, SUBTIMER_B);
       isrSubTimerB[5](argSubTimerB[5]);
+      vEnableTIMER(TIMER_5, SUBTIMER_B);
     }
   }
 
   ISR(TIMER5_COMPC_vect){
     if (isrSubTimerC[5] != NULL){
+      vDisableTIMER(TIMER_5, SUBTIMER_C);
       isrSubTimerC[5](argSubTimerC[5]);
+      vEnableTIMER(TIMER_5, SUBTIMER_C);
     }
   }
 #endif

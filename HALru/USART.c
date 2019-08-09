@@ -3,6 +3,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+//! Macro: USART Macros
+/*!
+  This macros are for facilitate the use of this library.
+*/
+#define     regUCSRA(usrGroup)                                (usrGroup)
+#define     regUBRRL(usrGroup)                                ((volatile uint8_t*) usrGroup + 4)
+#define     regUBRRH(usrGroup)                                ((volatile uint8_t*) usrGroup + 5)
+
 //! Declarations: Private USART Declarations
 /*!
   This macros and variables are for facilitate the use of this library.
@@ -18,12 +26,12 @@
                                                               usrGroup == USART_1 ? 1 :\
                                                               usrGroup == USART_2 ? 2 : 3
 #else
-  isr_usart_t* isrDataRegisterEmpty = NULL;
-  isr_usart_t* isrRXComplete = NULL;
-  isr_usart_t* isrTXComplete = NULL;
-  args_usart_t* argDataRegisterEmpty = NULL;
-  args_usart_t* argRXComplete = NULL;
-  args_usart_t* argTXComplete = NULL;
+  isr_usart_t isrDataRegisterEmpty = NULL;
+  isr_usart_t isrRXComplete = NULL;
+  isr_usart_t isrTXComplete = NULL;
+  args_usart_t argDataRegisterEmpty = NULL;
+  args_usart_t argRXComplete = NULL;
+  args_usart_t argTXComplete = NULL;
   #define   usrGetUSARTNumber(usrGroup)                       0
 #endif
 
@@ -75,16 +83,13 @@ void vSetUSARTBaudRate(volatile uint8_t* ui8pGroup, uint32_t ui32BaudRate){
   \param ui8Data is a 8-bit integer.
 */
 void vUSARTSendByte(volatile uint8_t* ui8pGroup, uint8_t ui8Data){
-  if (ui8ReadBit(SREG, 7) == 1){
-    vDisableAllInterrupts();
-    while (!(*regUCSRA(ui8pGroup) & (1 << UDREn)));
-    (*regUDR(ui8pGroup)) = ui8Data;
-    vEnableAllInterrupts();
-  }
-  else{
-    while (!(*regUCSRA(ui8pGroup) & (1 << UDREn)));
-    (*regUDR(ui8pGroup)) = ui8Data;
-  }
+  uint8_t ui8UCSRB = *regUCSRB(ui8pGroup);
+  while (!(*regUCSRA(ui8pGroup) & (1 << UDREn)));
+  *regUCSRB(ui8pGroup) &= 31;
+  vDisableAllInterrupts();
+  (*regUDR(ui8pGroup)) = ui8Data;
+  vEnableAllInterrupts();
+  *regUCSRB(ui8pGroup) = ui8UCSRB;
 }
 
 //! Function: USART Interrupt Attacher
@@ -96,27 +101,44 @@ void vUSARTSendByte(volatile uint8_t* ui8pGroup, uint8_t ui8Data){
   \param vpArgument is a void pointer. It's the callback argument.
 */
 void vAttachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8InterruptionType, isr_usart_t vInterruptFunction, void* vpArgument){
-  uint8_t ui8USARTNumber = usrGetUSARTNumber(ui8pGroup);
+  #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
+    uint8_t ui8USARTNumber = usrGetUSARTNumber(ui8pGroup);
+  #endif
   switch(ui8InterruptionType){
 
     case RX_COMPLETE:
     {
-      isrRXComplete[ui8USARTNumber] = vInterruptFunction;
-      argRXComplete[ui8USARTNumber] = vpArgument;
+      #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
+        isrRXComplete[ui8USARTNumber] = vInterruptFunction;
+        argRXComplete[ui8USARTNumber] = vpArgument;
+      #else
+        isrRXComplete = vInterruptFunction;
+        argRXComplete = vpArgument;
+      #endif
       break;
     }
 
     case TX_COMPLETE:
     {
-      isrTXComplete[ui8USARTNumber] = vInterruptFunction;
-      argTXComplete[ui8USARTNumber] = vpArgument;
+      #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
+        isrTXComplete[ui8USARTNumber] = vInterruptFunction;
+        argTXComplete[ui8USARTNumber] = vpArgument;
+      #else
+        isrTXComplete = vInterruptFunction;
+        argTXComplete = vpArgument;
+      #endif
       break;
     }
 
     case DATA_EMPTY:
     {
-      isrDataRegisterEmpty[ui8USARTNumber] = vInterruptFunction;
-      argDataRegisterEmpty[ui8USARTNumber] = vpArgument;
+      #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
+        isrDataRegisterEmpty[ui8USARTNumber] = vInterruptFunction;
+        argDataRegisterEmpty[ui8USARTNumber] = vpArgument;
+      #else
+        isrDataRegisterEmpty = vInterruptFunction;
+        argDataRegisterEmpty = vpArgument;
+      #endif
       break;
     }
 
@@ -130,31 +152,7 @@ void vAttachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8InterruptionT
   \param ui8InterruptionType is a 8-bit integer. It's the interruption type.
 */
 void vDettachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8InterruptionType){
-  uint8_t ui8USARTNumber = usrGetUSARTNumber(ui8pGroup);
-  switch(ui8InterruptionType){
-
-    case RX_COMPLETE:
-    {
-      isrRXComplete[ui8USARTNumber] = NULL;
-      argRXComplete[ui8USARTNumber] = NULL;
-      break;
-    }
-
-    case TX_COMPLETE:
-    {
-      isrTXComplete[ui8USARTNumber] = NULL;
-      argTXComplete[ui8USARTNumber] = NULL;
-      break;
-    }
-
-    case DATA_EMPTY:
-    {
-      isrDataRegisterEmpty[ui8USARTNumber] = NULL;
-      argDataRegisterEmpty[ui8USARTNumber] = NULL;
-      break;
-    }
-
-  }
+  vAttachUSARTInterrupt(ui8pGroup, ui8InterruptionType, NULL, NULL);
 }
 
 //! Callbacks: USART Interruptions
@@ -164,91 +162,121 @@ void vDettachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8Interruption
 #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
   ISR(USART0_RX_vect){
     if (isrRXComplete[0] != NULL){
+      vDisableRXInterrupt(USART_0);
       isrRXComplete[0](argRXComplete[0]);
+      vEnableRXInterrupt(USART_0);
     }
   }
 
   ISR(USART0_TX_vect){
     if (isrTXComplete[0] != NULL){
+      vDisableTXInterrupt(USART_0);
       isrTXComplete[0](argTXComplete[0]);
+      vEnableTXInterrupt(USART_0);
     }
   }
 
   ISR(USART0_UDRE_vect){
     if (isrDataRegisterEmpty[0] != NULL){
+      vDisableDataEmptyInterrupt(USART_0);
       isrDataRegisterEmpty[0](argDataRegisterEmpty[0]);
+      vEnableDataEmptyInterrupt(USART_0);
     }
   }
 
   ISR(USART1_RX_vect){
     if (isrRXComplete[1] != NULL){
+      vDisableRXInterrupt(USART_1);
       isrRXComplete[1](argRXComplete[1]);
+      vEnableRXInterrupt(USART_1);
     }
   }
 
   ISR(USART1_TX_vect){
     if (isrTXComplete[1] != NULL){
+      vDisableTXInterrupt(USART_1);
       isrTXComplete[1](argTXComplete[1]);
+      vEnableTXInterrupt(USART_1);
     }
   }
 
   ISR(USART1_UDRE_vect){
     if (isrDataRegisterEmpty[1] != NULL){
+      vDisableDataEmptyInterrupt(USART_1);
       isrDataRegisterEmpty[1](argDataRegisterEmpty[1]);
+      vEnableDataEmptyInterrupt(USART_1);
     }
   }
 
   ISR(USART2_RX_vect){
     if (isrRXComplete[2] != NULL){
+      vDisableRXInterrupt(USART_2);
       isrRXComplete[2](argRXComplete[2]);
+      vEnableRXInterrupt(USART_2);
     }
   }
 
   ISR(USART2_TX_vect){
     if (isrTXComplete[2] != NULL){
+      vDisableTXInterrupt(USART_2);
       isrTXComplete[2](argTXComplete[2]);
+      vEnableTXInterrupt(USART_2);
     }
   }
 
   ISR(USART2_UDRE_vect){
     if (isrDataRegisterEmpty[2] != NULL){
+      vDisableDataEmptyInterrupt(USART_2);
       isrDataRegisterEmpty[2](argDataRegisterEmpty[2]);
+      vEnableDataEmptyInterrupt(USART_2);
     }
   }
 
   ISR(USART3_RX_vect){
     if (isrRXComplete[3] != NULL){
+      vDisableRXInterrupt(USART_3);
       isrRXComplete[3](argRXComplete[3]);
+      vEnableRXInterrupt(USART_3);
     }
   }
 
   ISR(USART3_TX_vect){
     if (isrTXComplete[3] != NULL){
+      vDisableTXInterrupt(USART_3);
       isrTXComplete[3](argTXComplete[3]);
+      vEnableTXInterrupt(USART_3);
     }
   }
 
   ISR(USART3_UDRE_vect){
     if (isrDataRegisterEmpty[3] != NULL){
+      vDisableDataEmptyInterrupt(USART_3);
       isrDataRegisterEmpty[3](argDataRegisterEmpty[3]);
+      vEnableDataEmptyInterrupt(USART_3);
     }
   }
 #else
   ISR(USART_RX_vect){
-    if (isrRXComplete[0] != NULL){
-      isrRXComplete[0](argRXComplete[0]);
+    if (isrRXComplete != NULL){
+      vDisableRXInterrupt(USART_0);
+      isrRXComplete(argRXComplete);
+      vEnableRXInterrupt(USART_0);
     }
   }
 
   ISR(USART_TX_vect){
-    if (isrTXComplete[0] != NULL){
-      isrTXComplete[0](argTXComplete[0]);
+    if (isrTXComplete != NULL){
+      vDisableTXInterrupt(USART_0);
+      isrTXComplete(argTXComplete);
+      vEnableTXInterrupt(USART_0);
     }
   }
 
   ISR(USART_UDRE_vect){
-    if (isrDataRegisterEmpty[0] != NULL){
-      isrDataRegisterEmpty[0](argDataRegisterEmpty[0]);
+    if (isrDataRegisterEmpty != NULL){
+      vDisableDataEmptyInterrupt(USART_0);
+      isrDataRegisterEmpty(argDataRegisterEmpty);
+      vEnableDataEmptyInterrupt(USART_0);
     }
   }
 #endif

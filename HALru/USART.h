@@ -56,11 +56,8 @@
   #define     USART_3                                         &UCSR3A
 #endif
 
-#define     regUCSRA(usrGroup)                                (usrGroup)
 #define     regUCSRB(usrGroup)                                ((volatile uint8_t*) usrGroup + 1)
 #define     regUCSRC(usrGroup)                                ((volatile uint8_t*) usrGroup + 2)
-#define     regUBRRL(usrGroup)                                ((volatile uint8_t*) usrGroup + 4)
-#define     regUBRRH(usrGroup)                                ((volatile uint8_t*) usrGroup + 5)
 #define     regUDR(usrGroup)                                  ((volatile uint8_t*) usrGroup + 6)
 
 #define     MPCMn                                             0

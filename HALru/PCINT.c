@@ -50,18 +50,7 @@ void vAttachPCINTInterrupt(uint8_t ui8InterruptPin, isr_pfunc_t vInterruptFuncti
 }
 
 void vDettachPCINTInterrupt(uint8_t ui8InterruptPin){
-  if (ui8InterruptPin <= 7){
-    isrPCINTArray[0][ui8InterruptPin].vInterruptFunction = NULL;
-    isrPCINTArray[0][ui8InterruptPin].vpArgument = NULL;
-  }
-  else if(ui8InterruptPin > 7 && ui8InterruptPin < 16){
-    isrPCINTArray[1][ui8InterruptPin - 8].vInterruptFunction = NULL;
-    isrPCINTArray[1][ui8InterruptPin - 8].vpArgument = NULL;
-  }
-  else {
-    isrPCINTArray[2][ui8InterruptPin - 16].vInterruptFunction = NULL;
-    isrPCINTArray[2][ui8InterruptPin - 16].vpArgument = NULL;
-  }
+  vAttachPCINTInterrupt(ui8InterruptPin, NULL, NULL);
 }
 
 ISR(PCINT0_vect){
@@ -71,7 +60,9 @@ ISR(PCINT0_vect){
   volatile uint8_t ui8Counter = 0;
   for (ui8Counter = 0 ; ui8Counter <= 7 ; ui8Counter++){
     if (ui8ReadBit(ui8ActivedPins, ui8Counter) == 1 && isrPCINTArray[0][ui8Counter].vInterruptFunction != NULL){
+      vEraseBit(PCICR, 0);
       isrPCINTArray[0][ui8Counter].vInterruptFunction(isrPCINTArray[0][ui8Counter].vpArgument);
+      vSetBit(PCICR, 0);
     }
   }
 }
@@ -87,7 +78,9 @@ ISR(PCINT1_vect){
   volatile uint8_t ui8Counter = 0;
   for (ui8Counter = 0 ; ui8Counter <= 7 ; ui8Counter++){
     if (ui8ReadBit(ui8ActivedPins, ui8Counter) == 1 && isrPCINTArray[1][ui8Counter].vInterruptFunction != NULL){
+      vEraseBit(PCICR, 1);
       isrPCINTArray[1][ui8Counter].vInterruptFunction(isrPCINTArray[1][ui8Counter].vpArgument);
+      vSetBit(PCICR, 1);
     }
   }
 }
@@ -103,7 +96,9 @@ ISR(PCINT2_vect){
   volatile uint8_t ui8Counter = 0;
   for (ui8Counter = 0 ; ui8Counter <= 7 ; ui8Counter++){
     if (ui8ReadBit(ui8ActivedPins, ui8Counter) == 1 && isrPCINTArray[2][ui8Counter].vInterruptFunction != NULL){
+      vEraseBit(PCICR, 2);
       isrPCINTArray[2][ui8Counter].vInterruptFunction(isrPCINTArray[2][ui8Counter].vpArgument);
+      vSetBit(PCICR, 2);
     }
   }
 }
