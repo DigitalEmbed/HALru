@@ -53,6 +53,7 @@
   #define   EXTINT_4                                                            4
   #define   EXTINT_5                                                            5
   #define   EXTINT_6                                                            6
+  #define   EXTINT_7                                                            7
 #endif
 
 #define   LOW_LEVEL_INTERRUPT                                                   0
