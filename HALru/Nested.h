@@ -48,15 +48,15 @@
 */
 #define   NestedMode                          {\
                                                 vEnableAllInterrupts();\
-                                                static uint8_t ui8FlagFrontBurnerActived = 1;\
-                                                if (ui8FlagFrontBurnerActived != 1){\
+                                                static uint8_t ui8FlagNestedModeActived = 1;\
+                                                if (ui8FlagNestedModeActived != 1){\
                                                   return;\
                                                 }\
-                                                ui8FlagFrontBurnerActived = 0;\
+                                                ui8FlagNestedModeActived = 0;\
                                                 {
 
 #define   EndNestedMode                         }\
-                                                ui8FlagFrontBurnerActived = 1;\
+                                                ui8FlagNestedModeActived = 1;\
                                                 vDisableAllInterrupts();\
                                               }
 
