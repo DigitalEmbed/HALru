@@ -61,10 +61,6 @@
 #define   FALLING_BOARD_INTERRUPT                                               2
 #define   RISING_BOARD_INTERRUPT                                                3
 
-#define   vEnableEXTINT(extInterruptPin)                                        vSetBit(EIMSK, extInterruptPin)
-
-#define   vDisableEXTINT(extInterruptPin)                                       vEraseBit(EIMSK, extInterruptPin)
-
 #define   vIgnoreEXTINTRequest(extInterruptPin)                                 vSetBit(EIFR, extInterruptPin)
 
 #define   vForceEXTINTInterrupt(extInterruptPin)                                vEraseBit(EIFR, extInterruptPin)
@@ -87,6 +83,8 @@
 typedef void(*isr_extint_t)(void*);
 typedef void* args_extint_t;
 
+void vEnableEXTINT(uint8_t ui8InterruptPin);                                                                  /*!< Void type function. */
+void vDisableEXTINT(uint8_t ui8InterruptPin);                                                                 /*!< Void type function. */
 void vAttachEXTINTInterrupt(uint8_t ui8InterruptPin, isr_extint_t vInterruptFunction, void* vpArgument);      /*!< Void type function. */
 void vDettachEXTINTInterrupt(uint8_t ui8InterruptPin);                                                        /*!< Void type function. */
 
