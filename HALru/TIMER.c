@@ -27,11 +27,11 @@
   args_timer_t argMasterTimer[3] = {NULL};
   isr_timer_t isrSubTimerA[3] = {NULL};
   args_timer_t argSubTimerA[3] = {NULL};
-  isr_timer_t isrSubTimerB[1] = {NULL}; //vai dar pau aqui
-  args_timer_t argSubTimerB[1] = {NULL};
+  isr_timer_t isrSubTimerB = NULL;
+  args_timer_t argSubTimerB = NULL;
   volatile uint8_t ui8ActivedMasterTimer[3] = {0};
   volatile uint8_t ui8ActivedSubTimerA[3] = {0};
-  volatile uint8_t ui8ActivedSubTimerB[1] = {0};
+  volatile uint8_t ui8ActivedSubTimerB = 0;
   #define   usrGetTIMERNumber(usrGroup)                       usrGroup == TIMER_0 ? 0 :\
                                                               usrGroup == TIMER_1 ? 1 : 2
 #endif
@@ -79,7 +79,11 @@ void vEnableTIMER(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer){
       }
     }
     else if(ui8SubTimer == SUBTIMER_B && ui8pGroup != TIMER_0 && ui8pGroup != TIMER_2){
-      ui8ActivedSubTimerB[ui8TIMERNumber] = 1;
+      #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
+        ui8ActivedSubTimerB[ui8TIMERNumber] = 1;
+      #else
+        ui8ActivedSubTimerB = 1;
+      #endif
       vSetBit(*(regTIMSK(ui8pGroup)), OCIEnB);
     }
     #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
@@ -119,7 +123,11 @@ void vDisableTIMER(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer){
       }
     }
     else if(ui8SubTimer == SUBTIMER_B && ui8pGroup != TIMER_0 && ui8pGroup != TIMER_2){
-      ui8ActivedSubTimerB[ui8TIMERNumber] = 0;
+      #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
+        ui8ActivedSubTimerB[ui8TIMERNumber] = 0;
+      #else
+        ui8ActivedSubTimerB = 0;
+      #endif
       vEraseBit(*(regTIMSK(ui8pGroup)), OCIEnB);
     }
     #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
@@ -235,8 +243,13 @@ void vAttachTIMERInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer, isr
 
     case SUBTIMER_B:
     {
-      isrSubTimerB[ui8TIMERNumber] = vInterruptFunction;
-      argSubTimerB[ui8TIMERNumber] = vpArgument;
+      #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
+        isrSubTimerB[ui8TIMERNumber] = vInterruptFunction;
+        argSubTimerB[ui8TIMERNumber] = vpArgument;
+      #else
+        isrSubTimerB = vInterruptFunction;
+        argSubTimerB = vpArgument;
+      #endif
       break;
     }
 
@@ -397,13 +410,23 @@ ISR(TIMER1_COMPA_vect){
 }
 
 ISR(TIMER1_COMPB_vect){
-  if (isrSubTimerB[1] != NULL){
-    vEraseBit(*(regTIMSK(TIMER_1)), OCIEnB);
-    isrSubTimerB[1](argSubTimerB[1]);
-    if (ui8ActivedSubTimerB[1] == 1){
-      vSetBit(*(regTIMSK(TIMER_1)), OCIEnB);
+  #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
+    if (isrSubTimerB[1] != NULL){
+      vEraseBit(*(regTIMSK(TIMER_1)), OCIEnB);
+      isrSubTimerB[1](argSubTimerB[1]);
+      if (ui8ActivedSubTimerB[1] == 1){
+        vSetBit(*(regTIMSK(TIMER_1)), OCIEnB);
+      }
     }
-  }
+  #else
+    if (isrSubTimerB != NULL){
+      vEraseBit(*(regTIMSK(TIMER_1)), OCIEnB);
+      isrSubTimerB(argSubTimerB);
+      if (ui8ActivedSubTimerB == 1){
+        vSetBit(*(regTIMSK(TIMER_1)), OCIEnB);
+      }
+    }
+  #endif
 }
 
 ISR(TIMER2_COMPA_vect){
