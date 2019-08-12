@@ -27,7 +27,7 @@
   args_timer_t argMasterTimer[3] = {NULL};
   isr_timer_t isrSubTimerA[3] = {NULL};
   args_timer_t argSubTimerA[3] = {NULL};
-  isr_timer_t isrSubTimerB[1] = {NULL};
+  isr_timer_t isrSubTimerB[1] = {NULL}; //vai dar pau aqui
   args_timer_t argSubTimerB[1] = {NULL};
   volatile uint8_t ui8ActivedMasterTimer[3] = {0};
   volatile uint8_t ui8ActivedSubTimerA[3] = {0};
@@ -35,9 +35,6 @@
   #define   usrGetTIMERNumber(usrGroup)                       usrGroup == TIMER_0 ? 0 :\
                                                               usrGroup == TIMER_1 ? 1 : 2
 #endif
-
-void vPrivateEnableTIMER(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer);
-void vPrivateDisableTIMER(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer);
 
 //! Function: TIMER Initializer
 /*!
@@ -85,10 +82,12 @@ void vEnableTIMER(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer){
       ui8ActivedSubTimerB[ui8TIMERNumber] = 1;
       vSetBit(*(regTIMSK(ui8pGroup)), OCIEnB);
     }
-    else if(ui8SubTimer == SUBTIMER_C && ui8pGroup != TIMER_0 && ui8pGroup != TIMER_2){
-      ui8ActivedSubTimerC[ui8TIMERNumber] = 1;
-      vSetBit(*(regTIMSK(ui8pGroup)), OCIEnC);
-    }
+    #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
+      else if(ui8SubTimer == SUBTIMER_C && ui8pGroup != TIMER_0 && ui8pGroup != TIMER_2){
+        ui8ActivedSubTimerC[ui8TIMERNumber] = 1;
+        vSetBit(*(regTIMSK(ui8pGroup)), OCIEnC);
+      }
+    #endif
   }
 }
 
@@ -123,77 +122,12 @@ void vDisableTIMER(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer){
       ui8ActivedSubTimerB[ui8TIMERNumber] = 0;
       vEraseBit(*(regTIMSK(ui8pGroup)), OCIEnB);
     }
-    else if(ui8SubTimer == SUBTIMER_C && ui8pGroup != TIMER_0 && ui8pGroup != TIMER_2){
-      ui8ActivedSubTimerC[ui8TIMERNumber] = 0;
-      vEraseBit(*(regTIMSK(ui8pGroup)), OCIEnC);
-    }
-  }
-}
-
-//! Function: TIMER Enabler for Interrupts
-/*!
-  Enable a TIMER (Usable only on interruptions).
-  \param ui8pGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
-  \param ui8SubTimer is a 8-bit integer. It's the sub-timer.
-*/
-void vPrivateEnableTIMER(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer){
-  volatile uint8_t ui8TIMERNumber = usrGetTIMERNumber(ui8pGroup);
-  if (ui8SubTimer == MASTER_TIMER && ui8ActivedMasterTimer[ui8TIMERNumber] == 1){
-    if (ui8pGroup == TIMER_0 || ui8pGroup == TIMER_2){
-      vSetBit(*(regTIMSK(ui8pGroup)), OCIEnA);
-    }
-    else {
-      vSetBit(*(regTIMSK(ui8pGroup)), ICIEn);
-    }
-  }
-  else{
-    if(ui8SubTimer == SUBTIMER_A && ui8ActivedSubTimerA[ui8TIMERNumber] == 1){
-      if (ui8pGroup == TIMER_0 || ui8pGroup == TIMER_2){
-        vSetBit(*(regTIMSK(ui8pGroup)), OCIEnB);
+    #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
+      else if(ui8SubTimer == SUBTIMER_C && ui8pGroup != TIMER_0 && ui8pGroup != TIMER_2){
+        ui8ActivedSubTimerC[ui8TIMERNumber] = 0;
+        vEraseBit(*(regTIMSK(ui8pGroup)), OCIEnC);
       }
-      else{
-        vSetBit(*(regTIMSK(ui8pGroup)), OCIEnA);
-      }
-    }
-    else if(ui8SubTimer == SUBTIMER_B && ui8pGroup != TIMER_0 && ui8pGroup != TIMER_2 && ui8ActivedSubTimerB[ui8TIMERNumber] == 1){
-      vSetBit(*(regTIMSK(ui8pGroup)), OCIEnB);
-    }
-    else if(ui8SubTimer == SUBTIMER_C && ui8pGroup != TIMER_0 && ui8pGroup != TIMER_2 && ui8ActivedSubTimerC[ui8TIMERNumber] == 1){
-      vSetBit(*(regTIMSK(ui8pGroup)), OCIEnC);
-    }
-  }
-}
-
-//! Function: TIMER Disabler for Interrupts
-/*!
-  Disable a TIMER (Usable only on interruptions).
-  \param ui8pGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
-  \param ui8SubTimer is a 8-bit integer. It's the sub-timer.
-*/
-void vPrivateDisableTIMER(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer){
-  if (ui8SubTimer == MASTER_TIMER){
-    if (ui8pGroup == TIMER_0 || ui8pGroup == TIMER_2){
-      vEraseBit(*(regTIMSK(ui8pGroup)), OCIEnA);
-    }
-    else {
-      vEraseBit(*(regTIMSK(ui8pGroup)), ICIEn);
-    }
-  }
-  else{
-    if(ui8SubTimer == SUBTIMER_A){
-      if (ui8pGroup == TIMER_0 || ui8pGroup == TIMER_2){
-        vEraseBit(*(regTIMSK(ui8pGroup)), OCIEnB);
-      }
-      else{
-        vEraseBit(*(regTIMSK(ui8pGroup)), OCIEnA);
-      }
-    }
-    else if(ui8SubTimer == SUBTIMER_B && ui8pGroup != TIMER_0 && ui8pGroup != TIMER_2){
-      vEraseBit(*(regTIMSK(ui8pGroup)), OCIEnB);
-    }
-    else if(ui8SubTimer == SUBTIMER_C && ui8pGroup != TIMER_0 && ui8pGroup != TIMER_2){
-      vEraseBit(*(regTIMSK(ui8pGroup)), OCIEnC);
-    }
+    #endif
   }
 }
 
@@ -424,162 +358,202 @@ void vForceTIMERInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer){
 */
 ISR(TIMER0_COMPA_vect){
   if (isrMasterTimer[0] != NULL){
-    vPrivateDisableTIMER(TIMER_0, MASTER_TIMER);
+    vEraseBit(*(regTIMSK(TIMER_0)), OCIEnA);
     isrMasterTimer[0](argMasterTimer[0]);
-    vPrivateEnableTIMER(TIMER_0, MASTER_TIMER);
+    if (ui8ActivedMasterTimer[0] == 1){
+      vSetBit(*(regTIMSK(TIMER_0)), OCIEnA);
+    }
   }
 }
 
 ISR(TIMER0_COMPB_vect){
   if (isrSubTimerA[0] != NULL){
-    vPrivateDisableTIMER(TIMER_0, SUBTIMER_A);
+    vEraseBit(*(regTIMSK(TIMER_0)), OCIEnA);
     isrSubTimerA[0](argSubTimerA[0]);
-    vPrivateEnableTIMER(TIMER_0, SUBTIMER_A);
+    if (ui8ActivedSubTimerA[0] == 1){
+      vSetBit(*(regTIMSK(TIMER_0)), OCIEnA);
+    }
   }
 }
 
 ISR(TIMER1_CAPT_vect){
   if (isrMasterTimer[1] != NULL){
-    vPrivateDisableTIMER(TIMER_1, MASTER_TIMER);
+    vEraseBit(*(regTIMSK(TIMER_1)), ICIEn);
     isrMasterTimer[1](argMasterTimer[1]);
-    vPrivateEnableTIMER(TIMER_1, MASTER_TIMER);
+    if (ui8ActivedMasterTimer[1] == 1){
+      vSetBit(*(regTIMSK(TIMER_1)), ICIEn);
+    }
   }
 }
 
 ISR(TIMER1_COMPA_vect){
   if (isrSubTimerA[1] != NULL){
-    vPrivateDisableTIMER(TIMER_1, SUBTIMER_A);
+    vEraseBit(*(regTIMSK(TIMER_1)), OCIEnA);
     isrSubTimerA[1](argSubTimerA[1]);
-    vPrivateEnableTIMER(TIMER_1, SUBTIMER_A);
+    if (ui8ActivedSubTimerA[1] == 1){
+      vSetBit(*(regTIMSK(TIMER_1)), OCIEnA);
+    }
   }
 }
 
 ISR(TIMER1_COMPB_vect){
   if (isrSubTimerB[1] != NULL){
-    vPrivateDisableTIMER(TIMER_1, SUBTIMER_B);
+    vEraseBit(*(regTIMSK(TIMER_1)), OCIEnB);
     isrSubTimerB[1](argSubTimerB[1]);
-    vPrivateEnableTIMER(TIMER_1, SUBTIMER_B);
+    if (ui8ActivedSubTimerB[1] == 1){
+      vSetBit(*(regTIMSK(TIMER_1)), OCIEnB);
+    }
   }
 }
 
 ISR(TIMER2_COMPA_vect){
   if (isrMasterTimer[2] != NULL){
-    vPrivateDisableTIMER(TIMER_2, MASTER_TIMER);
+    vEraseBit(*(regTIMSK(TIMER_2)), OCIEnA);
     isrMasterTimer[2](argMasterTimer[2]);
-    vPrivateEnableTIMER(TIMER_2, MASTER_TIMER);
+    if (ui8ActivedMasterTimer[2] == 1){
+      vSetBit(*(regTIMSK(TIMER_2)), OCIEnA);
+    }
   }
 }
 
 ISR(TIMER2_COMPB_vect){
   if (isrSubTimerA[2] != NULL){
-    vPrivateDisableTIMER(TIMER_2, SUBTIMER_A);
+    vEraseBit(*(regTIMSK(TIMER_2)), OCIEnA);
     isrSubTimerA[2](argSubTimerA[2]);
-    vPrivateEnableTIMER(TIMER_2, SUBTIMER_A);
+    if (ui8ActivedSubTimerA[2] == 1){
+      vSetBit(*(regTIMSK(TIMER_2)), OCIEnA);
+    }
   }
 }
 
 #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
   ISR(TIMER1_COMPC_vect){
     if (isrSubTimerC[1] != NULL){
-      vPrivateDisableTIMER(TIMER_1, SUBTIMER_C);
+      vEraseBit(*(regTIMSK(TIMER_1)), OCIEnC);
       isrSubTimerC[1](argSubTimerC[1]);
-      vPrivateEnableTIMER(TIMER_1, SUBTIMER_C);
+      if (ui8ActivedSubTimerC[1] == 1){
+        vSetBit(*(regTIMSK(TIMER_1)), OCIEnC);
+      }
     }
   }
 
   ISR(TIMER3_CAPT_vect){
     if (isrMasterTimer[3] != NULL){
-      vPrivateDisableTIMER(TIMER_3, MASTER_TIMER);
+      vEraseBit(*(regTIMSK(TIMER_3)), ICIEn);
       isrMasterTimer[3](argMasterTimer[3]);
-      vPrivateEnableTIMER(TIMER_3, MASTER_TIMER);
+      if (ui8ActivedMasterTimer[3] == 1){
+        vSetBit(*(regTIMSK(TIMER_3)), ICIEn);
+      }
     }
   }
 
   ISR(TIMER3_COMPA_vect){
     if (isrSubTimerA[3] != NULL){
-      vPrivateDisableTIMER(TIMER_3, SUBTIMER_A);
+      vEraseBit(*(regTIMSK(TIMER_3)), OCIEnA);
       isrSubTimerA[3](argSubTimerA[3]);
-      vPrivateEnableTIMER(TIMER_3, SUBTIMER_A);
+      if (ui8ActivedSubTimerA[3] == 1){
+        vSetBit(*(regTIMSK(TIMER_3)), OCIEnA);
+      }
     }
   }
 
   ISR(TIMER3_COMPB_vect){
     if (isrSubTimerB[3] != NULL){
-      vPrivateDisableTIMER(TIMER_3, SUBTIMER_B);
+      vEraseBit(*(regTIMSK(TIMER_3)), OCIEnB);
       isrSubTimerB[3](argSubTimerB[3]);
-      vPrivateEnableTIMER(TIMER_3, SUBTIMER_B);
+      if (ui8ActivedSubTimerB[3] == 1){
+        vSetBit(*(regTIMSK(TIMER_3)), OCIEnB);
+      }
     }
   }
 
   ISR(TIMER3_COMPC_vect){
     if (isrSubTimerC[3] != NULL){
-      vPrivateDisableTIMER(TIMER_3, SUBTIMER_C);
+      vEraseBit(*(regTIMSK(TIMER_3)), OCIEnC);
       isrSubTimerC[3](argSubTimerC[3]);
-      vPrivateEnableTIMER(TIMER_3, SUBTIMER_C);
+      if (ui8ActivedSubTimerC[3] == 1){
+        vSetBit(*(regTIMSK(TIMER_3)), OCIEnC);
+      }
     }
   }
 
   ISR(TIMER4_CAPT_vect){
     if (isrMasterTimer[4] != NULL){
-      vPrivateDisableTIMER(TIMER_4, MASTER_TIMER);
+      vEraseBit(*(regTIMSK(TIMER_4)), ICIEn);
       isrMasterTimer[4](argMasterTimer[4]);
-      vPrivateEnableTIMER(TIMER_4, MASTER_TIMER);
+      if (ui8ActivedMasterTimer[4] == 1){
+        vSetBit(*(regTIMSK(TIMER_4)), ICIEn);
+      }
     }
   }
 
   ISR(TIMER4_COMPA_vect){
     if (isrSubTimerA[4] != NULL){
-      vPrivateDisableTIMER(TIMER_4, SUBTIMER_A);
+      vEraseBit(*(regTIMSK(TIMER_4)), OCIEnA);
       isrSubTimerA[4](argSubTimerA[4]);
-      vPrivateEnableTIMER(TIMER_4, SUBTIMER_A);
+      if (ui8ActivedSubTimerA[4] == 1){
+        vSetBit(*(regTIMSK(TIMER_4)), OCIEnA);
+      }
     }
   }
 
   ISR(TIMER4_COMPB_vect){
     if (isrSubTimerB[4] != NULL){
-      vPrivateDisableTIMER(TIMER_4, SUBTIMER_B);
+      vEraseBit(*(regTIMSK(TIMER_4)), OCIEnB);
       isrSubTimerB[4](argSubTimerB[4]);
-      vPrivateEnableTIMER(TIMER_4, SUBTIMER_B);
+      if (ui8ActivedSubTimerB[4] == 1){
+        vSetBit(*(regTIMSK(TIMER_4)), OCIEnB);
+      }
     }
   }
 
   ISR(TIMER4_COMPC_vect){
     if (isrSubTimerC[4] != NULL){
-      vPrivateDisableTIMER(TIMER_4, SUBTIMER_C);
+      vEraseBit(*(regTIMSK(TIMER_4)), OCIEnC);
       isrSubTimerC[4](argSubTimerC[4]);
-      vPrivateEnableTIMER(TIMER_4, SUBTIMER_C);
+      if (ui8ActivedSubTimerC[4] == 1){
+        vSetBit(*(regTIMSK(TIMER_4)), OCIEnC);
+      }
     }
   }
 
   ISR(TIMER5_CAPT_vect){
     if (isrMasterTimer[5] != NULL){
-      vPrivateDisableTIMER(TIMER_5, MASTER_TIMER);
+      vEraseBit(*(regTIMSK(TIMER_5)), ICIEn);
       isrMasterTimer[5](argMasterTimer[5]);
-      vPrivateEnableTIMER(TIMER_5, MASTER_TIMER);
+      if (ui8ActivedMasterTimer[5] == 1){
+        vSetBit(*(regTIMSK(TIMER_5)), ICIEn);
+      }
     }
   }
 
   ISR(TIMER5_COMPA_vect){
     if (isrSubTimerA[5] != NULL){
-      vPrivateDisableTIMER(TIMER_5, SUBTIMER_A);
+      vEraseBit(*(regTIMSK(TIMER_5)), OCIEnA);
       isrSubTimerA[5](argSubTimerA[5]);
-      vPrivateEnableTIMER(TIMER_5, SUBTIMER_A);
+      if (ui8ActivedSubTimerA[5] == 1){
+        vSetBit(*(regTIMSK(TIMER_5)), OCIEnA);
+      }
     }
   }
 
   ISR(TIMER5_COMPB_vect){
     if (isrSubTimerB[5] != NULL){
-      vPrivateDisableTIMER(TIMER_5, SUBTIMER_B);
+      vEraseBit(*(regTIMSK(TIMER_5)), OCIEnB);
       isrSubTimerB[5](argSubTimerB[5]);
-      vPrivateEnableTIMER(TIMER_5, SUBTIMER_B);
+      if (ui8ActivedSubTimerB[5] == 1){
+        vSetBit(*(regTIMSK(TIMER_5)), OCIEnB);
+      }
     }
   }
 
   ISR(TIMER5_COMPC_vect){
     if (isrSubTimerC[5] != NULL){
-      vPrivateDisableTIMER(TIMER_5, SUBTIMER_C);
+      vEraseBit(*(regTIMSK(TIMER_5)), OCIEnC);
       isrSubTimerC[5](argSubTimerC[5]);
-      vPrivateEnableTIMER(TIMER_5, SUBTIMER_C);
+      if (ui8ActivedSubTimerC[5] == 1){
+        vSetBit(*(regTIMSK(TIMER_5)), OCIEnC);
+      }
     }
   }
 #endif
