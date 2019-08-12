@@ -75,50 +75,10 @@
 #define   PCINT_GROUP_1                               1
 #define   PCINT_GROUP_2                               2
 
-#if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
-  #define   vEnablePCINTGroup(ioGroup)                if (ioGroup == IO_GROUP_B){\
-                                                        vSetBit(PCICR, 0);\
-                                                      }\
-                                                      else if(ioGroup == IO_GROUP_E || ioGroup == IO_GROUP_J){\
-                                                        vSetBit(PCICR, 1);\
-                                                      }\
-                                                      else{\
-                                                        vSetBit(PCICR, 2);\
-                                                      }
-
-  #define   vDisablePCINTGroup(ioGroup)               if (ioGroup == IO_GROUP_B){\
-                                                        vEraseBit(PCICR, 0);\
-                                                      }\
-                                                      else if(ioGroup == IO_GROUP_E || ioGroup == IO_GROUP_J){\
-                                                        vEraseBit(PCICR, 1);\
-                                                      }\
-                                                      else{\
-                                                        vEraseBit(PCICR, 2);\
-                                                      }
-#else
-  #define   vEnablePCINTGroup(ioGroup)                if (ioGroup == IO_GROUP_B){\
-                                                        vSetBit(PCICR, 0);\
-                                                      }\
-                                                      else if(ioGroup == IO_GROUP_C){\
-                                                        vSetBit(PCICR, 1);\
-                                                      }\
-                                                      else{\
-                                                        vSetBit(PCICR, 2);\
-                                                      }
-
-  #define   vDisablePCINTGroup(ioGroup)               if (ioGroup == IO_GROUP_B){\
-                                                        vEraseBit(PCICR, 0);\
-                                                      }\
-                                                      else if(ioGroup == IO_GROUP_C){\
-                                                        vEraseBit(PCICR, 1);\
-                                                      }\
-                                                      else{\
-                                                        vEraseBit(PCICR, 2);\
-                                                      }
-#endif
-
 void vEnablePCINTPin(uint8_t ui8InterruptPin);
 void vDisablePCINTPin(uint8_t ui8InterruptPin);
+void vEnablePCINTGroup(volatile uint8_t* ui8Group);
+void vDisablePCINTGroup(volatile uint8_t* ui8Group);
 void vAttachPCINTInterrupt(uint8_t ui8InterruptPin, isr_pfunc_t vInterruptFunction, void* vpArgument);
 void vDettachPCINTInterrupt(uint8_t ui8InterruptPin);
 

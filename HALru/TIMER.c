@@ -3,11 +3,11 @@
 //! Declarations: Private TIMER Declarations
 /*!
   This macros and variables are for facilitate the use of this library.
-  - ActivedTimers (For AVR Mega 2560):
+  - ActivedTIMERs (For AVR Mega 2560):
       MSB                                      MASTER_TIMER         SUBTIMER_A       SUBTIMER_B    SUBTIMER_C
       [-][-][-][-][-][-][-][-][-][-][-][-]  [5][4][3][2][1][0]  [5][4][3][2][1][0]  [5][4][3][1]  [5][4][3][1]
 
-  - ActivedTimers (For AVR Mega 328p):
+  - ActivedTIMERs (For AVR Mega 328p):
       MSB    MASTER      STA     STB
       [-]  [2][1][0]  [2][1][0]  [1]
 */
@@ -20,7 +20,7 @@
   args_timer_t argSubTimerB[4] = {NULL};
   isr_timer_t isrSubTimerC[4] = {NULL};
   args_timer_t argSubTimerC[4] = {NULL};
-  volatile uint32_t ui32ActivedTimers = 0;
+  volatile uint32_t ui32ActivedTIMERs = 0;
   #define   usrGetTIMERNumber(usrGroup)                       usrGroup == TIMER_0 ? 0 :\
                                                               usrGroup == TIMER_1 ? 1 :\
                                                               usrGroup == TIMER_2 ? 2 :\
@@ -33,7 +33,7 @@
   args_timer_t argSubTimerA[3] = {NULL};
   isr_timer_t isrSubTimerB = NULL;
   args_timer_t argSubTimerB = NULL;
-  volatile uint8_t ui8ActivedTimers = 0;
+  volatile uint8_t ui8ActivedTIMERs = 0;
   #define   usrGetTIMERNumber(usrGroup)                       usrGroup == TIMER_0 ? 0 :\
                                                               usrGroup == TIMER_1 ? 1 : 2
 #endif
@@ -69,9 +69,9 @@ void vEnableTIMER(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer){
       vSetBit(*(regTIMSK(ui8pGroup)), ICIEn);
     }
     #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
-      vSetBit(ui32ActivedTimers, ui8TIMERNumber + 14);
+      vSetBit(ui32ActivedTIMERs, ui8TIMERNumber + 14);
     #else
-      vSetBit(ui8ActivedTimers, ui8TIMERNumber + 4);
+      vSetBit(ui8ActivedTIMERs, ui8TIMERNumber + 4);
     #endif
   }
   else{
@@ -83,32 +83,32 @@ void vEnableTIMER(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer){
         vSetBit(*(regTIMSK(ui8pGroup)), OCIEnA);
       }
       #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
-        vSetBit(ui32ActivedTimers, ui8TIMERNumber + 8);
+        vSetBit(ui32ActivedTIMERs, ui8TIMERNumber + 8);
       #else
-        vSetBit(ui8ActivedTimers, ui8TIMERNumber + 1);
+        vSetBit(ui8ActivedTIMERs, ui8TIMERNumber + 1);
       #endif
     }
     else if(ui8SubTimer == SUBTIMER_B && ui8pGroup != TIMER_0 && ui8pGroup != TIMER_2){
       vSetBit(*(regTIMSK(ui8pGroup)), OCIEnB);
       #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
         if (ui8TIMERNumber == 1){
-          vSetBit(ui32ActivedTimers, ui8TIMERNumber + 3);
+          vSetBit(ui32ActivedTIMERs, ui8TIMERNumber + 3);
         }
         else{
-          vSetBit(ui32ActivedTimers, ui8TIMERNumber + 2);
+          vSetBit(ui32ActivedTIMERs, ui8TIMERNumber + 2);
         }
       #else
-        vSetBit(ui8ActivedTimers, 0);
+        vSetBit(ui8ActivedTIMERs, 0);
       #endif
     }
     #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
       else if(ui8SubTimer == SUBTIMER_C && ui8pGroup != TIMER_0 && ui8pGroup != TIMER_2){
         vSetBit(*(regTIMSK(ui8pGroup)), OCIEnC);
         if (ui8TIMERNumber == 1){
-          vSetBit(ui32ActivedTimers, uiModule(ui8TIMERNumber - 1));
+          vSetBit(ui32ActivedTIMERs, uiModule(ui8TIMERNumber - 1));
         }
         else{
-          vSetBit(ui32ActivedTimers, uiModule(ui8TIMERNumber - 2));
+          vSetBit(ui32ActivedTIMERs, uiModule(ui8TIMERNumber - 2));
         }
       }
     #endif
@@ -131,9 +131,9 @@ void vDisableTIMER(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer){
       vEraseBit(*(regTIMSK(ui8pGroup)), ICIEn);
     }
     #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
-      vEraseBit(ui32ActivedTimers, ui8TIMERNumber + 14);
+      vEraseBit(ui32ActivedTIMERs, ui8TIMERNumber + 14);
     #else
-      vEraseBit(ui8ActivedTimers, ui8TIMERNumber + 4);
+      vEraseBit(ui8ActivedTIMERs, ui8TIMERNumber + 4);
     #endif
   }
   else{
@@ -145,32 +145,32 @@ void vDisableTIMER(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer){
         vEraseBit(*(regTIMSK(ui8pGroup)), OCIEnA);
       }
       #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
-        vEraseBit(ui32ActivedTimers, ui8TIMERNumber + 8);
+        vEraseBit(ui32ActivedTIMERs, ui8TIMERNumber + 8);
       #else
-        vEraseBit(ui8ActivedTimers, ui8TIMERNumber + 1);
+        vEraseBit(ui8ActivedTIMERs, ui8TIMERNumber + 1);
       #endif
     }
     else if(ui8SubTimer == SUBTIMER_B && ui8pGroup != TIMER_0 && ui8pGroup != TIMER_2){
       vEraseBit(*(regTIMSK(ui8pGroup)), OCIEnB);
       #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
         if (ui8TIMERNumber == 1){
-          vEraseBit(ui32ActivedTimers, ui8TIMERNumber + 3);
+          vEraseBit(ui32ActivedTIMERs, ui8TIMERNumber + 3);
         }
         else{
-          vEraseBit(ui32ActivedTimers, ui8TIMERNumber + 2);
+          vEraseBit(ui32ActivedTIMERs, ui8TIMERNumber + 2);
         }
       #else
-        vEraseBit(ui8ActivedTimers, 0);
+        vEraseBit(ui8ActivedTIMERs, 0);
       #endif
     }
     #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
       else if(ui8SubTimer == SUBTIMER_C && ui8pGroup != TIMER_0 && ui8pGroup != TIMER_2){
         vEraseBit(*(regTIMSK(ui8pGroup)), OCIEnC);
         if (ui8TIMERNumber == 1){
-          vEraseBit(ui32ActivedTimers, uiModule(ui8TIMERNumber - 1));
+          vEraseBit(ui32ActivedTIMERs, uiModule(ui8TIMERNumber - 1));
         }
         else{
-          vEraseBit(ui32ActivedTimers, uiModule(ui8TIMERNumber - 2));
+          vEraseBit(ui32ActivedTIMERs, uiModule(ui8TIMERNumber - 2));
         }
       }
     #endif
@@ -412,9 +412,9 @@ ISR(TIMER0_COMPA_vect){
     vEraseBit(*(regTIMSK(TIMER_0)), OCIEnA);
     isrMasterTimer[0](argMasterTimer[0]);
     #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
-      if (ui8ReadBit(ui32ActivedTimers, 14) == 1){
+      if (ui8ReadBit(ui32ActivedTIMERs, 14) == 1){
     #else
-      if (ui8ReadBit(ui8ActivedTimers, 4) == 1){
+      if (ui8ReadBit(ui8ActivedTIMERs, 4) == 1){
     #endif
       vSetBit(*(regTIMSK(TIMER_0)), OCIEnA);
     }
@@ -426,9 +426,9 @@ ISR(TIMER0_COMPB_vect){
     vEraseBit(*(regTIMSK(TIMER_0)), OCIEnA);
     isrSubTimerA[0](argSubTimerA[0]);
     #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
-      if (ui8ReadBit(ui32ActivedTimers, 8) == 1){
+      if (ui8ReadBit(ui32ActivedTIMERs, 8) == 1){
     #else
-      if (ui8ReadBit(ui8ActivedTimers, 1) == 1){
+      if (ui8ReadBit(ui8ActivedTIMERs, 1) == 1){
     #endif
       vSetBit(*(regTIMSK(TIMER_0)), OCIEnA);
     }
@@ -440,9 +440,9 @@ ISR(TIMER1_CAPT_vect){
     vEraseBit(*(regTIMSK(TIMER_1)), ICIEn);
     isrMasterTimer[1](argMasterTimer[1]);
     #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
-      if (ui8ReadBit(ui32ActivedTimers, 15) == 1){
+      if (ui8ReadBit(ui32ActivedTIMERs, 15) == 1){
     #else
-      if (ui8ReadBit(ui8ActivedTimers, 5) == 1){
+      if (ui8ReadBit(ui8ActivedTIMERs, 5) == 1){
     #endif
       vSetBit(*(regTIMSK(TIMER_1)), ICIEn);
     }
@@ -454,9 +454,9 @@ ISR(TIMER1_COMPA_vect){
     vEraseBit(*(regTIMSK(TIMER_1)), OCIEnA);
     isrSubTimerA[1](argSubTimerA[1]);
     #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
-      if (ui8ReadBit(ui32ActivedTimers, 9) == 1){
+      if (ui8ReadBit(ui32ActivedTIMERs, 9) == 1){
     #else
-      if (ui8ReadBit(ui8ActivedTimers, 2) == 1){
+      if (ui8ReadBit(ui8ActivedTIMERs, 2) == 1){
     #endif
       vSetBit(*(regTIMSK(TIMER_1)), OCIEnA);
     }
@@ -468,7 +468,7 @@ ISR(TIMER1_COMPB_vect){
     if (isrSubTimerB[1] != NULL){
       vEraseBit(*(regTIMSK(TIMER_1)), OCIEnB);
       isrSubTimerB[1](argSubTimerB[1]);
-      if (ui8ReadBit(ui32ActivedTimers, 4) == 1){
+      if (ui8ReadBit(ui32ActivedTIMERs, 4) == 1){
         vSetBit(*(regTIMSK(TIMER_1)), OCIEnB);
       }
     }
@@ -476,7 +476,7 @@ ISR(TIMER1_COMPB_vect){
     if (isrSubTimerB != NULL){
       vEraseBit(*(regTIMSK(TIMER_1)), OCIEnB);
       isrSubTimerB(argSubTimerB);
-      if (ui8ReadBit(ui8ActivedTimers, 0) == 1){
+      if (ui8ReadBit(ui8ActivedTIMERs, 0) == 1){
         vSetBit(*(regTIMSK(TIMER_1)), OCIEnB);
       }
     }
@@ -488,9 +488,9 @@ ISR(TIMER2_COMPA_vect){
     vEraseBit(*(regTIMSK(TIMER_2)), OCIEnA);
     isrMasterTimer[2](argMasterTimer[2]);
     #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
-      if (ui8ReadBit(ui32ActivedTimers, 16) == 1){
+      if (ui8ReadBit(ui32ActivedTIMERs, 16) == 1){
     #else
-      if (ui8ReadBit(ui8ActivedTimers, 6) == 1){
+      if (ui8ReadBit(ui8ActivedTIMERs, 6) == 1){
     #endif
       vSetBit(*(regTIMSK(TIMER_2)), OCIEnA);
     }
@@ -502,9 +502,9 @@ ISR(TIMER2_COMPB_vect){
     vEraseBit(*(regTIMSK(TIMER_2)), OCIEnA);
     isrSubTimerA[2](argSubTimerA[2]);
     #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
-      if (ui8ReadBit(ui32ActivedTimers, 10) == 1){
+      if (ui8ReadBit(ui32ActivedTIMERs, 10) == 1){
     #else
-      if (ui8ReadBit(ui8ActivedTimers, 3) == 1){
+      if (ui8ReadBit(ui8ActivedTIMERs, 3) == 1){
     #endif
       vSetBit(*(regTIMSK(TIMER_2)), OCIEnA);
     }
@@ -516,7 +516,7 @@ ISR(TIMER2_COMPB_vect){
     if (isrSubTimerC[1] != NULL){
       vEraseBit(*(regTIMSK(TIMER_1)), OCIEnC);
       isrSubTimerC[1](argSubTimerC[1]);
-      if (ui8ReadBit(ui32ActivedTimers, 0) == 1){
+      if (ui8ReadBit(ui32ActivedTIMERs, 0) == 1){
         vSetBit(*(regTIMSK(TIMER_1)), OCIEnC);
       }
     }
@@ -526,7 +526,7 @@ ISR(TIMER2_COMPB_vect){
     if (isrMasterTimer[3] != NULL){
       vEraseBit(*(regTIMSK(TIMER_3)), ICIEn);
       isrMasterTimer[3](argMasterTimer[3]);
-      if (ui8ReadBit(ui32ActivedTimers, 17) == 1){
+      if (ui8ReadBit(ui32ActivedTIMERs, 17) == 1){
         vSetBit(*(regTIMSK(TIMER_3)), ICIEn);
       }
     }
@@ -536,7 +536,7 @@ ISR(TIMER2_COMPB_vect){
     if (isrSubTimerA[3] != NULL){
       vEraseBit(*(regTIMSK(TIMER_3)), OCIEnA);
       isrSubTimerA[3](argSubTimerA[3]);
-      if (ui8ReadBit(ui32ActivedTimers, 11) == 1){
+      if (ui8ReadBit(ui32ActivedTIMERs, 11) == 1){
         vSetBit(*(regTIMSK(TIMER_3)), OCIEnA);
       }
     }
@@ -546,7 +546,7 @@ ISR(TIMER2_COMPB_vect){
     if (isrSubTimerB[3] != NULL){
       vEraseBit(*(regTIMSK(TIMER_3)), OCIEnB);
       isrSubTimerB[3](argSubTimerB[3]);
-      if (ui8ReadBit(ui32ActivedTimers, 5) == 1){
+      if (ui8ReadBit(ui32ActivedTIMERs, 5) == 1){
         vSetBit(*(regTIMSK(TIMER_3)), OCIEnB);
       }
     }
@@ -556,7 +556,7 @@ ISR(TIMER2_COMPB_vect){
     if (isrSubTimerC[3] != NULL){
       vEraseBit(*(regTIMSK(TIMER_3)), OCIEnC);
       isrSubTimerC[3](argSubTimerC[3]);
-      if (ui8ReadBit(ui32ActivedTimers, 1) == 1){
+      if (ui8ReadBit(ui32ActivedTIMERs, 1) == 1){
         vSetBit(*(regTIMSK(TIMER_3)), OCIEnC);
       }
     }
@@ -566,7 +566,7 @@ ISR(TIMER2_COMPB_vect){
     if (isrMasterTimer[4] != NULL){
       vEraseBit(*(regTIMSK(TIMER_4)), ICIEn);
       isrMasterTimer[4](argMasterTimer[4]);
-      if (ui8ReadBit(ui32ActivedTimers, 18) == 1){
+      if (ui8ReadBit(ui32ActivedTIMERs, 18) == 1){
         vSetBit(*(regTIMSK(TIMER_4)), ICIEn);
       }
     }
@@ -576,7 +576,7 @@ ISR(TIMER2_COMPB_vect){
     if (isrSubTimerA[4] != NULL){
       vEraseBit(*(regTIMSK(TIMER_4)), OCIEnA);
       isrSubTimerA[4](argSubTimerA[4]);
-      if (ui8ReadBit(ui32ActivedTimers, 12) == 1){
+      if (ui8ReadBit(ui32ActivedTIMERs, 12) == 1){
         vSetBit(*(regTIMSK(TIMER_4)), OCIEnA);
       }
     }
@@ -586,7 +586,7 @@ ISR(TIMER2_COMPB_vect){
     if (isrSubTimerB[4] != NULL){
       vEraseBit(*(regTIMSK(TIMER_4)), OCIEnB);
       isrSubTimerB[4](argSubTimerB[4]);
-      if (ui8ReadBit(ui32ActivedTimers, 6) == 1){
+      if (ui8ReadBit(ui32ActivedTIMERs, 6) == 1){
         vSetBit(*(regTIMSK(TIMER_4)), OCIEnB);
       }
     }
@@ -596,7 +596,7 @@ ISR(TIMER2_COMPB_vect){
     if (isrSubTimerC[4] != NULL){
       vEraseBit(*(regTIMSK(TIMER_4)), OCIEnC);
       isrSubTimerC[4](argSubTimerC[4]);
-      if (ui8ReadBit(ui32ActivedTimers, 2) == 1){
+      if (ui8ReadBit(ui32ActivedTIMERs, 2) == 1){
         vSetBit(*(regTIMSK(TIMER_4)), OCIEnC);
       }
     }
@@ -606,7 +606,7 @@ ISR(TIMER2_COMPB_vect){
     if (isrMasterTimer[5] != NULL){
       vEraseBit(*(regTIMSK(TIMER_5)), ICIEn);
       isrMasterTimer[5](argMasterTimer[5]);
-      if (ui8ReadBit(ui32ActivedTimers, 19) == 1){
+      if (ui8ReadBit(ui32ActivedTIMERs, 19) == 1){
         vSetBit(*(regTIMSK(TIMER_5)), ICIEn);
       }
     }
@@ -616,7 +616,7 @@ ISR(TIMER2_COMPB_vect){
     if (isrSubTimerA[5] != NULL){
       vEraseBit(*(regTIMSK(TIMER_5)), OCIEnA);
       isrSubTimerA[5](argSubTimerA[5]);
-      if (ui8ReadBit(ui32ActivedTimers, 13) == 1){
+      if (ui8ReadBit(ui32ActivedTIMERs, 13) == 1){
         vSetBit(*(regTIMSK(TIMER_5)), OCIEnA);
       }
     }
@@ -626,7 +626,7 @@ ISR(TIMER2_COMPB_vect){
     if (isrSubTimerB[5] != NULL){
       vEraseBit(*(regTIMSK(TIMER_5)), OCIEnB);
       isrSubTimerB[5](argSubTimerB[5]);
-      if (ui8ReadBit(ui32ActivedTimers, 7) == 1){
+      if (ui8ReadBit(ui32ActivedTIMERs, 7) == 1){
         vSetBit(*(regTIMSK(TIMER_5)), OCIEnB);
       }
     }
@@ -636,7 +636,7 @@ ISR(TIMER2_COMPB_vect){
     if (isrSubTimerC[5] != NULL){
       vEraseBit(*(regTIMSK(TIMER_5)), OCIEnC);
       isrSubTimerC[5](argSubTimerC[5]);
-      if (ui8ReadBit(ui32ActivedTimers, 3) == 1){
+      if (ui8ReadBit(ui32ActivedTIMERs, 3) == 1){
         vSetBit(*(regTIMSK(TIMER_5)), OCIEnC);
       }
     }

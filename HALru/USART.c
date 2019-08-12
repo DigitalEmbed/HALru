@@ -22,6 +22,7 @@
   args_usart_t argDataRegisterEmpty[4] = {NULL};
   args_usart_t argRXComplete[4] = {NULL};
   args_usart_t argTXComplete[4] = {NULL};
+  volatile uint16_t ui16ActivedUSARTs = 0;
   #define   usrGetUSARTNumber(usrGroup)                       usrGroup == USART_0 ? 0 :\
                                                               usrGroup == USART_1 ? 1 :\
                                                               usrGroup == USART_2 ? 2 : 3
@@ -32,6 +33,7 @@
   args_usart_t argDataRegisterEmpty = NULL;
   args_usart_t argRXComplete = NULL;
   args_usart_t argTXComplete = NULL;
+  volatile uint8_t ui8ActivedUSARTs = 0;
   #define   usrGetUSARTNumber(usrGroup)                       0
 #endif
 
@@ -63,6 +65,11 @@ void vUSARTInit(volatile uint8_t* ui8pGroup){
   \param ui8InterruptionType is a 8-bit integer. It's the interruption type.
 */
 void vEnableUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8InterruptionType){
+  #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
+    vSetBit(ui16ActivedUSARTs, (3*(usrGetUSARTNumber(ui8pGroup)) + ui8InterruptionType));
+  #else
+    vSetBit(ui8ActivedUSARTs, ui8InterruptionType);
+  #endif
   switch(ui8InterruptionType){
     case RX_COMPLETE:
     {
@@ -91,6 +98,11 @@ void vEnableUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8InterruptionT
   \param ui8InterruptionType is a 8-bit integer. It's the interruption type.
 */
 void vDisableUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8InterruptionType){
+  #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
+    vEraseBit(ui16ActivedUSARTs, (3*(usrGetUSARTNumber(ui8pGroup)) + ui8InterruptionType));
+  #else
+    vEraseBit(ui8ActivedUSARTs, ui8InterruptionType);
+  #endif
   switch(ui8InterruptionType){
     case RX_COMPLETE:
     {
@@ -218,121 +230,151 @@ void vDettachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8Interruption
 #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
   ISR(USART0_RX_vect){
     if (isrRXComplete[0] != NULL){
-      vDisableUSARTInterrupt(USART_0, RX_COMPLETE);
+      vEraseBit(*regUCSRB(USART_0), RXCIEn);
       isrRXComplete[0](argRXComplete[0]);
-      vEnableUSARTInterrupt(USART_0, RX_COMPLETE);
+      if (ui8ReadBit(ui16ActivedUSARTs, 0) == 1){
+        vSetBit(*regUCSRB(USART_0), RXCIEn);
+      }
     }
   }
 
   ISR(USART0_TX_vect){
     if (isrTXComplete[0] != NULL){
-      vDisableUSARTInterrupt(USART_0, TX_COMPLETE);
+      vEraseBit(*regUCSRB(USART_0), TXCIEn);
       isrTXComplete[0](argTXComplete[0]);
-      vEnableUSARTInterrupt(USART_0, TX_COMPLETE);
+      if (ui8ReadBit(ui16ActivedUSARTs, 1) == 1){
+        vSetBit(*regUCSRB(USART_0), TXCIEn);
+      }
     }
   }
 
   ISR(USART0_UDRE_vect){
     if (isrDataRegisterEmpty[0] != NULL){
-      vDisableUSARTInterrupt(USART_0, DATA_EMPTY);
+      vEraseBit(*regUCSRB(USART_0), UDREn);
       isrDataRegisterEmpty[0](argDataRegisterEmpty[0]);
-      vEnableUSARTInterrupt(USART_0, DATA_EMPTY);
+      if (ui8ReadBit(ui16ActivedUSARTs, 2) == 1){
+        vSetBit(*regUCSRB(USART_0), UDREn);
+      }
     }
   }
 
   ISR(USART1_RX_vect){
     if (isrRXComplete[1] != NULL){
-      vDisableUSARTInterrupt(USART_1, RX_COMPLETE);
+      vEraseBit(*regUCSRB(USART_1), RXCIEn);
       isrRXComplete[1](argRXComplete[1]);
-      vEnableUSARTInterrupt(USART_1, RX_COMPLETE);
+      if (ui8ReadBit(ui16ActivedUSARTs, 3) == 1){
+        vSetBit(*regUCSRB(USART_1), RXCIEn);
+      }
     }
   }
 
   ISR(USART1_TX_vect){
     if (isrTXComplete[1] != NULL){
-      vDisableUSARTInterrupt(USART_1, RX_COMPLETE);
+      vEraseBit(*regUCSRB(USART_1), TXCIEn);
       isrTXComplete[1](argTXComplete[1]);
-      vEnableUSARTInterrupt(USART_1, RX_COMPLETE);
+      if (ui8ReadBit(ui16ActivedUSARTs, 4) == 1){
+        vSetBit(*regUCSRB(USART_1), TXCIEn);
+      }
     }
   }
 
   ISR(USART1_UDRE_vect){
     if (isrDataRegisterEmpty[1] != NULL){
-      vDisableUSARTInterrupt(USART_1, DATA_EMPTY);
+      vEraseBit(*regUCSRB(USART_1), UDREn);
       isrDataRegisterEmpty[1](argDataRegisterEmpty[1]);
-      vEnableUSARTInterrupt(USART_1, DATA_EMPTY);
+      if (ui8ReadBit(ui16ActivedUSARTs, 5) == 1){
+        vSetBit(*regUCSRB(USART_1), UDREn);
+      }
     }
   }
 
   ISR(USART2_RX_vect){
     if (isrRXComplete[2] != NULL){
-      vDisableUSARTInterrupt(USART_2, RX_COMPLETE);
+      vEraseBit(*regUCSRB(USART_2), RXCIEn);
       isrRXComplete[2](argRXComplete[2]);
-      vEnableUSARTInterrupt(USART_2, RX_COMPLETE);
+      if (ui8ReadBit(ui16ActivedUSARTs, 6) == 1){
+        vSetBit(*regUCSRB(USART_2), RXCIEn);
+      }
     }
   }
 
   ISR(USART2_TX_vect){
     if (isrTXComplete[2] != NULL){
-      vDisableUSARTInterrupt(USART_2, RX_COMPLETE);
+      vEraseBit(*regUCSRB(USART_2), TXCIEn);
       isrTXComplete[2](argTXComplete[2]);
-      vEnableUSARTInterrupt(USART_2, RX_COMPLETE);
+      if (ui8ReadBit(ui16ActivedUSARTs, 7) == 1){
+        vSetBit(*regUCSRB(USART_2), TXCIEn);
+      }
     }
   }
 
   ISR(USART2_UDRE_vect){
     if (isrDataRegisterEmpty[2] != NULL){
-      vDisableUSARTInterrupt(USART_2, DATA_EMPTY);
+      vEraseBit(*regUCSRB(USART_2), UDREn);
       isrDataRegisterEmpty[2](argDataRegisterEmpty[2]);
-      vEnableUSARTInterrupt(USART_2, DATA_EMPTY);
+      if (ui8ReadBit(ui16ActivedUSARTs, 8) == 1){
+        vSetBit(*regUCSRB(USART_2), UDREn);
+      }
     }
   }
 
   ISR(USART3_RX_vect){
     if (isrRXComplete[3] != NULL){
-      vDisableUSARTInterrupt(USART_3, RX_COMPLETE);
+      vEraseBit(*regUCSRB(USART_3), RXCIEn);
       isrRXComplete[3](argRXComplete[3]);
-      vEnableUSARTInterrupt(USART_3, RX_COMPLETE);
+      if (ui8ReadBit(ui16ActivedUSARTs, 9) == 1){
+        vSetBit(*regUCSRB(USART_3), RXCIEn);
+      }
     }
   }
 
   ISR(USART3_TX_vect){
     if (isrTXComplete[3] != NULL){
-      vDisableUSARTInterrupt(USART_3, RX_COMPLETE);
+      vEraseBit(*regUCSRB(USART_3), TXCIEn);
       isrTXComplete[3](argTXComplete[3]);
-      vEnableUSARTInterrupt(USART_3, RX_COMPLETE);
+      if (ui8ReadBit(ui16ActivedUSARTs, 10) == 1){
+        vSetBit(*regUCSRB(USART_3), TXCIEn);
+      }
     }
   }
 
   ISR(USART3_UDRE_vect){
     if (isrDataRegisterEmpty[3] != NULL){
-      vDisableUSARTInterrupt(USART_3, DATA_EMPTY);
+      vEraseBit(*regUCSRB(USART_3), UDREn);
       isrDataRegisterEmpty[3](argDataRegisterEmpty[3]);
-      vEnableUSARTInterrupt(USART_3, DATA_EMPTY);
+      if (ui8ReadBit(ui16ActivedUSARTs, 11) == 1){
+        vSetBit(*regUCSRB(USART_3), UDREn);
+      }
     }
   }
 #else
   ISR(USART_RX_vect){
     if (isrRXComplete != NULL){
-      vDisableUSARTInterrupt(USART_0, RX_COMPLETE);
+      vEraseBit(*regUCSRB(USART_0), RXCIEn);
       isrRXComplete(argRXComplete);
-      vEnableUSARTInterrupt(USART_0, RX_COMPLETE);
+      if (ui8ReadBit(ui8ActivedUSARTs, 0) == 1){
+        vSetBit(*regUCSRB(USART_0), RXCIEn);
+      }
     }
   }
 
   ISR(USART_TX_vect){
     if (isrTXComplete != NULL){
-      vDisableUSARTInterrupt(USART_0, TX_COMPLETE);
+      vEraseBit(*regUCSRB(USART_0), TXCIEn);
       isrTXComplete(argTXComplete);
-      vEnableUSARTInterrupt(USART_0, TX_COMPLETE);
+      if (ui8ReadBit(ui8ActivedUSARTs, 1) == 1){
+        vSetBit(*regUCSRB(USART_0), TXCIEn);
+      }
     }
   }
 
   ISR(USART_UDRE_vect){
     if (isrDataRegisterEmpty != NULL){
-      vDisableUSARTInterrupt(USART_0, DATA_EMPTY);
+      vEraseBit(*regUCSRB(USART_0), UDREn);
       isrDataRegisterEmpty(argDataRegisterEmpty);
-      vEnableUSARTInterrupt(USART_0, DATA_EMPTY);
+      if (ui8ReadBit(ui8ActivedUSARTs, 2) == 1){
+        vSetBit(*regUCSRB(USART_0), UDREn);
+      }
     }
   }
 #endif

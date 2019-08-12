@@ -7,12 +7,12 @@
 #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
   isr_timer_t isrExtInt[7] = {NULL};
   args_timer_t argExtInt[7] = {NULL};
-  volatile uint8_t ui8EnabledEXTINT[7] = {0};
 #else
   isr_timer_t isrExtInt[2] = {NULL};
   args_timer_t argExtInt[2] = {NULL};
-  volatile uint8_t ui8EnabledEXTINT[2] = {0};
 #endif
+
+uint8_t ui8EnabledEXTINT = 0;
 
 //! Function: EXTINT Interrupt Enabler
 /*!
@@ -21,7 +21,7 @@
 */
 void vEnableEXTINT(uint8_t ui8InterruptPin){
   vSetBit(EIMSK, ui8InterruptPin);
-  ui8EnabledEXTINT[ui8InterruptPin] = 1;
+  EIMSK = ui8EnabledEXTINT;
 }
 
 //! Function: EXTINT Interrupt Disnabler
@@ -31,7 +31,7 @@ void vEnableEXTINT(uint8_t ui8InterruptPin){
 */
 void vDisableEXTINT(uint8_t ui8InterruptPin){
   vEraseBit(EIMSK, ui8InterruptPin);
-  ui8EnabledEXTINT[ui8InterruptPin] = 0;
+  EIMSK = ui8EnabledEXTINT;
 }
 
 //! Function: EXTINT Interrupt Attacher
@@ -60,7 +60,7 @@ ISR(INT0_vect){
   if (isrExtInt[0] != NULL){
     vEraseBit(EIMSK, 0);
     isrExtInt[0](argExtInt[0]);
-    if (ui8EnabledEXTINT[0] == 1){
+    if (ui8ReadBit(ui8EnabledEXTINT, 0) == 1){
       vSetBit(EIMSK, 0);
     }
   }
@@ -70,7 +70,7 @@ ISR(INT1_vect){
   if (isrExtInt[1] != NULL){
     vEraseBit(EIMSK, 1);
     isrExtInt[1](argExtInt[1]);
-    if (ui8EnabledEXTINT[1] == 1){
+    if (ui8ReadBit(ui8EnabledEXTINT, 1) == 1){
       vSetBit(EIMSK, 1);
     }
   }
@@ -81,7 +81,7 @@ ISR(INT1_vect){
     if (isrExtInt[2] != NULL){
       vEraseBit(EIMSK, 2);
       isrExtInt[2](argExtInt[2]);
-      if (ui8EnabledEXTINT[2] == 1){
+      if (ui8ReadBit(ui8EnabledEXTINT ,2) == 1){
         vSetBit(EIMSK, 2);
       }
     }
@@ -91,7 +91,7 @@ ISR(INT1_vect){
     if (isrExtInt[3] != NULL){
       vEraseBit(EIMSK, 3);
       isrExtInt[3](argExtInt[3]);
-      if (ui8EnabledEXTINT[3] == 1){
+      if (ui8ReadBit(ui8EnabledEXTINT, 3) == 1){
         vSetBit(EIMSK, 3);
       }
     }
@@ -101,7 +101,7 @@ ISR(INT1_vect){
     if (isrExtInt[4] != NULL){
       vEraseBit(EIMSK, 4);
       isrExtInt[4](argExtInt[4]);
-      if (ui8EnabledEXTINT[4] == 1){
+      if (ui8ReadBit(ui8EnabledEXTINT, 4) == 1){
         vSetBit(EIMSK, 4);
       }
     }
@@ -111,7 +111,7 @@ ISR(INT1_vect){
     if (isrExtInt[5] != NULL){
       vEraseBit(EIMSK, 5);
       isrExtInt[5](argExtInt[5]);
-      if (ui8EnabledEXTINT[5] == 1){
+      if (ui8ReadBit(ui8EnabledEXTINT, 5) == 1){
         vSetBit(EIMSK, 5);
       }
     }
@@ -121,7 +121,7 @@ ISR(INT1_vect){
     if (isrExtInt[6] != NULL){
       vEraseBit(EIMSK, 6);
       isrExtInt[6](argExtInt[6]);
-      if (ui8EnabledEXTINT[6] == 1){
+      if (ui8ReadBit(ui8EnabledEXTINT, 6) == 1){
         vSetBit(EIMSK, 6);
       }
     }
@@ -131,7 +131,7 @@ ISR(INT1_vect){
     if (isrExtInt[7] != NULL){
       vEraseBit(EIMSK, 7);
       isrExtInt[7](argExtInt[7]);
-      if (ui8EnabledEXTINT[7] == 1){
+      if (ui8ReadBit(ui8EnabledEXTINT, 7) == 1){
         vSetBit(EIMSK, 7);
       }
     }

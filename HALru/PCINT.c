@@ -1,14 +1,48 @@
 #include "PCINT.h"
 
-#if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
-  volatile uint8_t ui8BeforeStatePCINT[3] = {0};
-  volatile uint8_t ui8ActualStatePCINT[3] = {0};
-#else
-  volatile uint8_t ui8BeforeStatePCINT[3] = {0};
-  volatile uint8_t ui8ActualStatePCINT[3] = {0};
-#endif
+volatile uint8_t ui8BeforeStatePCINT[3] = {0};
+volatile uint8_t ui8ActualStatePCINT[3] = {0};
+volatile uint8_t ui8EnabledPCINT = 0;
 
 hal_isr_t isrPCINTArray[3][8] = {{{NULL, NULL}}};
+
+void vEnablePCINTGroup(volatile uint8_t* ui8Group){
+  if (ui8Group == IO_GROUP_B){
+    vSetBit(PCICR, 0);
+  }
+  #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
+    else if(ui8Group == IO_GROUP_E || ui8Group == IO_GROUP_J){
+      vSetBit(PCICR, 1);
+    }
+  #else
+    else if(ui8Group == IO_GROUP_C){
+      vSetBit(PCICR, 1);
+    }
+  #endif
+  else{
+    vSetBit(PCICR, 2);
+  }
+  ui8EnabledPCINT = PCICR & 7;
+}
+
+void vDisablePCINTGroup(volatile uint8_t* ui8Group){
+  if (ui8Group == IO_GROUP_B){
+    vEraseBit(PCICR, 0);
+  }
+  #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
+    else if(ui8Group == IO_GROUP_E || ui8Group == IO_GROUP_J){
+      vEraseBit(PCICR, 1);
+    }
+  #else
+    else if(ui8Group == IO_GROUP_C){
+      vEraseBit(PCICR, 1);
+    }
+  #endif
+  else{
+    vEraseBit(PCICR, 2);
+  }
+  ui8EnabledPCINT = PCICR & 7;
+}
 
 void vEnablePCINTPin(uint8_t ui8InterruptPin){
   if (ui8InterruptPin <= 7 && ui8ReadBit(PCMSK0, ui8InterruptPin) == 0){
@@ -62,7 +96,9 @@ ISR(PCINT0_vect){
     if (ui8ReadBit(ui8ActivedPins, ui8Counter) == 1 && isrPCINTArray[0][ui8Counter].vInterruptFunction != NULL){
       vEraseBit(PCICR, 0);
       isrPCINTArray[0][ui8Counter].vInterruptFunction(isrPCINTArray[0][ui8Counter].vpArgument);
-      vSetBit(PCICR, 0);
+      if (ui8ReadBit(ui8EnabledPCINT, 0) == 1){
+        vSetBit(PCICR, 0);
+      }
     }
   }
 }
@@ -80,7 +116,9 @@ ISR(PCINT1_vect){
     if (ui8ReadBit(ui8ActivedPins, ui8Counter) == 1 && isrPCINTArray[1][ui8Counter].vInterruptFunction != NULL){
       vEraseBit(PCICR, 1);
       isrPCINTArray[1][ui8Counter].vInterruptFunction(isrPCINTArray[1][ui8Counter].vpArgument);
-      vSetBit(PCICR, 1);
+      if (ui8ReadBit(ui8EnabledPCINT, 1) == 1){
+        vSetBit(PCICR, 1);
+      }
     }
   }
 }
@@ -98,7 +136,9 @@ ISR(PCINT2_vect){
     if (ui8ReadBit(ui8ActivedPins, ui8Counter) == 1 && isrPCINTArray[2][ui8Counter].vInterruptFunction != NULL){
       vEraseBit(PCICR, 2);
       isrPCINTArray[2][ui8Counter].vInterruptFunction(isrPCINTArray[2][ui8Counter].vpArgument);
-      vSetBit(PCICR, 2);
+      if (ui8ReadBit(ui8EnabledPCINT, 2) == 1){
+        vSetBit(PCICR, 2);
+      }
     }
   }
 }
