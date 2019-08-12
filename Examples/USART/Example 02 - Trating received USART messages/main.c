@@ -110,7 +110,7 @@ int main(void){
   vUSARTInit(USART_0);
   vSetUSARTBaudRate(USART_0, 115200);                                           //Setting baud rate to 115200  
   vAttachUSARTInterrupt(USART_0, RX_COMPLETE, &vCheckMessage, NULL);
-  vEnableRXInterrupt(USART_0);
+  vEnableUSARTInterrupt(USART_0, RX_COMPLETE);
   
   /*!
     Setting printf output.
