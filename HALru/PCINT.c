@@ -9,18 +9,26 @@ hal_isr_t isrPCINTArray[3][8] = {{{NULL, NULL}}};
 void vEnablePCINTGroup(volatile uint8_t* ui8Group){
   if (ui8Group == IO_GROUP_B){
     vSetBit(PCICR, 0);
+    ui8ActualStatePCINT[0] = *(IO_GROUP_B);
   }
   #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
     else if(ui8Group == IO_GROUP_E || ui8Group == IO_GROUP_J){
       vSetBit(PCICR, 1);
+      ui8ActualStatePCINT[1] = (volatile uint8_t) (((*(IO_GROUP_E)) & 1) | (*(IO_GROUP_J) << 1));
     }
   #else
     else if(ui8Group == IO_GROUP_C){
       vSetBit(PCICR, 1);
+      ui8ActualStatePCINT[1] = *(IO_GROUP_C);
     }
   #endif
   else{
     vSetBit(PCICR, 2);
+    #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
+      ui8ActualStatePCINT[2] = *(IO_GROUP_K);
+    #else
+      ui8ActualStatePCINT[2] = *(IO_GROUP_D);
+    #endif
   }
   ui8EnabledPCINT = PCICR & 7;
 }
