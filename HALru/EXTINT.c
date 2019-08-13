@@ -21,7 +21,7 @@ uint8_t ui8EnabledEXTINT = 0;
 */
 void vEnableEXTINT(uint8_t ui8InterruptPin){
   vSetBit(EIMSK, ui8InterruptPin);
-  EIMSK = ui8EnabledEXTINT;
+  ui8EnabledEXTINT = EIMSK;
 }
 
 //! Function: EXTINT Interrupt Disnabler
@@ -31,7 +31,7 @@ void vEnableEXTINT(uint8_t ui8InterruptPin){
 */
 void vDisableEXTINT(uint8_t ui8InterruptPin){
   vEraseBit(EIMSK, ui8InterruptPin);
-  EIMSK = ui8EnabledEXTINT;
+  ui8EnabledEXTINT = EIMSK;
 }
 
 //! Function: EXTINT Interrupt Attacher
