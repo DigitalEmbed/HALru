@@ -1,6 +1,5 @@
 #include "ADC.h"
 
-
 #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
   #define   AMOUNT_OF_ADCS                              16
 #else
@@ -40,6 +39,21 @@ volatile hal_isr_t isrADCInterruptVector[AMOUNT_OF_ADCS] = {{NULL, NULL}};
 volatile uint16_t ui16ADCValuesVector[AMOUNT_OF_ADCS] = {65535};
 volatile uint8_t ui8SelectedADCInput = 255;
 volatile uint8_t ui8SafePrescaler = 0;
+volatile uint8_t ui8EnabledADC = 0;
+
+void vEnableADC(){
+  vSetBit(ADCSRA, ADEN);
+  vSetBit(ADCSRA, ADIE);
+  vSetBit(ADCSRA, ADSC);
+  ui8EnabledADC = 1;
+}
+
+void vDisableADC(){
+  vEraseBit(ADCSRA, ADEN);
+  vEraseBit(ADCSRA, ADIE);
+  vEraseBit(ADCSRA, ADSC);
+  ui8EnabledADC = 0;
+}
 
 void vSetADCSamplingRate(uint32_t ui32SamplingRate){
   uint8_t ui8Counter = 0;
@@ -110,7 +124,9 @@ ISR(ADC_vect){
     if (isrADCInterruptVector[ui8ActualADCInput].vInterruptFunction != NULL){
       vEraseBit(ADCSRA, ADIE);
       isrADCInterruptVector[ui8ActualADCInput].vInterruptFunction(isrADCInterruptVector[ui8ActualADCInput].vpArgument);
-      vSetBit(ADCSRA, ADIE);
+      if (ui8EnabledADC == 1){
+        vSetBit(ADCSRA, ADIE);
+      }
     }
     if (ui8ActualADCInput != ui8SelectedADCInput){
       vStopADConvertion();
@@ -118,7 +134,7 @@ ISR(ADC_vect){
       ui8ActualADCInput = ui8SelectedADCInput;
       vDisableGPIOPin(ui8SelectedADCInput);
       vSetADCInput(ui8SelectedADCInput);
-      vStarADConvertion();
+      vStartADConvertion();
     }
   }
 }

@@ -105,14 +105,6 @@
                                                           vEraseBit(ADMUX, ADLAR);\
                                                         }
 
-#define   vEnableADC()                                  vSetBit(ADCSRA, ADEN);\
-                                                        vSetBit(ADCSRA, ADIE);\
-                                                        vSetBit(ADCSRA, ADSC)
-
-#define   vDisableADC()                                 vEraseBit(ADCSRA, ADEN);\
-                                                        vEraseBit(ADCSRA, ADIE);\
-                                                        vEraseBit(ADCSRA, ADSC)
-
 #define   vIgnoreADCRequest()                           vEraseBit(ADCSRA, ADIF)
 
 #define   vSetADCPrescaler(ui8ADCPrescaler)             vCopyBits(ADCSRA, ADPS0, ui8ADCPrescaler, 0, 3)
@@ -124,7 +116,7 @@
                                                           vEraseBit(ADCSRA, ADATE);\
                                                         }
 
-#define   vStarADConvertion()                           vSetBit(ADCSRA, ADSC)
+#define   vStartADConvertion()                          vSetBit(ADCSRA, ADSC)
 #define   vStopADConvertion()                           vEraseBit(ADCSRA, ADSC)
 
 #define   ui8GetADCValue(ui8ADCInput)                   (uint8_t) ui16GetADCValue(ui8ADCInput)
@@ -134,6 +126,8 @@
                                                         vSetADCTriggerMode(ADC_AUTO_TRIGGER_MODE);\
                                                         vSetADCResolution(ADC_RESOLUTION_10BITS)
 
+void vEnableADC();
+void vDisableADC();
 void vSetADCSamplingRate(uint32_t ui32SamplingRate);
 void vAttachADCInterrupt(uint8_t ui8ADCInput, isr_pfunc_t vInterruptFunction, void* vpArgument);
 void vDettachADCInterrupt(uint8_t ui8ADCInput);
