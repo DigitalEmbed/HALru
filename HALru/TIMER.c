@@ -244,7 +244,7 @@ void vSetTIMERPeriodUS(volatile uint8_t* ui8pGroup, uint32_t ui32PeriodUS){
   uint8_t ui8Prescaler[7] = {0, 3, 5, 6, 7, 8, 10};
   uint32_t ui32CounterLimit = 0;
   for (ui8PrescalerCounter = 0 ; ui8PrescalerCounter < 7 ; ui8PrescalerCounter++){
-    ui32CounterLimit = (ui32PeriodUS) * (DEVICE_CLOCK_HZ >> ui8Prescaler[ui8PrescalerCounter])/1000000 - 1;
+    ui32CounterLimit = ((DEVICE_CLOCK_HZ >> ui8Prescaler[ui8PrescalerCounter])/1000000 - 1) * (ui32PeriodUS);
     if (ui32CounterLimit < 65535 && ui32CounterLimit > 10){
       vSetTIMERPrescaler(ui8pGroup, ui8PrescalerCounter + 1);
       vSetTIMERCounterLimit(ui8pGroup, (uint16_t) ui32CounterLimit);

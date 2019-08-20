@@ -13,6 +13,7 @@ void vInitSoftPWM(pwm_group_t* pwmGroup, volatile uint8_t* ioGroup, volatile uin
   pwmGroup->ioGroup = ioGroup;
   pwmGroup->tmrGroup = tmrGroup;
   pwmGroup->ui8TickCounter = 0;
+  pwmGroup->ui8Resolution = 255;
   memset((uint8_t*) pwmGroup->ui8pActivedPinsVector, 255, 8*sizeof(uint8_t));
   memset((uint8_t*) pwmGroup->ui8pDutyCicleVector, 0, 8*sizeof(uint8_t));
   vTIMERInit(pwmGroup->tmrGroup);
@@ -43,8 +44,9 @@ void vEnableSoftPWM(pwm_group_t* pwmGroup){
   \param pwmGroup is a pwm_group_t pointer. It's the pwm group configurations.
   \param ui32PeriodUS is a 32-bit integer. It's the period value, in microseconds.
 */
-void vSetSoftPWMPeriodUS(pwm_group_t* pwmGroup, uint32_t ui32PeriodUS){
-  vSetTIMERPeriodUS(pwmGroup->tmrGroup, (ui32PeriodUS >> 8));
+void vSetSoftPWMPeriodUS(pwm_group_t* pwmGroup, uint8_t ui8Resolution, uint32_t ui32PeriodUS){
+  pwmGroup->ui8Resolution = ui8Resolution;
+  vSetTIMERPeriodUS(pwmGroup->tmrGroup, ui32PeriodUS/ui8Resolution);
   vAttachTIMERInterrupt(pwmGroup->tmrGroup, MASTER_TIMER, &vSoftPWMInterrupt, pwmGroup);
 }
 
@@ -54,9 +56,9 @@ void vSetSoftPWMPeriodUS(pwm_group_t* pwmGroup, uint32_t ui32PeriodUS){
   \param pwmGroup is a pwm_group_t pointer. It's the pwm group configurations.
   \param ui16FrequencyHZ is a 16-bit integer. It's the frequency value, in hertz.
 */
-void vSetSoftPWMFrequencyHZ(pwm_group_t* pwmGroup, uint16_t ui16FrequencyHZ){
+void vSetSoftPWMFrequencyHZ(pwm_group_t* pwmGroup, uint8_t ui8Resolution, uint16_t ui16FrequencyHZ){
   uint32_t ui32PeriodUS = 1000000/ui16FrequencyHZ;
-  vSetSoftPWMPeriodUS(pwmGroup, ui32PeriodUS);
+  vSetSoftPWMPeriodUS(pwmGroup, ui8Resolution, ui32PeriodUS);
 }
 
 //! Function: SoftPWM Pin Setter
@@ -75,7 +77,7 @@ void vSetSoftPWMPin(pwm_group_t* pwmGroup, uint8_t ui8Pin, uint8_t ui8DutyCicle)
     vUnsetSoftPWMPin(pwmGroup, ui8Pin);
     return;
   }
-  if (ui8DutyCicle == 255){
+  if (ui8DutyCicle >= pwmGroup->ui8Resolution){
     vUnsetSoftPWMPin(pwmGroup, ui8Pin);
     vSetGPIOPin(pwmGroup->ioGroup, ui8Pin);
     return;
@@ -133,13 +135,18 @@ void vUnsetSoftPWMPin(pwm_group_t* pwmGroup, uint8_t ui8Pin){
 void vSoftPWMInterrupt(void* vpArgs){
   uint8_t ui8Counter = 0;
   pwm_group_t* pwmGroup = (pwm_group_t*) vpArgs;
-  pwmGroup->ui8TickCounter++;
-  for(ui8Counter = 0 ; pwmGroup->ui8pActivedPinsVector[ui8Counter] != 255 ; ui8Counter++){
-    if (pwmGroup->ui8pDutyCicleVector[ui8Counter] == pwmGroup->ui8TickCounter){
-      vUnsetGPIOPin(pwmGroup->ioGroup, pwmGroup->ui8pActivedPinsVector[ui8Counter]);
-    }
-    else if (pwmGroup->ui8TickCounter == 0){
+  if (pwmGroup->ui8TickCounter > pwmGroup->ui8Resolution){
+    pwmGroup->ui8TickCounter = 0;
+    for(ui8Counter = 0 ; pwmGroup->ui8pActivedPinsVector[ui8Counter] != 255 ; ui8Counter++){
       vSetGPIOPin(pwmGroup->ioGroup, pwmGroup->ui8pActivedPinsVector[ui8Counter]);
+    }
+  }
+  else{
+    pwmGroup->ui8TickCounter++;
+    for(ui8Counter = 0 ; pwmGroup->ui8pActivedPinsVector[ui8Counter] != 255 ; ui8Counter++){
+      if (pwmGroup->ui8pDutyCicleVector[ui8Counter] == pwmGroup->ui8TickCounter){
+        vUnsetGPIOPin(pwmGroup->ioGroup, pwmGroup->ui8pActivedPinsVector[ui8Counter]);
+      }
     }
   }
 }
