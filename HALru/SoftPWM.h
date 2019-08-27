@@ -63,8 +63,8 @@ void vDisableSoftPWM(pwm_group_t* pwmGroup);                                    
 void vEnableSoftPWM(pwm_group_t* pwmGroup);                                                               /*!< Void type function. */
 void vSetSoftPWMPeriodUS(pwm_group_t* pwmGroup, uint8_t ui8Resolution, uint32_t ui32PeriodUS);            /*!< Void type function. */
 void vSetSoftPWMFrequencyHZ(pwm_group_t* pwmGroup, uint8_t ui8Resolution, uint16_t ui16FrequencyHZ);      /*!< Void type function. */
-void vUnsetSoftPWMPin(pwm_group_t* pwmGroup, uint8_t ui8Pin);                                             /*!< Void type function. */
-void vSetSoftPWMPin(pwm_group_t* pwmGroup, uint8_t ui8Pin, uint8_t ui8DutyCicle);                         /*!< Void type function. */
+void vDisableSoftPWMPin(pwm_group_t* pwmGroup, uint8_t ui8Pin);                                           /*!< Void type function. */
+void vSetSoftPWMDutyCicle(pwm_group_t* pwmGroup, uint8_t ui8Pin, uint8_t ui8DutyCicle);                   /*!< Void type function. */
 
 #ifdef __cplusplus
   }

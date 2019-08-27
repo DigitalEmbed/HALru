@@ -77,6 +77,7 @@ typedef struct {
 #include "GPIO.h"
 #include "USART.h"
 #include "TIMER.h"
+#include "PWM.h"
 #include "SoftPWM.h"
 #include "EXTINT.h"
 #include "PCINT.h"

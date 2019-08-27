@@ -25,7 +25,7 @@ void vInitSoftPWM(pwm_group_t* pwmGroup, volatile uint8_t* ioGroup, volatile uin
   \param pwmGroup is a pwm_group_t pointer. It's the pwm group configurations.
 */
 void vDisableSoftPWM(pwm_group_t* pwmGroup){
-  vDisableTIMER(pwmGroup->tmrGroup, MASTER_TIMER);
+  vDisableTIMERInterrupt(pwmGroup->tmrGroup, MASTER_TIMER);
   *regPORT(pwmGroup->ioGroup) = 0;
 }
 
@@ -35,7 +35,7 @@ void vDisableSoftPWM(pwm_group_t* pwmGroup){
   \param pwmGroup is a pwm_group_t pointer. It's the pwm group configurations.
 */
 void vEnableSoftPWM(pwm_group_t* pwmGroup){
-  vEnableTIMER(pwmGroup->tmrGroup, MASTER_TIMER);
+  vEnableTIMERInterrupt(pwmGroup->tmrGroup, MASTER_TIMER);
 }
 
 //! Function: SoftPWM Period (us) Seter
@@ -68,17 +68,17 @@ void vSetSoftPWMFrequencyHZ(pwm_group_t* pwmGroup, uint8_t ui8Resolution, uint16
   \param ui8Pin is a 8-bit integer. It's the pin number of a GPIO group (0 to 7).
   \param ui8DutyCicle is a 8-bit integer. It's the pwm duty cicle of the pin (0 to 255).
 */
-void vSetSoftPWMPin(pwm_group_t* pwmGroup, uint8_t ui8Pin, uint8_t ui8DutyCicle){
+void vSetSoftPWMDutyCicle(pwm_group_t* pwmGroup, uint8_t ui8Pin, uint8_t ui8DutyCicle){
   uint8_t ui8Counter = 0;
   if (ui8Pin > 7){
     return;
   }
   if (ui8DutyCicle == 0){
-    vUnsetSoftPWMPin(pwmGroup, ui8Pin);
+    vDisableSoftPWMPin(pwmGroup, ui8Pin);
     return;
   }
   if (ui8DutyCicle >= pwmGroup->ui8Resolution){
-    vUnsetSoftPWMPin(pwmGroup, ui8Pin);
+    vDisableSoftPWMPin(pwmGroup, ui8Pin);
     vSetGPIOPin(pwmGroup->ioGroup, ui8Pin);
     return;
   }
@@ -94,7 +94,7 @@ void vSetSoftPWMPin(pwm_group_t* pwmGroup, uint8_t ui8Pin, uint8_t ui8DutyCicle)
   pwmGroup->ui8pDutyCicleVector[ui8Counter] = ui8DutyCicle;
   vIgnoreTIMERRequest(pwmGroup->tmrGroup, MASTER_TIMER);
   vResetTIMERCounter(pwmGroup->tmrGroup);
-  vEnableTIMER(pwmGroup->tmrGroup, MASTER_TIMER);
+  vEnableTIMERInterrupt(pwmGroup->tmrGroup, MASTER_TIMER);
 }
 
 //! Function: SoftPWM Pin Unsetter
@@ -103,7 +103,7 @@ void vSetSoftPWMPin(pwm_group_t* pwmGroup, uint8_t ui8Pin, uint8_t ui8DutyCicle)
   \param pwmGroup is a pwm_group_t pointer. It's the pwm group configurations.
   \param ui8Pin is a 8-bit integer. It's the pin number of a GPIO group (0 to 7).
 */
-void vUnsetSoftPWMPin(pwm_group_t* pwmGroup, uint8_t ui8Pin){
+void vDisableSoftPWMPin(pwm_group_t* pwmGroup, uint8_t ui8Pin){
   uint8_t ui8Counter = 0;
   if (ui8Pin > 7){
     return;
@@ -112,7 +112,7 @@ void vUnsetSoftPWMPin(pwm_group_t* pwmGroup, uint8_t ui8Pin){
   if (ui8Counter == 8){
     return;
   }
-  vDisableTIMER(pwmGroup->tmrGroup, MASTER_TIMER);
+  vDisableTIMERInterrupt(pwmGroup->tmrGroup, MASTER_TIMER);
   *regPORT(pwmGroup->ioGroup) = 0;
   for (ui8Counter = ui8Counter ; ui8Counter != 7 && pwmGroup->ui8pActivedPinsVector[ui8Counter + 1] != 255 ; ui8Counter++){
     pwmGroup->ui8pActivedPinsVector[ui8Counter] = pwmGroup->ui8pActivedPinsVector[ui8Counter + 1];
@@ -123,7 +123,7 @@ void vUnsetSoftPWMPin(pwm_group_t* pwmGroup, uint8_t ui8Pin){
   vIgnoreTIMERRequest(pwmGroup->tmrGroup, MASTER_TIMER);
   vResetTIMERCounter(pwmGroup->tmrGroup);
   if (ui8Counter > 0){
-    vEnableTIMER(pwmGroup->tmrGroup, MASTER_TIMER);
+    vEnableTIMERInterrupt(pwmGroup->tmrGroup, MASTER_TIMER);
   }
 }
 

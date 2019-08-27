@@ -41,32 +41,44 @@
 //! Function: TIMER Initializer
 /*!
   Initialize a TIMER.
-  \param ui8pGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
+  \param ui8pTIMERGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
 */
-void vTIMERInit(volatile uint8_t* ui8pGroup){
-  if (ui8pGroup == TIMER_0 || ui8pGroup == TIMER_2){
-    vSetBit(*regTCCRA(ui8pGroup), WGMn1);
+void vTIMERInit(volatile uint8_t* ui8pTIMERGroup){
+  vEraseBit(*regTCCRA(ui8pTIMERGroup), WGMn0);
+  vEraseBit(*regTCCRA(ui8pTIMERGroup), WGMn1);
+  vEraseBit(*regTCCRB(ui8pTIMERGroup), WGMn2);
+  vEraseBit(*regTCCRB(ui8pTIMERGroup), WGMn3);
+  vEraseBit(*(regTCCRA(ui8pTIMERGroup)), COMnA0);
+  vEraseBit(*(regTCCRA(ui8pTIMERGroup)), COMnB0);
+  vEraseBit(*(regTCCRA(ui8pTIMERGroup)), COMnA1);
+  vEraseBit(*(regTCCRA(ui8pTIMERGroup)), COMnB1);
+  #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
+    vEraseBit(*(regTCCRA(ui8pTIMERGroup)), COMnC0);
+    vEraseBit(*(regTCCRA(ui8pTIMERGroup)), COMnC1);
+  #endif
+  if (ui8pTIMERGroup == TIMER_0 || ui8pTIMERGroup == TIMER_2){
+    vSetBit(*regTCCRA(ui8pTIMERGroup), WGMn1);
   }
   else{
-    vSetBit(*regTCCRB(ui8pGroup), WGMn2);
-    vSetBit(*regTCCRB(ui8pGroup), WGMn3);
+    vSetBit(*regTCCRB(ui8pTIMERGroup), WGMn2);
+    vSetBit(*regTCCRB(ui8pTIMERGroup), WGMn3);
   }
 }
 
 //! Function: TIMER Enabler
 /*!
   Enable a TIMER.
-  \param ui8pGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
+  \param ui8pTIMERGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
   \param ui8SubTimer is a 8-bit integer. It's the sub-timer.
 */
-void vEnableTIMER(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer){
-  volatile uint8_t ui8TIMERNumber = usrGetTIMERNumber(ui8pGroup);
+void vEnableTIMERInterrupt(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTimer){
+  volatile uint8_t ui8TIMERNumber = usrGetTIMERNumber(ui8pTIMERGroup);
   if (ui8SubTimer == MASTER_TIMER){
-    if (ui8pGroup == TIMER_0 || ui8pGroup == TIMER_2){
-      vSetBit(*(regTIMSK(ui8pGroup)), OCIEnA);
+    if (ui8pTIMERGroup == TIMER_0 || ui8pTIMERGroup == TIMER_2){
+      vSetBit(*(regTIMSK(ui8pTIMERGroup)), OCIEnA);
     }
     else {
-      vSetBit(*(regTIMSK(ui8pGroup)), ICIEn);
+      vSetBit(*(regTIMSK(ui8pTIMERGroup)), ICIEn);
     }
     #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
       vSetBit(ui32ActivedTIMERs, ui8TIMERNumber + 14);
@@ -76,11 +88,11 @@ void vEnableTIMER(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer){
   }
   else{
     if(ui8SubTimer == SUBTIMER_A){
-      if (ui8pGroup == TIMER_0 || ui8pGroup == TIMER_2){
-        vSetBit(*(regTIMSK(ui8pGroup)), OCIEnB);
+      if (ui8pTIMERGroup == TIMER_0 || ui8pTIMERGroup == TIMER_2){
+        vSetBit(*(regTIMSK(ui8pTIMERGroup)), OCIEnB);
       }
       else{
-        vSetBit(*(regTIMSK(ui8pGroup)), OCIEnA);
+        vSetBit(*(regTIMSK(ui8pTIMERGroup)), OCIEnA);
       }
       #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
         vSetBit(ui32ActivedTIMERs, ui8TIMERNumber + 8);
@@ -88,8 +100,8 @@ void vEnableTIMER(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer){
         vSetBit(ui8ActivedTIMERs, ui8TIMERNumber + 1);
       #endif
     }
-    else if(ui8SubTimer == SUBTIMER_B && ui8pGroup != TIMER_0 && ui8pGroup != TIMER_2){
-      vSetBit(*(regTIMSK(ui8pGroup)), OCIEnB);
+    else if(ui8SubTimer == SUBTIMER_B && ui8pTIMERGroup != TIMER_0 && ui8pTIMERGroup != TIMER_2){
+      vSetBit(*(regTIMSK(ui8pTIMERGroup)), OCIEnB);
       #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
         if (ui8TIMERNumber == 1){
           vSetBit(ui32ActivedTIMERs, ui8TIMERNumber + 3);
@@ -102,8 +114,8 @@ void vEnableTIMER(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer){
       #endif
     }
     #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
-      else if(ui8SubTimer == SUBTIMER_C && ui8pGroup != TIMER_0 && ui8pGroup != TIMER_2){
-        vSetBit(*(regTIMSK(ui8pGroup)), OCIEnC);
+      else if(ui8SubTimer == SUBTIMER_C && ui8pTIMERGroup != TIMER_0 && ui8pTIMERGroup != TIMER_2){
+        vSetBit(*(regTIMSK(ui8pTIMERGroup)), OCIEnC);
         if (ui8TIMERNumber == 1){
           vSetBit(ui32ActivedTIMERs, uiModule(ui8TIMERNumber - 1));
         }
@@ -118,17 +130,17 @@ void vEnableTIMER(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer){
 //! Function: TIMER Disabler
 /*!
   Disable a TIMER.
-  \param ui8pGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
+  \param ui8pTIMERGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
   \param ui8SubTimer is a 8-bit integer. It's the sub-timer.
 */
-void vDisableTIMER(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer){
-  volatile uint8_t ui8TIMERNumber = usrGetTIMERNumber(ui8pGroup);
+void vDisableTIMERInterrupt(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTimer){
+  volatile uint8_t ui8TIMERNumber = usrGetTIMERNumber(ui8pTIMERGroup);
   if (ui8SubTimer == MASTER_TIMER){
-    if (ui8pGroup == TIMER_0 || ui8pGroup == TIMER_2){
-      vEraseBit(*(regTIMSK(ui8pGroup)), OCIEnA);
+    if (ui8pTIMERGroup == TIMER_0 || ui8pTIMERGroup == TIMER_2){
+      vEraseBit(*(regTIMSK(ui8pTIMERGroup)), OCIEnA);
     }
     else {
-      vEraseBit(*(regTIMSK(ui8pGroup)), ICIEn);
+      vEraseBit(*(regTIMSK(ui8pTIMERGroup)), ICIEn);
     }
     #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
       vEraseBit(ui32ActivedTIMERs, ui8TIMERNumber + 14);
@@ -138,11 +150,11 @@ void vDisableTIMER(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer){
   }
   else{
     if(ui8SubTimer == SUBTIMER_A){
-      if (ui8pGroup == TIMER_0 || ui8pGroup == TIMER_2){
-        vEraseBit(*(regTIMSK(ui8pGroup)), OCIEnB);
+      if (ui8pTIMERGroup == TIMER_0 || ui8pTIMERGroup == TIMER_2){
+        vEraseBit(*(regTIMSK(ui8pTIMERGroup)), OCIEnB);
       }
       else{
-        vEraseBit(*(regTIMSK(ui8pGroup)), OCIEnA);
+        vEraseBit(*(regTIMSK(ui8pTIMERGroup)), OCIEnA);
       }
       #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
         vEraseBit(ui32ActivedTIMERs, ui8TIMERNumber + 8);
@@ -150,8 +162,8 @@ void vDisableTIMER(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer){
         vEraseBit(ui8ActivedTIMERs, ui8TIMERNumber + 1);
       #endif
     }
-    else if(ui8SubTimer == SUBTIMER_B && ui8pGroup != TIMER_0 && ui8pGroup != TIMER_2){
-      vEraseBit(*(regTIMSK(ui8pGroup)), OCIEnB);
+    else if(ui8SubTimer == SUBTIMER_B && ui8pTIMERGroup != TIMER_0 && ui8pTIMERGroup != TIMER_2){
+      vEraseBit(*(regTIMSK(ui8pTIMERGroup)), OCIEnB);
       #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
         if (ui8TIMERNumber == 1){
           vEraseBit(ui32ActivedTIMERs, ui8TIMERNumber + 3);
@@ -164,8 +176,8 @@ void vDisableTIMER(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer){
       #endif
     }
     #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
-      else if(ui8SubTimer == SUBTIMER_C && ui8pGroup != TIMER_0 && ui8pGroup != TIMER_2){
-        vEraseBit(*(regTIMSK(ui8pGroup)), OCIEnC);
+      else if(ui8SubTimer == SUBTIMER_C && ui8pTIMERGroup != TIMER_0 && ui8pTIMERGroup != TIMER_2){
+        vEraseBit(*(regTIMSK(ui8pTIMERGroup)), OCIEnC);
         if (ui8TIMERNumber == 1){
           vEraseBit(ui32ActivedTIMERs, uiModule(ui8TIMERNumber - 1));
         }
@@ -180,11 +192,11 @@ void vDisableTIMER(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer){
 //! Function: TIMER Prescaler Seter
 /*!
   Set a prescaler TIMER.
-  \param ui8pGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
+  \param ui8pTIMERGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
   \param ui8SubTimer is a 8-bit integer. It's the prescaler timer.
 */
-void vSetTIMERPrescaler(volatile uint8_t* ui8pGroup, uint8_t ui8TIMERPrescaler){
-  if (ui8pGroup != TIMER_2){
+void vSetTIMERPrescaler(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8TIMERPrescaler){
+  if (ui8pTIMERGroup != TIMER_2){
     if (ui8TIMERPrescaler > TIMER_PS_8 && ui8TIMERPrescaler <= TIMER_PS_64){
       ui8TIMERPrescaler--;
     }
@@ -192,62 +204,77 @@ void vSetTIMERPrescaler(volatile uint8_t* ui8pGroup, uint8_t ui8TIMERPrescaler){
       ui8TIMERPrescaler -= 2;
     }
   }
-  vCopyBits(*regTCCRB(ui8pGroup), CSn0, ui8TIMERPrescaler, 0, 3);
+  vCopyBits(*regTCCRB(ui8pTIMERGroup), CSn0, ui8TIMERPrescaler, 0, 3);
 }
 
 //! Function: TIMER Counter Seter
 /*!
   Set a counter TIMER.
-  \param ui8pGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
+  \param ui8pTIMERGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
   \param ui16TIMERLimit is a 16-bit integer. It's the counter timer.
 */
-void vSetTIMERCounterLimit(volatile uint8_t* ui8pGroup, uint16_t ui16TIMERLimit){
-  if ((ui8pGroup == TIMER_0 || ui8pGroup == TIMER_2) && ui16TIMERLimit < 256){
-    *(regOCRAL(ui8pGroup)) = ui16TIMERLimit & 255;
-    *(regOCRBL(ui8pGroup)) = (ui16TIMERLimit >> 1) & 255;
+void vSetTIMERCounterLimit(volatile uint8_t* ui8pTIMERGroup, uint16_t ui16TIMERLimit){
+  if ((ui8pTIMERGroup == TIMER_0 || ui8pTIMERGroup == TIMER_2) && ui16TIMERLimit < 256){
+    if (ui8ReadBit(*regTCCRA(ui8pTIMERGroup), WGMn0) == 0){
+      *(regOCRAL(ui8pTIMERGroup)) = ui16TIMERLimit & 255;
+      *(regOCRBL(ui8pTIMERGroup)) = (ui16TIMERLimit >> 1) & 255;
+    }
+    else{
+      if (ui8ReadBit(*regTCCRA(ui8pTIMERGroup), WGMn1) == 1){
+        *(regOCRAL(ui8pTIMERGroup)) = ui16TIMERLimit & 255;
+      }
+    }
   }
   else{
-    *(regICRH(ui8pGroup)) = (ui16TIMERLimit >> 8) & 255;
-    *(regICRL(ui8pGroup)) = (ui16TIMERLimit) & 255;
-    *(regOCRAH(ui8pGroup)) = (ui16TIMERLimit >> 10) & 255;
-    *(regOCRAL(ui8pGroup)) = (ui16TIMERLimit >> 2) & 255;
-    *(regOCRBH(ui8pGroup)) = (ui16TIMERLimit >> 9) & 255;
-    *(regOCRBL(ui8pGroup)) = (ui16TIMERLimit >> 1) & 255;
-    #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
-      *(regOCRCH(ui8pGroup)) =  (((ui16TIMERLimit >> 1) + (ui16TIMERLimit >> 2)) >> 8) & 255;
-      *(regOCRCL(ui8pGroup)) =  ((ui16TIMERLimit >> 1) + (ui16TIMERLimit >> 2)) & 255;
-    #endif
+    if (ui8ReadBit(*regTCCRB(ui8pTIMERGroup), WGMn2) == 1){
+      *(regICRH(ui8pTIMERGroup)) = (ui16TIMERLimit >> 8) & 255;
+      *(regICRL(ui8pTIMERGroup)) = (ui16TIMERLimit) & 255;
+      *(regOCRAH(ui8pTIMERGroup)) = (ui16TIMERLimit >> 10) & 255;
+      *(regOCRAL(ui8pTIMERGroup)) = (ui16TIMERLimit >> 2) & 255;
+      *(regOCRBH(ui8pTIMERGroup)) = (ui16TIMERLimit >> 9) & 255;
+      *(regOCRBL(ui8pTIMERGroup)) = (ui16TIMERLimit >> 1) & 255;
+      #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
+        *(regOCRCH(ui8pTIMERGroup)) =  (((ui16TIMERLimit >> 1) + (ui16TIMERLimit >> 2)) >> 8) & 255;
+        *(regOCRCL(ui8pTIMERGroup)) =  ((ui16TIMERLimit >> 1) + (ui16TIMERLimit >> 2)) & 255;
+      #endif
+    }
+    else{
+      if (ui8ReadBit(*regTCCRA(ui8pTIMERGroup), WGMn1) == 1){
+        *(regICRH(ui8pTIMERGroup)) = (ui16TIMERLimit >> 8) & 255;
+        *(regICRL(ui8pTIMERGroup)) = (ui16TIMERLimit) & 255;
+      }
+    }
   }
 }
 
 //! Function: TIMER Period (ms) Seter
 /*!
   Set TIMER period (in ms).
-  \param ui8pGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
+  \param ui8pTIMERGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
   \param ui16PeriodMS is a 16-bit integer. It's the period value, in miliseconds.
 */
-void vSetTIMERPeriodMS(volatile uint8_t* ui8pGroup, uint16_t ui16PeriodMS){
-  if (((ui8pGroup == TIMER_2 || ui8pGroup == TIMER_0) && ui16PeriodMS < 17) || ((ui8pGroup != TIMER_2 && ui8pGroup != TIMER_0) && ui16PeriodMS < 4194)){
-    vSetTIMERPrescaler(ui8pGroup, TIMER_PS_1024);
-    vSetTIMERCounterLimit(ui8pGroup, ui16PeriodMS * (DEVICE_CLOCK_HZ >> 10)/1000 - 1);
+void vSetTIMERPeriodMS(volatile uint8_t* ui8pTIMERGroup, uint16_t ui16PeriodMS){
+  if (((ui8pTIMERGroup == TIMER_2 || ui8pTIMERGroup == TIMER_0) && ui16PeriodMS < 17) || ((ui8pTIMERGroup != TIMER_2 && ui8pTIMERGroup != TIMER_0) && ui16PeriodMS < 4194)){
+    vSetTIMERPrescaler(ui8pTIMERGroup, TIMER_PS_1024);
+    vSetTIMERCounterLimit(ui8pTIMERGroup, ui16PeriodMS * (DEVICE_CLOCK_HZ >> 10)/1000 - 1);
   }
 }
 
 //! Function: TIMER Period (us) Seter
 /*!
   Set TIMER period (in us).
-  \param ui8pGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
+  \param ui8pTIMERGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
   \param ui32PeriodUS is a 32-bit integer. It's the period value, in microseconds.
 */
-void vSetTIMERPeriodUS(volatile uint8_t* ui8pGroup, uint32_t ui32PeriodUS){
+void vSetTIMERPeriodUS(volatile uint8_t* ui8pTIMERGroup, uint32_t ui32PeriodUS){
   uint8_t ui8PrescalerCounter = 0;
   uint8_t ui8Prescaler[7] = {0, 3, 5, 6, 7, 8, 10};
   uint32_t ui32CounterLimit = 0;
   for (ui8PrescalerCounter = 0 ; ui8PrescalerCounter < 7 ; ui8PrescalerCounter++){
-    ui32CounterLimit = ((DEVICE_CLOCK_HZ >> ui8Prescaler[ui8PrescalerCounter])/1000000 - 1) * (ui32PeriodUS);
+    ui32CounterLimit = ((DEVICE_CLOCK_HZ >> ui8Prescaler[ui8PrescalerCounter])/1000000) * (ui32PeriodUS) - 1;
     if (ui32CounterLimit < 65535 && ui32CounterLimit > 10){
-      vSetTIMERPrescaler(ui8pGroup, ui8PrescalerCounter + 1);
-      vSetTIMERCounterLimit(ui8pGroup, (uint16_t) ui32CounterLimit);
+      vSetTIMERPrescaler(ui8pTIMERGroup, ui8PrescalerCounter + 1);
+      vSetTIMERCounterLimit(ui8pTIMERGroup, (uint16_t) ui32CounterLimit);
       break;
     }
   }
@@ -256,13 +283,13 @@ void vSetTIMERPeriodUS(volatile uint8_t* ui8pGroup, uint32_t ui32PeriodUS){
 //! Function: TIMER Interrupt Attacher
 /*!
   Attach a TIMER interruption function.
-  \param ui8pGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
+  \param ui8pTIMERGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
   \param ui8SubTimer is a 8-bit integer. It's the prescaler timer.
   \param vInterruptFunction is a function pointer. It's the callback interruption.
   \param vpArgument is a void pointer. It's the callback argument.
 */
-void vAttachTIMERInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer, isr_timer_t vInterruptFunction, void* vpArgument){
-  uint8_t ui8TIMERNumber = usrGetTIMERNumber(ui8pGroup);
+void vAttachTIMERInterrupt(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTimer, isr_timer_t vInterruptFunction, void* vpArgument){
+  uint8_t ui8TIMERNumber = usrGetTIMERNumber(ui8pTIMERGroup);
   switch(ui8SubTimer){
 
     case MASTER_TIMER:
@@ -306,51 +333,51 @@ void vAttachTIMERInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer, isr
 //! Function: TIMER Interrupt Dettacher
 /*!
   Dettach a TIMER interruption function.
-  \param ui8pGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
+  \param ui8pTIMERGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
   \param ui8SubTimer is a 8-bit integer. It's the prescaler timer.
 */
-void vDettachTIMERInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer){
-  vAttachTIMERInterrupt(ui8pGroup, ui8SubTimer, NULL, NULL);
+void vDettachTIMERInterrupt(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTimer){
+  vAttachTIMERInterrupt(ui8pTIMERGroup, ui8SubTimer, NULL, NULL);
 }
 
 //! Function: TIMER Interrupt Ignorer
 /*!
   Ignore a TIMER interruption flag.
-  \param ui8pGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
+  \param ui8pTIMERGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
   \param ui8SubTimer is a 8-bit integer. It's the prescaler timer.
 */
-void vIgnoreTIMERRequest(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer){
-  if (ui8pGroup == TIMER_0 || ui8pGroup == TIMER_2){
+void vIgnoreTIMERRequest(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTimer){
+  if (ui8pTIMERGroup == TIMER_0 || ui8pTIMERGroup == TIMER_2){
     if (ui8SubTimer == MASTER_TIMER){
-      vSetBit(*(regTIFR(ui8pGroup)), OCFnA);
+      vSetBit(*(regTIFR(ui8pTIMERGroup)), OCFnA);
     }
     else{
-      vSetBit(*(regTIFR(ui8pGroup)), OCFnB);
+      vSetBit(*(regTIFR(ui8pTIMERGroup)), OCFnB);
     }
   }
   else{
     switch (ui8SubTimer) {
       case MASTER_TIMER:
       {
-        vSetBit(*(regTIFR(ui8pGroup)), ICFn);
+        vSetBit(*(regTIFR(ui8pTIMERGroup)), ICFn);
       }
       break;
 
       case SUBTIMER_A:
       {
-        vSetBit(*(regTIFR(ui8pGroup)), OCFnA);
+        vSetBit(*(regTIFR(ui8pTIMERGroup)), OCFnA);
       }
       break;
 
       case SUBTIMER_B:
       {
-        vSetBit(*(regTIFR(ui8pGroup)), OCFnB);
+        vSetBit(*(regTIFR(ui8pTIMERGroup)), OCFnB);
       }
       break;
 
       case SUBTIMER_C:
       {
-        vSetBit(*(regTIFR(ui8pGroup)), OCFnC);
+        vSetBit(*(regTIFR(ui8pTIMERGroup)), OCFnC);
       }
       break;
 
@@ -361,41 +388,41 @@ void vIgnoreTIMERRequest(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer){
 //! Function: TIMER Interrupt Forcer
 /*!
   Force a TIMER interruption.
-  \param ui8pGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
+  \param ui8pTIMERGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
   \param ui8SubTimer is a 8-bit integer. It's the prescaler timer.
 */
-void vForceTIMERInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8SubTimer){
-  if (ui8pGroup == TIMER_0 || ui8pGroup == TIMER_2){
+void vForceTIMERInterrupt(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTimer){
+  if (ui8pTIMERGroup == TIMER_0 || ui8pTIMERGroup == TIMER_2){
     if (ui8SubTimer == MASTER_TIMER){
-      vEraseBit(*(regTIFR(ui8pGroup)), OCFnA);
+      vEraseBit(*(regTIFR(ui8pTIMERGroup)), OCFnA);
     }
     else{
-      vEraseBit(*(regTIFR(ui8pGroup)), OCFnB);
+      vEraseBit(*(regTIFR(ui8pTIMERGroup)), OCFnB);
     }
   }
   else{
     switch (ui8SubTimer) {
       case MASTER_TIMER:
       {
-        vEraseBit(*(regTIFR(ui8pGroup)), ICFn);
+        vEraseBit(*(regTIFR(ui8pTIMERGroup)), ICFn);
       }
       break;
 
       case SUBTIMER_A:
       {
-        vEraseBit(*(regTIFR(ui8pGroup)), OCFnA);
+        vEraseBit(*(regTIFR(ui8pTIMERGroup)), OCFnA);
       }
       break;
 
       case SUBTIMER_B:
       {
-        vEraseBit(*(regTIFR(ui8pGroup)), OCFnB);
+        vEraseBit(*(regTIFR(ui8pTIMERGroup)), OCFnB);
       }
       break;
 
       case SUBTIMER_C:
       {
-        vEraseBit(*(regTIFR(ui8pGroup)), OCFnC);
+        vEraseBit(*(regTIFR(ui8pTIMERGroup)), OCFnC);
       }
       break;
 

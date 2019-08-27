@@ -83,8 +83,8 @@
 typedef void(*isr_extint_t)(void*);
 typedef void* args_extint_t;
 
-void vEnableEXTINT(uint8_t ui8InterruptPin);                                                                  /*!< Void type function. */
-void vDisableEXTINT(uint8_t ui8InterruptPin);                                                                 /*!< Void type function. */
+void vEnableEXTINTInterrupt(uint8_t ui8InterruptPin);                                                         /*!< Void type function. */
+void vDisableEXTINTInterrupt(uint8_t ui8InterruptPin);                                                        /*!< Void type function. */
 void vAttachEXTINTInterrupt(uint8_t ui8InterruptPin, isr_extint_t vInterruptFunction, void* vpArgument);      /*!< Void type function. */
 void vDettachEXTINTInterrupt(uint8_t ui8InterruptPin);                                                        /*!< Void type function. */
 

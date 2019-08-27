@@ -19,7 +19,7 @@ uint8_t ui8EnabledEXTINT = 0;
   Enable a EXTINT interruption.
   \param ui8InterruptPin is a 8-bit pointer integer. It's the EXTINT pin (EXTINT_X).
 */
-void vEnableEXTINT(uint8_t ui8InterruptPin){
+void vEnableEXTINTInterrupt(uint8_t ui8InterruptPin){
   vSetBit(EIMSK, ui8InterruptPin);
   ui8EnabledEXTINT = EIMSK;
 }
@@ -29,7 +29,7 @@ void vEnableEXTINT(uint8_t ui8InterruptPin){
   Disable a EXTINT interruption.
   \param ui8InterruptPin is a 8-bit pointer integer. It's the EXTINT pin (EXTINT_X).
 */
-void vDisableEXTINT(uint8_t ui8InterruptPin){
+void vDisableEXTINTInterrupt(uint8_t ui8InterruptPin){
   vEraseBit(EIMSK, ui8InterruptPin);
   ui8EnabledEXTINT = EIMSK;
 }
