@@ -1,34 +1,34 @@
-//! HALru Versui8pn 1.0b
+//! HALru Version 1.0b
 /*!
   This code file was written by Jorge Henrique Moreira Santana and is under
   the GNU GPLv3 license. All legal rights are reserved.
 
-  Permissui8pns of this copy left license are conditui8pned on making available
-  complete source code of licensed works and modificatui8pns under the same
+  Permissions of this copyleft license are conditioned on making available
+  complete source code of licensed works and modifications under the same
   license or the GNU GPLv3. Copyright and license notices must be preserved.
   Contributors provide an express grant of patent rights. However, a larger
   work using the licensed work through interfaces provided by the licensed
   work may be distributed under different terms and without source code for
   the larger work.
 
-  * Permissui8pns:
-    -" Commercial use;
-    -" Modificatui8pn;
-    -" Distributui8pn;
-    -" Patent Use;
-    -" Private Use;
+  * Permissions:
+    -> Commercial use;
+    -> Modification;
+    -> Distribuition;
+    -> Patent Use;
+    -> Private Use;
 
-  * Limitatui8pns:
-    -" Liability;
-    -" Warranty;
+  * Limitations:
+    -> Liability;
+    -> Warranty;
 
-  * Conditui8pns:
-    -" License and copyright notice;
-    -" Disclose source;
-    -" State changes;
-    -" Same license (library);
+  * Conditions:
+    -> License and copyright notice;
+    -> Disclose source;
+    -> State changes;
+    -> Same license (library);
 
-  For more informatui8pns, check the LICENSE document. If you want to use a
+  For more informations, check the LICENSE document. If you want to use a
   commercial product without having to provide the source code, send an email
   to jorge_henrique_123@hotmail.com to talk.
 */
