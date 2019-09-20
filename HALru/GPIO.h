@@ -41,8 +41,8 @@
 #endif
 
 #include <stdint.h>
-#include "avr/io.h"
-#include "HALru.h"
+#include <avr/io.h>
+#include <EmbeddedTools.h>
 
 //! Macro: GPIO Macros
 /*!
@@ -59,14 +59,14 @@
 #define   IO_GROUP_D                                                &PIND
 
 #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
-  #define   ui8p_GROUP_A                                            &PINA
-  #define   ui8p_GROUP_E                                            &PINE
-  #define   ui8p_GROUP_F                                            &PINF
-  #define   ui8p_GROUP_G                                            &PING
-  #define   ui8p_GROUP_H                                            &PINH
-  #define   ui8p_GROUP_K                                            &PINK
-  #define   ui8p_GROUP_L                                            &PINL
-  #define   ui8p_GROUP_J                                            &PINJ
+  #define   IO_GROUP_A                                              &PINA
+  #define   IO_GROUP_E                                              &PINE
+  #define   IO_GROUP_F                                              &PINF
+  #define   IO_GROUP_G                                              &PING
+  #define   IO_GROUP_H                                              &PINH
+  #define   IO_GROUP_K                                              &PINK
+  #define   IO_GROUP_L                                              &PINL
+  #define   IO_GROUP_J                                              &PINJ
 #endif
 
 #define   regPIN(ui8pGroup)                                         (ui8pGroup)
@@ -76,7 +76,7 @@
 //! Macro: Set Pin Mode
 /*!
   Set mode of a GPIO pin.
-  \param ui8pGroup is an undefined parameter. It's the GPIO group pin (ui8p_GROUP_X).
+  \param ui8pGroup is an undefined parameter. It's the GPIO group pin (IO_GROUP_X).
   \param ui8Pin is an undefined parameter. It's the pin number of a GPIO group (0 to 7).
   \param ui8Mode is an undefined parameter. It's OUTPUT_MODE or INPUT_MODE.
 */
@@ -90,7 +90,7 @@
 //! Macro: Enable GPIO PullUp Resistor
 /*!
   Enable PullUp resistor on a GPIO Pin.
-  \param ui8pGroup is an undefined parameter. It's the GPIO group pin (ui8p_GROUP_X).
+  \param ui8pGroup is an undefined parameter. It's the GPIO group pin (IO_GROUP_X).
   \param ui8Pin is an undefined parameter. It's the pin number of a GPIO group (0 to 7).
 */
 #define   vEnableGPIOPullUp(ui8pGroup, ui8Pin)                      vSetBit(*regPORT(ui8pGroup), ui8Pin)
@@ -98,7 +98,7 @@
 //! Macro: Disable GPIO PullUp Resistor
 /*!
   Enable PullUp resistor on a GPIO Pin.
-  \param ui8pGroup is an undefined parameter. It's the GPIO group pin (ui8p_GROUP_X).
+  \param ui8pGroup is an undefined parameter. It's the GPIO group pin (IO_GROUP_X).
   \param ui8Pin is an undefined parameter. It's the pin number of a GPIO group (0 to 7).
 */
 #define   vDisableGPIOPullUp(ui8pGroup, ui8Pin)                     vEraseBit(*regPORT(ui8pGroup), ui8Pin)
@@ -106,7 +106,7 @@
 //! Macro: Set GPIO Pin
 /*!
   Write high logic-level on a GPIO Pin.
-  \param ui8pGroup is an undefined parameter. It's the GPIO group pin (ui8p_GROUP_X).
+  \param ui8pGroup is an undefined parameter. It's the GPIO group pin (IO_GROUP_X).
   \param ui8Pin is an undefined parameter. It's the pin number of a GPIO group (0 to 7).
 */
 
@@ -115,7 +115,7 @@
 //! Macro: Unset GPIO Pin
 /*!
   Write low logic-level on a GPIO Pin.
-  \param ui8pGroup is an undefined parameter. It's the GPIO group pin (ui8p_GROUP_X).
+  \param ui8pGroup is an undefined parameter. It's the GPIO group pin (IO_GROUP_X).
   \param ui8Pin is an undefined parameter. It's the pin number of a GPIO group (0 to 7).
 */
 #define   vUnsetGPIOPin(ui8pGroup, ui8Pin)                          vEraseBit(*regPORT(ui8pGroup), ui8Pin)
@@ -123,7 +123,7 @@
 //! Macro: Toggle GPIO Pin
 /*!
   Toggle the logic-level on a GPIO Pin.
-  \param ui8pGroup is an undefined parameter. It's the GPIO group pin (ui8p_GROUP_X).
+  \param ui8pGroup is an undefined parameter. It's the GPIO group pin (IO_GROUP_X).
   \param ui8Pin is an undefined parameter. It's the pin number of a GPIO group (0 to 7).
 */
 #define   vToggleGPIOPin(ui8pGroup, ui8Pin)                         vInvertBit(*regPORT(ui8pGroup), ui8Pin)
@@ -131,7 +131,7 @@
 //! Macro: Digital Write on a GPIO Pin
 /*!
   Write a logic-level on a GPIO Pin.
-  \param ui8pGroup is an undefined parameter. It's the GPIO group pin (ui8p_GROUP_X).
+  \param ui8pGroup is an undefined parameter. It's the GPIO group pin (IO_GROUP_X).
   \param ui8Pin is an undefined parameter. It's the pin number of a GPIO group (0 to 7).
   \param ui8Mode is an undefined parameter. It's HIGH_LEVEL or LOW_LEVEL.
 */
@@ -145,48 +145,11 @@
 //! Macro: Digital Read on a GPIO Pin
 /*!
   Read a logic-level on a GPIO Pin.
-  \param ui8pGroup is an undefined parameter. It's the GPIO group pin (ui8p_GROUP_X).
+  \param ui8pGroup is an undefined parameter. It's the GPIO group pin (IO_GROUP_X).
   \param ui8Pin is an undefined parameter. It's the pin number of a GPIO group (0 to 7).
   \return Returns the logic-level.
 */
 #define   ui8GPIODigitalRead(ui8pGroup, ui8Pin)                     ui8ReadBit(*regPORT(ui8pGroup), ui8Pin)
-
-//! Macro: gpio_t "object" constructor
-/*!
-  "Construct" a gpio_t "object".
-  \param ui8pGroup is an undefined parameter. It's the GPIO group pin (ui8p_GROUP_X).
-  \param ui8Pin is an undefined parameter. It's the pin number of a GPIO group (0 to 7).
-  \return Returns the logic-level.
-*/
-#define   NewGPIO(ui8pGroup, ui8Pin)                                {ui8pGroup, ui8Pin}
-
-
-//! Type Definitui8pn: gpio_t
-/*!
-  This is a "class" of gpio_t type.
-*/
-typedef struct{
-  volatile uint8_t* ui8pGroup;
-  uint8_t ui8Pin;
-} gpio_t;
-
-//! Type Definitui8pn: GPIO_manager_t
-/*!
-  This is a "class" of GPIO_manager_t type.
-*/
-typedef struct{
-  void (*vOutputMode)(gpio_t* ioPin);                               /*!< void "method". */
-  void (*vInputMode)(gpio_t* ioPin);                                /*!< void "method". */
-  void (*vEnablePullUp)(gpio_t* ioPin);                             /*!< void "method". */
-  void (*vDisablePullUp)(gpio_t* ioPin);                            /*!< void "method". */
-  void (*vSet)(gpio_t* ioPin);                                      /*!< void "method". */
-  void (*vUnset)(gpio_t* ioPin);                                    /*!< void "method". */
-  void (*vToggle)(gpio_t* ioPin);                                   /*!< void "method". */
-  void (*vWrite)(gpio_t* ioPin, uint8_t ui8LogicalLevel);           /*!< void "method". */
-  uint8_t (*ui8Read)(gpio_t* ioPin);                                /*!< uint8_t "method". */
-} gpio_manager_t;
-
-extern gpio_manager_t GPIO;                                         /*!< GPIO manager "object". */
 
 #ifdef __cplusplus
   }

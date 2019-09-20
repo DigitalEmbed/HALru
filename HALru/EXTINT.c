@@ -1,15 +1,17 @@
 #include "EXTINT.h"
+#include <stdio.h>
+#include <avr/interrupt.h>
+#include "./Configs.h"
+#include "./Interrupts.h"
 
 //! Declarations: Private EXTINT Declarations
 /*!
   This macros and variables are for facilitate the use of this library.
 */
 #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
-  isr_timer_t isrExtInt[7] = {NULL};
-  args_timer_t argExtInt[7] = {NULL};
+  volatile hal_isr_t isrEXTINTArray[7] = {{NULL, NULL}};
 #else
-  isr_timer_t isrExtInt[2] = {NULL};
-  args_timer_t argExtInt[2] = {NULL};
+  volatile hal_isr_t isrEXTINTArray[2] = {{NULL, NULL}};
 #endif
 
 uint8_t ui8EnabledEXTINT = 0;
@@ -38,13 +40,12 @@ void vDisableEXTINTInterrupt(uint8_t ui8InterruptPin){
 /*!
   Attach a EXTINT interruption function.
   \param ui8InterruptPin is a 8-bit pointer integer. It's the EXTINT pin (EXTINT_X).
-  \param ui8SubTimer is a 8-bit integer. It's the prescaler timer.
   \param vInterruptFunction is a function pointer. It's the callback interruption.
   \param vpArgument is a void pointer. It's the callback argument.
 */
 void vAttachEXTINTInterrupt(uint8_t ui8InterruptPin, isr_extint_t vInterruptFunction, void* vpArgument){
-  isrExtInt[ui8InterruptPin] = vInterruptFunction;
-  argExtInt[ui8InterruptPin] = vpArgument;
+  isrEXTINTArray[ui8InterruptPin].vInterruptFunction = vInterruptFunction;
+  isrEXTINTArray[ui8InterruptPin].vpArgument = vpArgument;
 }
 
 //! Function: EXTINT Interrupt Dettacher
@@ -57,9 +58,9 @@ void vDettachEXTINTInterrupt(uint8_t ui8InterruptPin){
 }
 
 ISR(INT0_vect){
-  if (isrExtInt[0] != NULL){
+  if (isrEXTINTArray[0].vInterruptFunction != NULL){
     vEraseBit(EIMSK, 0);
-    isrExtInt[0](argExtInt[0]);
+    isrEXTINTArray[0].vInterruptFunction(isrEXTINTArray[0].vpArgument);
     if (ui8ReadBit(ui8EnabledEXTINT, 0) == 1){
       vSetBit(EIMSK, 0);
     }
@@ -67,9 +68,9 @@ ISR(INT0_vect){
 }
 
 ISR(INT1_vect){
-  if (isrExtInt[1] != NULL){
+  if (isrEXTINTArray[1].vInterruptFunction != NULL){
     vEraseBit(EIMSK, 1);
-    isrExtInt[1](argExtInt[1]);
+    isrEXTINTArray[1].vInterruptFunction(isrEXTINTArray[1].vpArgument);
     if (ui8ReadBit(ui8EnabledEXTINT, 1) == 1){
       vSetBit(EIMSK, 1);
     }
@@ -78,9 +79,9 @@ ISR(INT1_vect){
 
 #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
   ISR(INT2_vect){
-    if (isrExtInt[2] != NULL){
+    if (isrEXTINTArray[2].vInterruptFunction != NULL){
       vEraseBit(EIMSK, 2);
-      isrExtInt[2](argExtInt[2]);
+      isrEXTINTArray[2].vInterruptFunction(isrEXTINTArray[2].vpArgument);
       if (ui8ReadBit(ui8EnabledEXTINT ,2) == 1){
         vSetBit(EIMSK, 2);
       }
@@ -88,9 +89,9 @@ ISR(INT1_vect){
   }
 
   ISR(INT3_vect){
-    if (isrExtInt[3] != NULL){
+    if (isrEXTINTArray[3].vInterruptFunction != NULL){
       vEraseBit(EIMSK, 3);
-      isrExtInt[3](argExtInt[3]);
+      isrEXTINTArray[3].vInterruptFunction(isrEXTINTArray[3].vpArgument);
       if (ui8ReadBit(ui8EnabledEXTINT, 3) == 1){
         vSetBit(EIMSK, 3);
       }
@@ -98,9 +99,9 @@ ISR(INT1_vect){
   }
 
   ISR(INT4_vect){
-    if (isrExtInt[4] != NULL){
+    if (isrEXTINTArray[4].vInterruptFunction != NULL){
       vEraseBit(EIMSK, 4);
-      isrExtInt[4](argExtInt[4]);
+      isrEXTINTArray[4].vInterruptFunction(isrEXTINTArray[4].vpArgument);
       if (ui8ReadBit(ui8EnabledEXTINT, 4) == 1){
         vSetBit(EIMSK, 4);
       }
@@ -108,9 +109,9 @@ ISR(INT1_vect){
   }
 
   ISR(INT5_vect){
-    if (isrExtInt[5] != NULL){
+    if (isrEXTINTArray[5].vInterruptFunction != NULL){
       vEraseBit(EIMSK, 5);
-      isrExtInt[5](argExtInt[5]);
+      isrEXTINTArray[5].vInterruptFunction(isrEXTINTArray[5].vpArgument);
       if (ui8ReadBit(ui8EnabledEXTINT, 5) == 1){
         vSetBit(EIMSK, 5);
       }
@@ -118,9 +119,9 @@ ISR(INT1_vect){
   }
 
   ISR(INT6_vect){
-    if (isrExtInt[6] != NULL){
+    if (isrEXTINTArray[6].vInterruptFunction != NULL){
       vEraseBit(EIMSK, 6);
-      isrExtInt[6](argExtInt[6]);
+      isrEXTINTArray[6].vInterruptFunction(isrEXTINTArray[6].vpArgument);
       if (ui8ReadBit(ui8EnabledEXTINT, 6) == 1){
         vSetBit(EIMSK, 6);
       }
@@ -128,9 +129,9 @@ ISR(INT1_vect){
   }
 
   ISR(INT7_vect){
-    if (isrExtInt[7] != NULL){
+    if (isrEXTINTArray[7].vInterruptFunction != NULL){
       vEraseBit(EIMSK, 7);
-      isrExtInt[7](argExtInt[7]);
+      isrEXTINTArray[7].vInterruptFunction(isrEXTINTArray[7].vpArgument);
       if (ui8ReadBit(ui8EnabledEXTINT, 7) == 1){
         vSetBit(EIMSK, 7);
       }

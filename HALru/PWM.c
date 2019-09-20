@@ -1,5 +1,8 @@
 #include "PWM.h"
 
+#include <Print.h>
+#include <USART.h>
+
 void vEnablePWMMode(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8PWMMode){
   if (ui8pTIMERGroup == TIMER_0 || ui8pTIMERGroup == TIMER_2){
     vSetBit(*regTCCRA(ui8pTIMERGroup), WGMn0);
@@ -59,11 +62,17 @@ void vDisablePWMMode(volatile uint8_t* ui8pTIMERGroup){
 }
 
 uint16_t ui16GetTIMERMaxDutyCicle(volatile uint8_t* ui8pTIMERGroup){
+  if (ui8pTIMERGroup == NULL){
+    return 0;
+  }
   if (ui8pTIMERGroup == TIMER_0 || ui8pTIMERGroup == TIMER_2) {
     return (*(regOCRAL(ui8pTIMERGroup)));
   }
   else {
-    return (*(regICRL(ui8pTIMERGroup))) | ((*(regICRH(ui8pTIMERGroup))) << 8);
+    uint8_t ui8MaxDutyCicle[2] = {(*(regICRL(ui8pTIMERGroup))), (*(regICRH(ui8pTIMERGroup)))};
+    uint16_t ui16MaxDutyCicle = 0;
+    memcpy(&ui16MaxDutyCicle, ui8MaxDutyCicle, sizeof(uint16_t));
+    return ui16MaxDutyCicle;
   }
 }
 

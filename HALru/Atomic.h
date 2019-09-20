@@ -40,8 +40,6 @@
   extern "C" {
 #endif
 
-#include "HALru.h"
-
 //! Macro: Atomic Macros
 /*!
   This macros are for facilitate the use of this library.

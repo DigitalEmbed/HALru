@@ -41,9 +41,7 @@
 #endif
 
 #include <stdint.h>
-#include "avr/io.h"
-#include "avr/interrupt.h"
-#include "HALru.h"
+#include <avr/io.h>
 
 //! Macro: TIMER Macros
 /*!
@@ -161,13 +159,6 @@
 */
 #define   vSetTIMERFrequencyHZ(tmrGroup, ui32FrequencyHZ)     vSetTIMERPeriodUS(tmrGroup, (1000000/(ui32FrequencyHZ)))
 
-//! Type Definition: isr_timer_t and args_timer_t
-/*!
-  This typedef exist for organization purpose.
-*/
-typedef void(*isr_timer_t)(void*);
-typedef void* args_timer_t;
-
 void vTIMERInit(volatile uint8_t* ui8pTIMERGroup);                                                                                         /*!< Void type function. */
 void vEnableTIMERInterrupt(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTimer);                                                         /*!< Void type function. */
 void vDisableTIMERInterrupt(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTimer);                                                        /*!< Void type function. */
@@ -177,7 +168,7 @@ void vSetTIMERPeriodMS(volatile uint8_t* ui8pTIMERGroup, uint16_t ui16PeriodMS);
 void vSetTIMERPeriodUS(volatile uint8_t* ui8pTIMERGroup, uint32_t ui32PeriodUS);                                                           /*!< Void type function. */
 void vIgnoreTIMERRequest(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTimer);                                                           /*!< Void type function. */
 void vForceTIMERInterrupt(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTimer);                                                          /*!< Void type function. */
-void vAttachTIMERInterrupt(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTimer, isr_timer_t vInterruptFunction, void* vpArgument);       /*!< Void type function. */
+void vAttachTIMERInterrupt(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTimer, void (*vInterruptFunction)(void*), void* vpArgument);    /*!< Void type function. */
 void vDettachTIMERInterrupt(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTimer);                                                        /*!< Void type function. */
 
 #ifdef __cplusplus

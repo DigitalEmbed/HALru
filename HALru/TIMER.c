@@ -1,4 +1,9 @@
 #include "TIMER.h"
+#include <stdio.h>
+#include <avr/interrupt.h>
+#include <EmbeddedTools.h>
+#include "./Configs.h"
+#include "./Interrupts.h"
 
 //! Declarations: Private TIMER Declarations
 /*!
@@ -12,14 +17,10 @@
       [-]  [2][1][0]  [2][1][0]  [1]
 */
 #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
-  isr_timer_t isrMasterTimer[6] = {NULL};
-  args_timer_t argMasterTimer[6] = {NULL};
-  isr_timer_t isrSubTimerA[6] = {NULL};
-  args_timer_t argSubTimerA[6] = {NULL};
-  isr_timer_t isrSubTimerB[4] = {NULL};
-  args_timer_t argSubTimerB[4] = {NULL};
-  isr_timer_t isrSubTimerC[4] = {NULL};
-  args_timer_t argSubTimerC[4] = {NULL};
+  hal_isr_t isrMasterTimer[6] = {{NULL, NULL}};
+  hal_isr_t isrSubTimerA[6] = {{NULL, NULL}};
+  hal_isr_t isrSubTimerB[4] = {{NULL, NULL}};
+  hal_isr_t isrSubTimerC[4] = {{NULL, NULL}};
   volatile uint32_t ui32ActivedTIMERs = 0;
   #define   usrGetTIMERNumber(usrGroup)                       usrGroup == TIMER_0 ? 0 :\
                                                               usrGroup == TIMER_1 ? 1 :\
@@ -27,12 +28,9 @@
                                                               usrGroup == TIMER_3 ? 3 :\
                                                               usrGroup == TIMER_4 ? 4 : 5
 #else
-  isr_timer_t isrMasterTimer[3] = {NULL};
-  args_timer_t argMasterTimer[3] = {NULL};
-  isr_timer_t isrSubTimerA[3] = {NULL};
-  args_timer_t argSubTimerA[3] = {NULL};
-  isr_timer_t isrSubTimerB = NULL;
-  args_timer_t argSubTimerB = NULL;
+  hal_isr_t isrMasterTimer[3] = {{NULL, NULL}};
+  hal_isr_t isrSubTimerA[3] = {{NULL, NULL}};
+  hal_isr_t isrSubTimerB = {NULL, NULL};
   volatile uint8_t ui8ActivedTIMERs = 0;
   #define   usrGetTIMERNumber(usrGroup)                       usrGroup == TIMER_0 ? 0 :\
                                                               usrGroup == TIMER_1 ? 1 : 2
@@ -270,8 +268,11 @@ void vSetTIMERPeriodUS(volatile uint8_t* ui8pTIMERGroup, uint32_t ui32PeriodUS){
   uint8_t ui8PrescalerCounter = 0;
   uint8_t ui8Prescaler[7] = {0, 3, 5, 6, 7, 8, 10};
   uint32_t ui32CounterLimit = 0;
-  for (ui8PrescalerCounter = 0 ; ui8PrescalerCounter < 7 ; ui8PrescalerCounter++){
-    ui32CounterLimit = ((DEVICE_CLOCK_HZ >> ui8Prescaler[ui8PrescalerCounter])/1000000) * (ui32PeriodUS) - 1;
+  for (ui8PrescalerCounter = 0 ; ui8Prescaler[ui8PrescalerCounter] < 7 ; ui8PrescalerCounter++){
+    if (ui8pTIMERGroup != TIMER_2 && (ui8Prescaler[ui8PrescalerCounter] == 5 || ui8Prescaler[ui8PrescalerCounter] == 7)){
+      ui8PrescalerCounter++;
+    }
+    ui32CounterLimit = ((float) (DEVICE_CLOCK_HZ >> ui8Prescaler[ui8PrescalerCounter])/1000000) * (ui32PeriodUS) - 1;
     if (ui32CounterLimit < 65535 && ui32CounterLimit > 10){
       vSetTIMERPrescaler(ui8pTIMERGroup, ui8PrescalerCounter + 1);
       vSetTIMERCounterLimit(ui8pTIMERGroup, (uint16_t) ui32CounterLimit);
@@ -288,32 +289,32 @@ void vSetTIMERPeriodUS(volatile uint8_t* ui8pTIMERGroup, uint32_t ui32PeriodUS){
   \param vInterruptFunction is a function pointer. It's the callback interruption.
   \param vpArgument is a void pointer. It's the callback argument.
 */
-void vAttachTIMERInterrupt(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTimer, isr_timer_t vInterruptFunction, void* vpArgument){
+void vAttachTIMERInterrupt(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTimer, void (*vInterruptFunction)(void*), void* vpArgument){
   uint8_t ui8TIMERNumber = usrGetTIMERNumber(ui8pTIMERGroup);
   switch(ui8SubTimer){
 
     case MASTER_TIMER:
     {
-      isrMasterTimer[ui8TIMERNumber] = vInterruptFunction;
-      argMasterTimer[ui8TIMERNumber] = vpArgument;
+      isrMasterTimer[ui8TIMERNumber].vInterruptFunction = vInterruptFunction;
+      isrMasterTimer[ui8TIMERNumber].vpArgument = vpArgument;
       break;
     }
 
     case SUBTIMER_A:
     {
-      isrSubTimerA[ui8TIMERNumber] = vInterruptFunction;
-      argSubTimerA[ui8TIMERNumber] = vpArgument;
+      isrSubTimerA[ui8TIMERNumber].vInterruptFunction = vInterruptFunction;
+      isrSubTimerA[ui8TIMERNumber].vpArgument = vpArgument;
       break;
     }
 
     case SUBTIMER_B:
     {
       #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
-        isrSubTimerB[ui8TIMERNumber] = vInterruptFunction;
-        argSubTimerB[ui8TIMERNumber] = vpArgument;
+        isrSubTimerB[ui8TIMERNumber].vInterruptFunction = vInterruptFunction;
+        isrSubTimerB[ui8TIMERNumber].vpArgument = vpArgument;
       #else
-        isrSubTimerB = vInterruptFunction;
-        argSubTimerB = vpArgument;
+        isrSubTimerB.vInterruptFunction = vInterruptFunction;
+        isrSubTimerB.vpArgument = vpArgument;
       #endif
       break;
     }
@@ -321,8 +322,8 @@ void vAttachTIMERInterrupt(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTimer
     #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
       case SUBTIMER_C:
       {
-        isrSubTimerC[ui8TIMERNumber] = vInterruptFunction;
-        argSubTimerC[ui8TIMERNumber] = vpArgument;
+        isrSubTimerC[ui8TIMERNumber].vInterruptFunction = vInterruptFunction;
+        isrSubTimerC[ui8TIMERNumber].vpArgument = vpArgument;
         break;
       }
     #endif
@@ -435,9 +436,9 @@ void vForceTIMERInterrupt(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTimer)
   Callbacks of TIMER hardware interruptions.
 */
 ISR(TIMER0_COMPA_vect){
-  if (isrMasterTimer[0] != NULL){
+  if (isrMasterTimer[0].vInterruptFunction != NULL){
     vEraseBit(*(regTIMSK(TIMER_0)), OCIEnA);
-    isrMasterTimer[0](argMasterTimer[0]);
+    isrMasterTimer[0].vInterruptFunction(isrMasterTimer[0].vpArgument);
     #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
       if (ui8ReadBit(ui32ActivedTIMERs, 14) == 1){
     #else
@@ -449,9 +450,9 @@ ISR(TIMER0_COMPA_vect){
 }
 
 ISR(TIMER0_COMPB_vect){
-  if (isrSubTimerA[0] != NULL){
+  if (isrSubTimerA[0].vInterruptFunction != NULL){
     vEraseBit(*(regTIMSK(TIMER_0)), OCIEnA);
-    isrSubTimerA[0](argSubTimerA[0]);
+    isrSubTimerA[0].vInterruptFunction(isrSubTimerA[0].vpArgument);
     #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
       if (ui8ReadBit(ui32ActivedTIMERs, 8) == 1){
     #else
@@ -463,9 +464,9 @@ ISR(TIMER0_COMPB_vect){
 }
 
 ISR(TIMER1_CAPT_vect){
-  if (isrMasterTimer[1] != NULL){
+  if (isrMasterTimer[1].vInterruptFunction != NULL){
     vEraseBit(*(regTIMSK(TIMER_1)), ICIEn);
-    isrMasterTimer[1](argMasterTimer[1]);
+    isrMasterTimer[1].vInterruptFunction(isrMasterTimer[1].vpArgument);
     #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
       if (ui8ReadBit(ui32ActivedTIMERs, 15) == 1){
     #else
@@ -477,9 +478,9 @@ ISR(TIMER1_CAPT_vect){
 }
 
 ISR(TIMER1_COMPA_vect){
-  if (isrSubTimerA[1] != NULL){
+  if (isrSubTimerA[1].vInterruptFunction != NULL){
     vEraseBit(*(regTIMSK(TIMER_1)), OCIEnA);
-    isrSubTimerA[1](argSubTimerA[1]);
+    isrSubTimerA[1].vInterruptFunction(isrSubTimerA[1].vpArgument);
     #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
       if (ui8ReadBit(ui32ActivedTIMERs, 9) == 1){
     #else
@@ -492,17 +493,17 @@ ISR(TIMER1_COMPA_vect){
 
 ISR(TIMER1_COMPB_vect){
   #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
-    if (isrSubTimerB[1] != NULL){
+    if (isrSubTimerB[1].vInterruptFunction != NULL){
       vEraseBit(*(regTIMSK(TIMER_1)), OCIEnB);
-      isrSubTimerB[1](argSubTimerB[1]);
+      isrSubTimerB[1].vInterruptFunction(isrSubTimerB[1].vpArgument);
       if (ui8ReadBit(ui32ActivedTIMERs, 4) == 1){
         vSetBit(*(regTIMSK(TIMER_1)), OCIEnB);
       }
     }
   #else
-    if (isrSubTimerB != NULL){
+    if (isrSubTimerB.vInterruptFunction != NULL){
       vEraseBit(*(regTIMSK(TIMER_1)), OCIEnB);
-      isrSubTimerB(argSubTimerB);
+      isrSubTimerB.vInterruptFunction(isrSubTimerB.vpArgument);
       if (ui8ReadBit(ui8ActivedTIMERs, 0) == 1){
         vSetBit(*(regTIMSK(TIMER_1)), OCIEnB);
       }
@@ -511,9 +512,9 @@ ISR(TIMER1_COMPB_vect){
 }
 
 ISR(TIMER2_COMPA_vect){
-  if (isrMasterTimer[2] != NULL){
+  if (isrMasterTimer[2].vInterruptFunction != NULL){
     vEraseBit(*(regTIMSK(TIMER_2)), OCIEnA);
-    isrMasterTimer[2](argMasterTimer[2]);
+    isrMasterTimer[2].vInterruptFunction(isrMasterTimer[2].vpArgument);
     #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
       if (ui8ReadBit(ui32ActivedTIMERs, 16) == 1){
     #else
@@ -525,9 +526,9 @@ ISR(TIMER2_COMPA_vect){
 }
 
 ISR(TIMER2_COMPB_vect){
-  if (isrSubTimerA[2] != NULL){
+  if (isrSubTimerA[2].vInterruptFunction != NULL){
     vEraseBit(*(regTIMSK(TIMER_2)), OCIEnA);
-    isrSubTimerA[2](argSubTimerA[2]);
+    isrSubTimerA[2].vInterruptFunction(isrSubTimerA[2].vpArgument);
     #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
       if (ui8ReadBit(ui32ActivedTIMERs, 10) == 1){
     #else
@@ -540,9 +541,9 @@ ISR(TIMER2_COMPB_vect){
 
 #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
   ISR(TIMER1_COMPC_vect){
-    if (isrSubTimerC[1] != NULL){
+    if (isrSubTimerC[1].vInterruptFunction != NULL){
       vEraseBit(*(regTIMSK(TIMER_1)), OCIEnC);
-      isrSubTimerC[1](argSubTimerC[1]);
+      isrSubTimerC[1].vInterruptFunction(isrSubTimerC[1].vpArgument);
       if (ui8ReadBit(ui32ActivedTIMERs, 0) == 1){
         vSetBit(*(regTIMSK(TIMER_1)), OCIEnC);
       }
@@ -550,9 +551,9 @@ ISR(TIMER2_COMPB_vect){
   }
 
   ISR(TIMER3_CAPT_vect){
-    if (isrMasterTimer[3] != NULL){
+    if (isrMasterTimer[3].vInterruptFunction != NULL){
       vEraseBit(*(regTIMSK(TIMER_3)), ICIEn);
-      isrMasterTimer[3](argMasterTimer[3]);
+      isrMasterTimer[3].vInterruptFunction(isrMasterTimer[3].vpArgument);
       if (ui8ReadBit(ui32ActivedTIMERs, 17) == 1){
         vSetBit(*(regTIMSK(TIMER_3)), ICIEn);
       }
@@ -560,9 +561,9 @@ ISR(TIMER2_COMPB_vect){
   }
 
   ISR(TIMER3_COMPA_vect){
-    if (isrSubTimerA[3] != NULL){
+    if (isrSubTimerA[3].vInterruptFunction != NULL){
       vEraseBit(*(regTIMSK(TIMER_3)), OCIEnA);
-      isrSubTimerA[3](argSubTimerA[3]);
+      isrSubTimerA[3].vInterruptFunction(isrSubTimerA[3].vpArgument);
       if (ui8ReadBit(ui32ActivedTIMERs, 11) == 1){
         vSetBit(*(regTIMSK(TIMER_3)), OCIEnA);
       }
@@ -570,9 +571,9 @@ ISR(TIMER2_COMPB_vect){
   }
 
   ISR(TIMER3_COMPB_vect){
-    if (isrSubTimerB[3] != NULL){
+    if (isrSubTimerB[3].vInterruptFunction != NULL){
       vEraseBit(*(regTIMSK(TIMER_3)), OCIEnB);
-      isrSubTimerB[3](argSubTimerB[3]);
+      isrSubTimerB[3].vInterruptFunction(isrSubTimerB[3].vpArgument);
       if (ui8ReadBit(ui32ActivedTIMERs, 5) == 1){
         vSetBit(*(regTIMSK(TIMER_3)), OCIEnB);
       }
@@ -580,9 +581,9 @@ ISR(TIMER2_COMPB_vect){
   }
 
   ISR(TIMER3_COMPC_vect){
-    if (isrSubTimerC[3] != NULL){
+    if (isrSubTimerC[3].vInterruptFunction != NULL){
       vEraseBit(*(regTIMSK(TIMER_3)), OCIEnC);
-      isrSubTimerC[3](argSubTimerC[3]);
+      isrSubTimerC[3].vInterruptFunction(isrSubTimerC[3].vpArgument);
       if (ui8ReadBit(ui32ActivedTIMERs, 1) == 1){
         vSetBit(*(regTIMSK(TIMER_3)), OCIEnC);
       }
@@ -590,9 +591,9 @@ ISR(TIMER2_COMPB_vect){
   }
 
   ISR(TIMER4_CAPT_vect){
-    if (isrMasterTimer[4] != NULL){
+    if (isrMasterTimer[4].vInterruptFunction != NULL){
       vEraseBit(*(regTIMSK(TIMER_4)), ICIEn);
-      isrMasterTimer[4](argMasterTimer[4]);
+      isrMasterTimer[4].vInterruptFunction(isrMasterTimer[4].vpArgument);
       if (ui8ReadBit(ui32ActivedTIMERs, 18) == 1){
         vSetBit(*(regTIMSK(TIMER_4)), ICIEn);
       }
@@ -600,9 +601,9 @@ ISR(TIMER2_COMPB_vect){
   }
 
   ISR(TIMER4_COMPA_vect){
-    if (isrSubTimerA[4] != NULL){
+    if (isrSubTimerA[4].vInterruptFunction != NULL){
       vEraseBit(*(regTIMSK(TIMER_4)), OCIEnA);
-      isrSubTimerA[4](argSubTimerA[4]);
+      isrSubTimerA[4].vInterruptFunction(isrSubTimerA[4].vpArgument);
       if (ui8ReadBit(ui32ActivedTIMERs, 12) == 1){
         vSetBit(*(regTIMSK(TIMER_4)), OCIEnA);
       }
@@ -610,9 +611,9 @@ ISR(TIMER2_COMPB_vect){
   }
 
   ISR(TIMER4_COMPB_vect){
-    if (isrSubTimerB[4] != NULL){
+    if (isrSubTimerB[4].vInterruptFunction != NULL){
       vEraseBit(*(regTIMSK(TIMER_4)), OCIEnB);
-      isrSubTimerB[4](argSubTimerB[4]);
+      isrSubTimerB[4].vInterruptFunction(isrSubTimerB[4].vpArgument);
       if (ui8ReadBit(ui32ActivedTIMERs, 6) == 1){
         vSetBit(*(regTIMSK(TIMER_4)), OCIEnB);
       }
@@ -620,9 +621,9 @@ ISR(TIMER2_COMPB_vect){
   }
 
   ISR(TIMER4_COMPC_vect){
-    if (isrSubTimerC[4] != NULL){
+    if (isrSubTimerC[4].vInterruptFunction != NULL){
       vEraseBit(*(regTIMSK(TIMER_4)), OCIEnC);
-      isrSubTimerC[4](argSubTimerC[4]);
+      isrSubTimerC[4].vInterruptFunction(isrSubTimerC[4].vpArgument);
       if (ui8ReadBit(ui32ActivedTIMERs, 2) == 1){
         vSetBit(*(regTIMSK(TIMER_4)), OCIEnC);
       }
@@ -630,9 +631,9 @@ ISR(TIMER2_COMPB_vect){
   }
 
   ISR(TIMER5_CAPT_vect){
-    if (isrMasterTimer[5] != NULL){
+    if (isrMasterTimer[5].vInterruptFunction != NULL){
       vEraseBit(*(regTIMSK(TIMER_5)), ICIEn);
-      isrMasterTimer[5](argMasterTimer[5]);
+      isrMasterTimer[5].vInterruptFunction(isrMasterTimer[5].vpArgument);
       if (ui8ReadBit(ui32ActivedTIMERs, 19) == 1){
         vSetBit(*(regTIMSK(TIMER_5)), ICIEn);
       }
@@ -640,9 +641,9 @@ ISR(TIMER2_COMPB_vect){
   }
 
   ISR(TIMER5_COMPA_vect){
-    if (isrSubTimerA[5] != NULL){
+    if (isrSubTimerA[5].vInterruptFunction != NULL){
       vEraseBit(*(regTIMSK(TIMER_5)), OCIEnA);
-      isrSubTimerA[5](argSubTimerA[5]);
+      isrSubTimerA[5].vInterruptFunction(isrSubTimerA[5].vpArgument);
       if (ui8ReadBit(ui32ActivedTIMERs, 13) == 1){
         vSetBit(*(regTIMSK(TIMER_5)), OCIEnA);
       }
@@ -650,9 +651,9 @@ ISR(TIMER2_COMPB_vect){
   }
 
   ISR(TIMER5_COMPB_vect){
-    if (isrSubTimerB[5] != NULL){
+    if (isrSubTimerB[5].vInterruptFunction != NULL){
       vEraseBit(*(regTIMSK(TIMER_5)), OCIEnB);
-      isrSubTimerB[5](argSubTimerB[5]);
+      isrSubTimerB[5].vInterruptFunction(isrSubTimerB[5].vpArgument);
       if (ui8ReadBit(ui32ActivedTIMERs, 7) == 1){
         vSetBit(*(regTIMSK(TIMER_5)), OCIEnB);
       }
@@ -660,9 +661,9 @@ ISR(TIMER2_COMPB_vect){
   }
 
   ISR(TIMER5_COMPC_vect){
-    if (isrSubTimerC[5] != NULL){
+    if (isrSubTimerC[5].vInterruptFunction != NULL){
       vEraseBit(*(regTIMSK(TIMER_5)), OCIEnC);
-      isrSubTimerC[5](argSubTimerC[5]);
+      isrSubTimerC[5].vInterruptFunction(isrSubTimerC[5].vpArgument);
       if (ui8ReadBit(ui32ActivedTIMERs, 3) == 1){
         vSetBit(*(regTIMSK(TIMER_5)), OCIEnC);
       }

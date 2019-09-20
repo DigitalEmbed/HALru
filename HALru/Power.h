@@ -92,10 +92,10 @@
   #define   vTurnOnAllPeripherals()               PRR0 &= 16;\
                                                   PRR1 &= 192
 #else
-  #define   vTurnOffPeripheral(ui8Peripheral)     vSetBit(PRR0, ui8Peripheral)
-  #define   vTurnOffAllPeripherals()              PRR0 |= 239
-  #define   vTurnOnPeripheral(ui8Peripheral)      vEraseBit(PRR0, ui8Peripheral)
-  #define   vTurnOnAllPeripherals()               PRR0 &= 192
+  #define   vTurnOffPeripheral(ui8Peripheral)     vSetBit(PRR, ui8Peripheral)
+  #define   vTurnOffAllPeripherals()              PRR |= 239
+  #define   vTurnOnPeripheral(ui8Peripheral)      vEraseBit(PRR, ui8Peripheral)
+  #define   vTurnOnAllPeripherals()               PRR &= 192
 #endif
 
 #define   vWaitingForInterrupts()                 vEnableAllInterrupts(); while(1) { vSleepEnable(); }

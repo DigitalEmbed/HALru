@@ -40,15 +40,7 @@
   extern "C" {
 #endif
 
-/*!
-  Type Definition: Interruptions
-*/
-typedef void (*isr_pfunc_t)(void*);
-typedef struct {
-  isr_pfunc_t vInterruptFunction;
-  void* vpArgument;
-} hal_isr_t;
-
+#define HALRU_ACTIVED
 
 /*!
   Standard C Libraries
@@ -60,13 +52,6 @@ typedef struct {
 #include <string.h>
 
 /*!
-  Standard AVR Libraries
-*/
-#include <avr/io.h>
-#include <util/delay.h>
-#include <avr/interrupt.h>
-
-/*!
   Interface Libraries
 */
 #include "EmbeddedTools.h"
@@ -74,6 +59,8 @@ typedef struct {
 #include "Nested.h"
 #include "Print.h"
 #include "Power.h"
+#include "Watchdog.h"
+#include "Reset.h"
 #include "GPIO.h"
 #include "USART.h"
 #include "TIMER.h"
@@ -82,12 +69,6 @@ typedef struct {
 #include "EXTINT.h"
 #include "PCINT.h"
 #include "ADC.h"
-
-//! Configuration: Micro controler configurations
-/*!
-  Configure the micro controler here.
-*/
-#define   DEVICE_CLOCK_HZ             16000000
 
 //! Macro: Enable All Interrupts
 /*!

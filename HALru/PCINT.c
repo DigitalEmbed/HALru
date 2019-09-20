@@ -1,48 +1,53 @@
 #include "PCINT.h"
+#include <stdio.h>
+#include <avr/interrupt.h>
+#include <EmbeddedTools.h>
+#include "./Configs.h"
+#include "./Interrupts.h"
 
 volatile uint8_t ui8BeforeStatePCINT[3] = {0};
 volatile uint8_t ui8ActualStatePCINT[3] = {0};
 volatile uint8_t ui8EnabledPCINT = 0;
 
-hal_isr_t isrPCINTArray[3][8] = {{{NULL, NULL}}};
+volatile hal_isr_t isrPCINTArray[3][8] = {{{NULL, NULL}}};
 
 void vEnablePCINTGroup(volatile uint8_t* ui8Group){
-  if (ui8Group == IO_GROUP_B){
+  if (ui8Group == &PINB){
     vSetBit(PCICR, 0);
-    ui8ActualStatePCINT[0] = *(IO_GROUP_B);
+    ui8ActualStatePCINT[0] = PINB;
   }
   #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
-    else if(ui8Group == IO_GROUP_E || ui8Group == IO_GROUP_J){
+    else if(ui8Group == &PINE || ui8Group == &PINJ){
       vSetBit(PCICR, 1);
-      ui8ActualStatePCINT[1] = (volatile uint8_t) (((*(IO_GROUP_E)) & 1) | (*(IO_GROUP_J) << 1));
+      ui8ActualStatePCINT[1] = (volatile uint8_t) ((PINE & 1) | (PINJ << 1));
     }
   #else
-    else if(ui8Group == IO_GROUP_C){
+    else if(ui8Group == &PINC){
       vSetBit(PCICR, 1);
-      ui8ActualStatePCINT[1] = *(IO_GROUP_C);
+      ui8ActualStatePCINT[1] = PINC;
     }
   #endif
   else{
     vSetBit(PCICR, 2);
     #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
-      ui8ActualStatePCINT[2] = *(IO_GROUP_K);
+      ui8ActualStatePCINT[2] = PINK;
     #else
-      ui8ActualStatePCINT[2] = *(IO_GROUP_D);
+      ui8ActualStatePCINT[2] = PIND;
     #endif
   }
   ui8EnabledPCINT = PCICR & 7;
 }
 
 void vDisablePCINTGroup(volatile uint8_t* ui8Group){
-  if (ui8Group == IO_GROUP_B){
+  if (ui8Group == &PINB){
     vEraseBit(PCICR, 0);
   }
   #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
-    else if(ui8Group == IO_GROUP_E || ui8Group == IO_GROUP_J){
+    else if(ui8Group == &PINE || ui8Group == &PINJ){
       vEraseBit(PCICR, 1);
     }
   #else
-    else if(ui8Group == IO_GROUP_C){
+    else if(ui8Group == &PINC){
       vEraseBit(PCICR, 1);
     }
   #endif
@@ -76,7 +81,7 @@ void vDisablePCINTPin(uint8_t ui8InterruptPin){
   }
 }
 
-void vAttachPCINTInterrupt(uint8_t ui8InterruptPin, isr_pfunc_t vInterruptFunction, void* vpArgument){
+void vAttachPCINTInterrupt(uint8_t ui8InterruptPin, void (*vInterruptFunction)(void*), void* vpArgument){
   if (ui8InterruptPin <= 7){
     isrPCINTArray[0][ui8InterruptPin].vInterruptFunction = vInterruptFunction;
     isrPCINTArray[0][ui8InterruptPin].vpArgument = vpArgument;
@@ -97,7 +102,7 @@ void vDettachPCINTInterrupt(uint8_t ui8InterruptPin){
 
 ISR(PCINT0_vect){
   ui8BeforeStatePCINT[0] = ui8ActualStatePCINT[0];
-  ui8ActualStatePCINT[0] = *(IO_GROUP_B);
+  ui8ActualStatePCINT[0] = PINB;
   volatile uint8_t ui8ActivedPins = ui8BeforeStatePCINT[0] ^ ui8ActualStatePCINT[0];
   volatile uint8_t ui8Counter = 0;
   for (ui8Counter = 0 ; ui8Counter <= 7 ; ui8Counter++){
@@ -114,9 +119,9 @@ ISR(PCINT0_vect){
 ISR(PCINT1_vect){
   ui8BeforeStatePCINT[1] = ui8ActualStatePCINT[1];
   #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
-    ui8ActualStatePCINT[1] = (volatile uint8_t) (((*(IO_GROUP_E)) & 1) | (*(IO_GROUP_J) << 1));
+    ui8ActualStatePCINT[1] = (volatile uint8_t) ((PINE & 1) | (PINJ << 1));
   #else
-    ui8ActualStatePCINT[1] = *(IO_GROUP_C);
+    ui8ActualStatePCINT[1] = PINC;
   #endif
   volatile uint8_t ui8ActivedPins = ui8BeforeStatePCINT[1] ^ ui8ActualStatePCINT[1];
   volatile uint8_t ui8Counter = 0;
@@ -134,9 +139,9 @@ ISR(PCINT1_vect){
 ISR(PCINT2_vect){
   ui8BeforeStatePCINT[2] = ui8ActualStatePCINT[2];
   #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
-    ui8ActualStatePCINT[2] = *(IO_GROUP_K);
+    ui8ActualStatePCINT[2] = PINK;
   #else
-    ui8ActualStatePCINT[2] = *(IO_GROUP_D);
+    ui8ActualStatePCINT[2] = PIND;
   #endif
   volatile uint8_t ui8ActivedPins = ui8BeforeStatePCINT[2] ^ ui8ActualStatePCINT[2];
   volatile uint8_t ui8Counter = 0;

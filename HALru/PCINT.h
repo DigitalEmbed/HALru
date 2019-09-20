@@ -1,4 +1,4 @@
-//! HALru Version 1.0b
+//! HALru Version 2.0b
 /*!
   This code file was written by Jorge Henrique Moreira Santana and is under
   the GNU GPLv3 license. All legal rights are reserved.
@@ -41,8 +41,7 @@
 #endif
 
 #include <stdint.h>
-#include <avr/interrupt.h>
-#include "HALru.h"
+#include <avr/io.h>
 
 #define   PCINT_0                                     0
 #define   PCINT_1                                     1
@@ -71,15 +70,15 @@
 #define   PCINT_22                                    22
 #define   PCINT_23                                    23
 
-#define   PCINT_GROUP_0                               0
+/*#define   PCINT_GROUP_0                               0
 #define   PCINT_GROUP_1                               1
-#define   PCINT_GROUP_2                               2
+#define   PCINT_GROUP_2                               2*/
 
 void vEnablePCINTPin(uint8_t ui8InterruptPin);
 void vDisablePCINTPin(uint8_t ui8InterruptPin);
 void vEnablePCINTGroup(volatile uint8_t* ui8Group);
 void vDisablePCINTGroup(volatile uint8_t* ui8Group);
-void vAttachPCINTInterrupt(uint8_t ui8InterruptPin, isr_pfunc_t vInterruptFunction, void* vpArgument);
+void vAttachPCINTInterrupt(uint8_t ui8InterruptPin, void (*vInterruptFunction)(void*), void* vpArgument);
 void vDettachPCINTInterrupt(uint8_t ui8InterruptPin);
 
 #ifdef __cplusplus

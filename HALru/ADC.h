@@ -40,7 +40,9 @@
   extern "C" {
 #endif
 
-#include "HALru.h"
+#include <stdint.h>
+#include <avr/io.h>
+#include <EmbeddedTools.h>
 
 #define   ADC_PIN_SETTED                                2
 #define   ERROR_ADC_PIN_NOT_SETTED                      12
@@ -129,7 +131,7 @@
 void vEnableADC();
 void vDisableADC();
 void vSetADCSamplingRate(uint32_t ui32SamplingRate);
-void vAttachADCInterrupt(uint8_t ui8ADCInput, isr_pfunc_t vInterruptFunction, void* vpArgument);
+void vAttachADCInterrupt(uint8_t ui8ADCInput, void (*vInterruptFunction)(void*), void* vpArgument);
 void vDettachADCInterrupt(uint8_t ui8ADCInput);
 uint16_t ui16GetADCValue(uint8_t ui8ADCInput);
 void vSelectADCInput(uint8_t ui8ADCInput);

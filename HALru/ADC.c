@@ -1,4 +1,8 @@
 #include "ADC.h"
+#include <stdio.h>
+#include <avr/interrupt.h>
+#include "./Configs.h"
+#include "./Interrupts.h"
 
 #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
   #define   AMOUNT_OF_ADCS                              16
@@ -82,7 +86,7 @@ void vSetADCSamplingRate(uint32_t ui32SamplingRate){
   }
 }
 
-void vAttachADCInterrupt(uint8_t ui8ADCInput, isr_pfunc_t vInterruptFunction, void* vpArgument){
+void vAttachADCInterrupt(uint8_t ui8ADCInput, void (*vInterruptFunction)(void*), void* vpArgument){
   if (ui8ADCInput < AMOUNT_OF_ADCS){
     isrADCInterruptVector[ui8ADCInput].vInterruptFunction = vInterruptFunction;
     isrADCInterruptVector[ui8ADCInput].vpArgument = vpArgument;

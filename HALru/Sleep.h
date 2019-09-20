@@ -1,4 +1,4 @@
-//! HALru Version 1.0b
+//! HALru Version 2.0b
 /*!
   This code file was written by Jorge Henrique Moreira Santana and is under
   the GNU GPLv3 license. All legal rights are reserved.
@@ -40,7 +40,6 @@
   extern "C" {
 #endif
 
-#include "HALru.h"
 #include <avr/io.h>
 
 #define   SLEEP_IDLE_MODE                         0

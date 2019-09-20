@@ -1,4 +1,4 @@
-//! HALru Version 1.0b
+//! HALru Version 2.0b
 /*!
   This code file was written by Jorge Henrique Moreira Santana and is under
   the GNU GPLv3 license. All legal rights are reserved.
@@ -41,9 +41,13 @@
 #endif
 
 #include <stdint.h>
-#include <avr/interrupt.h>
-#include "HALru.h"
+#include <avr/io.h>
+#include <EmbeddedTools.h>
 
+//! Macro: EXTINT Macros
+/*!
+  This macros are for facilitate the use of this library.
+*/
 #define   EXTINT_0                                                              0
 #define   EXTINT_1                                                              1
 
@@ -56,6 +60,10 @@
   #define   EXTINT_7                                                            7
 #endif
 
+//! Macro: Interrupt Mode Macros
+/*!
+  This macros are for facilitate the use of this library.
+*/
 #define   LOW_LEVEL_INTERRUPT                                                   0
 #define   LEVEL_CHANGE_INTERRUPT                                                1
 #define   FALLING_BOARD_INTERRUPT                                               2

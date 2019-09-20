@@ -41,8 +41,8 @@
 #endif
 
 #include <stdint.h>
-#include "avr/io.h"
-#include "HALru.h"
+#include <avr/io.h>
+#include "./Configs.h"
 
 //! Macro: USART Macros
 /*!
@@ -104,13 +104,6 @@
 #define     RX_COMPLETE                                       0
 #define     TX_COMPLETE                                       1
 #define     DATA_EMPTY                                        2
-
-//! Type Definition: isr_usart_t and args_usart_t
-/*!
-  This typedef exist for organization purpose.
-*/
-typedef void(*isr_usart_t)(void*);
-typedef void* args_usart_t;
 
 //! Macro: Enable RX
 /*!
@@ -205,6 +198,7 @@ typedef void* args_usart_t;
 /*!
   Get received USART data.
   \param usrGroup is an undefined parameter. It's the gpio group pin (USART_X).
+  \return Returns USART data.
 */
 #define     ui8USARTReceiveByte(usrGroup)                     *regUDR(usrGroup)
 
@@ -213,7 +207,7 @@ void vEnableUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8InterruptionT
 void vDisableUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8InterruptionType);                                                        /*!< Void type function. */
 void vSetUSARTBaudRate(volatile uint8_t* ui8pGroup, uint32_t ui32BaudRate);                                                                   /*!< Void type function. */
 void vUSARTSendByte(volatile uint8_t* ui8pGroup, uint8_t ui8Data);                                                                            /*!< Void type function. */
-void vAttachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8InterruptionType, isr_usart_t vInterruptFunction, void* vpArgument);       /*!< Void type function. */
+void vAttachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8InterruptionType, void (*vInterruptFunction)(void*), void* vpArgument);    /*!< Void type function. */
 void vDettachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8InterruptionType);                                                        /*!< Void type function. */
 
 #ifdef __cplusplus

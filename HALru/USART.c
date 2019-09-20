@@ -1,7 +1,10 @@
 #include "USART.h"
-#include <avr/interrupt.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <avr/interrupt.h>
+#include <EmbeddedTools.h>
+#include "./Configs.h"
+#include "./Interrupts.h"
 
 //! Macro: USART Macros
 /*!
@@ -16,23 +19,17 @@
   This macros and variables are for facilitate the use of this library.
 */
 #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
-  isr_usart_t isrDataRegisterEmpty[4] = {NULL};
-  isr_usart_t isrRXComplete[4] = {NULL};
-  isr_usart_t isrTXComplete[4] = {NULL};
-  args_usart_t argDataRegisterEmpty[4] = {NULL};
-  args_usart_t argRXComplete[4] = {NULL};
-  args_usart_t argTXComplete[4] = {NULL};
+  volatile hal_isr_t isrDataRegisterEmpty[4] = {{NULL, NULL}};
+  volatile hal_isr_t isrRXComplete[4] = {{NULL, NULL}};
+  volatile hal_isr_t isrTXComplete[4] = {{NULL, NULL}};
   volatile uint16_t ui16ActivedUSARTs = 0;
   #define   usrGetUSARTNumber(usrGroup)                       usrGroup == USART_0 ? 0 :\
                                                               usrGroup == USART_1 ? 1 :\
                                                               usrGroup == USART_2 ? 2 : 3
 #else
-  isr_usart_t isrDataRegisterEmpty = NULL;
-  isr_usart_t isrRXComplete = NULL;
-  isr_usart_t isrTXComplete = NULL;
-  args_usart_t argDataRegisterEmpty = NULL;
-  args_usart_t argRXComplete = NULL;
-  args_usart_t argTXComplete = NULL;
+  volatile hal_isr_t isrDataRegisterEmpty = {NULL, NULL};
+  volatile hal_isr_t isrRXComplete = {NULL, NULL};
+  volatile hal_isr_t isrTXComplete = {NULL, NULL};
   volatile uint8_t ui8ActivedUSARTs = 0;
   #define   usrGetUSARTNumber(usrGroup)                       0
 #endif
@@ -146,7 +143,7 @@ void vSetUSARTBaudRate(volatile uint8_t* ui8pGroup, uint32_t ui32BaudRate){
 
 //! Function: USART Data Sender
 /*!
-  Send data on a USART.
+  Sends USART data.
   \param ui8pGroup is a volatile 8-bit pointer integer. It's the USART group (USART_X).
   \param ui8Data is a 8-bit integer.
 */
@@ -154,21 +151,21 @@ void vUSARTSendByte(volatile uint8_t* ui8pGroup, uint8_t ui8Data){
   uint8_t ui8UCSRB = *regUCSRB(ui8pGroup);
   while (!(*regUCSRA(ui8pGroup) & (1 << UDREn)));
   *regUCSRB(ui8pGroup) &= 31;
-  vDisableAllInterrupts();
+  vEraseBit(SREG, 7);
   (*regUDR(ui8pGroup)) = ui8Data;
-  vEnableAllInterrupts();
+  vSetBit(SREG, 7);
   *regUCSRB(ui8pGroup) = ui8UCSRB;
 }
 
 //! Function: USART Interrupt Attacher
 /*!
-  Attach a USART interruption function.
+  Attaches an USART interruption function.
   \param ui8pGroup is a volatile 8-bit pointer integer. It's the USART group (USART_X).
   \param ui8InterruptionType is a 8-bit integer. It's the interruption type.
   \param vInterruptFunction is a function pointer. It's the callback interruption.
   \param vpArgument is a void pointer. It's the callback argument.
 */
-void vAttachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8InterruptionType, isr_usart_t vInterruptFunction, void* vpArgument){
+void vAttachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8InterruptionType, void (*vInterruptFunction)(void*), void* vpArgument){
   #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
     uint8_t ui8USARTNumber = usrGetUSARTNumber(ui8pGroup);
   #endif
@@ -177,11 +174,11 @@ void vAttachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8InterruptionT
     case RX_COMPLETE:
     {
       #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
-        isrRXComplete[ui8USARTNumber] = vInterruptFunction;
-        argRXComplete[ui8USARTNumber] = vpArgument;
+        isrRXComplete[ui8USARTNumber].vInterruptFunction = vInterruptFunction;
+        isrRXComplete[ui8USARTNumber].vpArgument = vpArgument;
       #else
-        isrRXComplete = vInterruptFunction;
-        argRXComplete = vpArgument;
+        isrRXComplete.vInterruptFunction = vInterruptFunction;
+        isrRXComplete.vpArgument = vpArgument;
       #endif
       break;
     }
@@ -189,11 +186,11 @@ void vAttachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8InterruptionT
     case TX_COMPLETE:
     {
       #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
-        isrTXComplete[ui8USARTNumber] = vInterruptFunction;
-        argTXComplete[ui8USARTNumber] = vpArgument;
+        isrTXComplete[ui8USARTNumber].vInterruptFunction = vInterruptFunction;
+        isrTXComplete[ui8USARTNumber].vpArgument = vpArgument;
       #else
-        isrTXComplete = vInterruptFunction;
-        argTXComplete = vpArgument;
+        isrTXComplete.vInterruptFunction = vInterruptFunction;
+        isrTXComplete.vpArgument = vpArgument;
       #endif
       break;
     }
@@ -201,11 +198,11 @@ void vAttachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8InterruptionT
     case DATA_EMPTY:
     {
       #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
-        isrDataRegisterEmpty[ui8USARTNumber] = vInterruptFunction;
-        argDataRegisterEmpty[ui8USARTNumber] = vpArgument;
+        isrDataRegisterEmpty[ui8USARTNumber].vInterruptFunction = vInterruptFunction;
+        isrDataRegisterEmpty[ui8USARTNumber].vpArgument = vpArgument;
       #else
-        isrDataRegisterEmpty = vInterruptFunction;
-        argDataRegisterEmpty = vpArgument;
+        isrDataRegisterEmpty.vInterruptFunction = vInterruptFunction;
+        isrDataRegisterEmpty.vpArgument = vpArgument;
       #endif
       break;
     }
@@ -215,7 +212,7 @@ void vAttachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8InterruptionT
 
 //! Function: USART Interrupt Dettacher
 /*!
-  Dettach a USART interruption function.
+  Dettaches USART interruption function.
   \param ui8pGroup is a volatile 8-bit pointer integer. It's the USART group (USART_X).
   \param ui8InterruptionType is a 8-bit integer. It's the interruption type.
 */
@@ -229,9 +226,9 @@ void vDettachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8Interruption
 */
 #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
   ISR(USART0_RX_vect){
-    if (isrRXComplete[0] != NULL){
+    if (isrRXComplete[0].vInterruptFunction != NULL){
       vEraseBit(*regUCSRB(USART_0), RXCIEn);
-      isrRXComplete[0](argRXComplete[0]);
+      isrRXComplete[0].vInterruptFunction(isrRXComplete[0].vpArgument);
       if (ui8ReadBit(ui16ActivedUSARTs, 0) == 1){
         vSetBit(*regUCSRB(USART_0), RXCIEn);
       }
@@ -239,9 +236,9 @@ void vDettachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8Interruption
   }
 
   ISR(USART0_TX_vect){
-    if (isrTXComplete[0] != NULL){
+    if (isrTXComplete[0].vInterruptFunction != NULL){
       vEraseBit(*regUCSRB(USART_0), TXCIEn);
-      isrTXComplete[0](argTXComplete[0]);
+      isrTXComplete[0].vInterruptFunction(isrTXComplete[0].vpArgument);
       if (ui8ReadBit(ui16ActivedUSARTs, 1) == 1){
         vSetBit(*regUCSRB(USART_0), TXCIEn);
       }
@@ -249,9 +246,9 @@ void vDettachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8Interruption
   }
 
   ISR(USART0_UDRE_vect){
-    if (isrDataRegisterEmpty[0] != NULL){
+    if (isrDataRegisterEmpty[0].vInterruptFunction != NULL){
       vEraseBit(*regUCSRB(USART_0), UDREn);
-      isrDataRegisterEmpty[0](argDataRegisterEmpty[0]);
+      isrDataRegisterEmpty[0].vInterruptFunction(isrDataRegisterEmpty[0].vpArgument);
       if (ui8ReadBit(ui16ActivedUSARTs, 2) == 1){
         vSetBit(*regUCSRB(USART_0), UDREn);
       }
@@ -259,9 +256,9 @@ void vDettachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8Interruption
   }
 
   ISR(USART1_RX_vect){
-    if (isrRXComplete[1] != NULL){
+    if (isrRXComplete[1].vInterruptFunction != NULL){
       vEraseBit(*regUCSRB(USART_1), RXCIEn);
-      isrRXComplete[1](argRXComplete[1]);
+      isrRXComplete[1].vInterruptFunction(isrRXComplete[1].vpArgument);
       if (ui8ReadBit(ui16ActivedUSARTs, 3) == 1){
         vSetBit(*regUCSRB(USART_1), RXCIEn);
       }
@@ -269,9 +266,9 @@ void vDettachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8Interruption
   }
 
   ISR(USART1_TX_vect){
-    if (isrTXComplete[1] != NULL){
+    if (isrTXComplete[1].vInterruptFunction != NULL){
       vEraseBit(*regUCSRB(USART_1), TXCIEn);
-      isrTXComplete[1](argTXComplete[1]);
+      isrTXComplete[1].vInterruptFunction(isrTXComplete[1].vpArgument);
       if (ui8ReadBit(ui16ActivedUSARTs, 4) == 1){
         vSetBit(*regUCSRB(USART_1), TXCIEn);
       }
@@ -279,9 +276,9 @@ void vDettachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8Interruption
   }
 
   ISR(USART1_UDRE_vect){
-    if (isrDataRegisterEmpty[1] != NULL){
+    if (isrDataRegisterEmpty[1].vInterruptFunction != NULL){
       vEraseBit(*regUCSRB(USART_1), UDREn);
-      isrDataRegisterEmpty[1](argDataRegisterEmpty[1]);
+      isrDataRegisterEmpty[1].vInterruptFunction(isrDataRegisterEmpty[1].vpArgument);
       if (ui8ReadBit(ui16ActivedUSARTs, 5) == 1){
         vSetBit(*regUCSRB(USART_1), UDREn);
       }
@@ -289,9 +286,9 @@ void vDettachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8Interruption
   }
 
   ISR(USART2_RX_vect){
-    if (isrRXComplete[2] != NULL){
+    if (isrRXComplete[2].vInterruptFunction != NULL){
       vEraseBit(*regUCSRB(USART_2), RXCIEn);
-      isrRXComplete[2](argRXComplete[2]);
+      isrRXComplete[2].vInterruptFunction(isrRXComplete[2].vpArgument);
       if (ui8ReadBit(ui16ActivedUSARTs, 6) == 1){
         vSetBit(*regUCSRB(USART_2), RXCIEn);
       }
@@ -299,9 +296,9 @@ void vDettachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8Interruption
   }
 
   ISR(USART2_TX_vect){
-    if (isrTXComplete[2] != NULL){
+    if (isrTXComplete[2].vInterruptFunction != NULL){
       vEraseBit(*regUCSRB(USART_2), TXCIEn);
-      isrTXComplete[2](argTXComplete[2]);
+      isrTXComplete[2].vInterruptFunction(isrTXComplete[2].vpArgument);
       if (ui8ReadBit(ui16ActivedUSARTs, 7) == 1){
         vSetBit(*regUCSRB(USART_2), TXCIEn);
       }
@@ -309,9 +306,9 @@ void vDettachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8Interruption
   }
 
   ISR(USART2_UDRE_vect){
-    if (isrDataRegisterEmpty[2] != NULL){
+    if (isrDataRegisterEmpty[2].vInterruptFunction != NULL){
       vEraseBit(*regUCSRB(USART_2), UDREn);
-      isrDataRegisterEmpty[2](argDataRegisterEmpty[2]);
+      isrDataRegisterEmpty[2].vInterruptFunction(isrDataRegisterEmpty[2].vpArgument);
       if (ui8ReadBit(ui16ActivedUSARTs, 8) == 1){
         vSetBit(*regUCSRB(USART_2), UDREn);
       }
@@ -319,9 +316,9 @@ void vDettachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8Interruption
   }
 
   ISR(USART3_RX_vect){
-    if (isrRXComplete[3] != NULL){
+    if (isrRXComplete[3].vInterruptFunction != NULL){
       vEraseBit(*regUCSRB(USART_3), RXCIEn);
-      isrRXComplete[3](argRXComplete[3]);
+      isrRXComplete[3].vInterruptFunction(isrRXComplete[3].vpArgument);
       if (ui8ReadBit(ui16ActivedUSARTs, 9) == 1){
         vSetBit(*regUCSRB(USART_3), RXCIEn);
       }
@@ -329,9 +326,9 @@ void vDettachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8Interruption
   }
 
   ISR(USART3_TX_vect){
-    if (isrTXComplete[3] != NULL){
+    if (isrTXComplete[3].vInterruptFunction != NULL){
       vEraseBit(*regUCSRB(USART_3), TXCIEn);
-      isrTXComplete[3](argTXComplete[3]);
+      isrTXComplete[3].vInterruptFunction(isrTXComplete[3].vpArgument);
       if (ui8ReadBit(ui16ActivedUSARTs, 10) == 1){
         vSetBit(*regUCSRB(USART_3), TXCIEn);
       }
@@ -339,9 +336,9 @@ void vDettachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8Interruption
   }
 
   ISR(USART3_UDRE_vect){
-    if (isrDataRegisterEmpty[3] != NULL){
+    if (isrDataRegisterEmpty[3].vInterruptFunction != NULL){
       vEraseBit(*regUCSRB(USART_3), UDREn);
-      isrDataRegisterEmpty[3](argDataRegisterEmpty[3]);
+      isrDataRegisterEmpty[3].vInterruptFunction(isrDataRegisterEmpty[3].vpArgument);
       if (ui8ReadBit(ui16ActivedUSARTs, 11) == 1){
         vSetBit(*regUCSRB(USART_3), UDREn);
       }
@@ -349,9 +346,9 @@ void vDettachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8Interruption
   }
 #else
   ISR(USART_RX_vect){
-    if (isrRXComplete != NULL){
+    if (isrRXComplete.vInterruptFunction != NULL){
       vEraseBit(*regUCSRB(USART_0), RXCIEn);
-      isrRXComplete(argRXComplete);
+      isrRXComplete.vInterruptFunction(isrRXComplete.vpArgument);
       if (ui8ReadBit(ui8ActivedUSARTs, 0) == 1){
         vSetBit(*regUCSRB(USART_0), RXCIEn);
       }
@@ -359,9 +356,9 @@ void vDettachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8Interruption
   }
 
   ISR(USART_TX_vect){
-    if (isrTXComplete != NULL){
+    if (isrTXComplete.vInterruptFunction != NULL){
       vEraseBit(*regUCSRB(USART_0), TXCIEn);
-      isrTXComplete(argTXComplete);
+      isrTXComplete.vInterruptFunction(isrTXComplete.vpArgument);
       if (ui8ReadBit(ui8ActivedUSARTs, 1) == 1){
         vSetBit(*regUCSRB(USART_0), TXCIEn);
       }
@@ -369,9 +366,9 @@ void vDettachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8Interruption
   }
 
   ISR(USART_UDRE_vect){
-    if (isrDataRegisterEmpty != NULL){
+    if (isrDataRegisterEmpty.vInterruptFunction != NULL){
       vEraseBit(*regUCSRB(USART_0), UDREn);
-      isrDataRegisterEmpty(argDataRegisterEmpty);
+      isrDataRegisterEmpty.vInterruptFunction(isrDataRegisterEmpty.vpArgument);
       if (ui8ReadBit(ui8ActivedUSARTs, 2) == 1){
         vSetBit(*regUCSRB(USART_0), UDREn);
       }
