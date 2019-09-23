@@ -18,7 +18,7 @@ uint8_t ui8EnabledEXTINT = 0;
 
 //! Function: EXTINT Interrupt Enabler
 /*!
-  Enable a EXTINT interruption.
+  Enables an EXTINT interruption.
   \param ui8InterruptPin is a 8-bit pointer integer. It's the EXTINT pin (EXTINT_X).
 */
 void vEnableEXTINTInterrupt(uint8_t ui8InterruptPin){
@@ -26,9 +26,9 @@ void vEnableEXTINTInterrupt(uint8_t ui8InterruptPin){
   ui8EnabledEXTINT = EIMSK;
 }
 
-//! Function: EXTINT Interrupt Disnabler
+//! Function: EXTINT Interrupt Disabler
 /*!
-  Disable a EXTINT interruption.
+  Disables an EXTINT interruption.
   \param ui8InterruptPin is a 8-bit pointer integer. It's the EXTINT pin (EXTINT_X).
 */
 void vDisableEXTINTInterrupt(uint8_t ui8InterruptPin){
@@ -38,7 +38,7 @@ void vDisableEXTINTInterrupt(uint8_t ui8InterruptPin){
 
 //! Function: EXTINT Interrupt Attacher
 /*!
-  Attach a EXTINT interruption function.
+  Attaches an EXTINT interruption function.
   \param ui8InterruptPin is a 8-bit pointer integer. It's the EXTINT pin (EXTINT_X).
   \param vInterruptFunction is a function pointer. It's the callback interruption.
   \param vpArgument is a void pointer. It's the callback argument.
@@ -48,15 +48,19 @@ void vAttachEXTINTInterrupt(uint8_t ui8InterruptPin, isr_extint_t vInterruptFunc
   isrEXTINTArray[ui8InterruptPin].vpArgument = vpArgument;
 }
 
-//! Function: EXTINT Interrupt Dettacher
+//! Function: EXTINT Interrupt Detacher
 /*!
-  Dettach a EXTINT interruption function.
+  Detaches an EXTINT interruption function.
   \param ui8InterruptPin is a 8-bit pointer integer. It's the EXTINT pin (EXTINT_X).
 */
-void vDettachEXTINTInterrupt(uint8_t ui8InterruptPin){
+void vDetachEXTINTInterrupt(uint8_t ui8InterruptPin){
   vAttachEXTINTInterrupt(ui8InterruptPin, NULL, NULL);
 }
 
+//! Callbacks: EXTINT Interruptions
+/*!
+  Callbacks of EXTINT hardware interruptions.
+*/
 ISR(INT0_vect){
   if (isrEXTINTArray[0].vInterruptFunction != NULL){
     vEraseBit(EIMSK, 0);

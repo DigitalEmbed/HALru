@@ -59,6 +59,7 @@
 #include "Nested.h"
 #include "Print.h"
 #include "Power.h"
+#include "Sleep.h"
 #include "Watchdog.h"
 #include "Reset.h"
 #include "GPIO.h"

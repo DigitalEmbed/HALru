@@ -1,4 +1,4 @@
-//! HALru Version 1.0b
+//! HALru+ Version 1.0b
 /*!
   This code file was written by Jorge Henrique Moreira Santana and is under
   the GNU GPLv3 license. All legal rights are reserved.
@@ -33,30 +33,24 @@
   to jorge_henrique_123@hotmail.com to talk.
 */
 
-#ifndef Print_H
-#define Print_H
+#ifndef HALru_Classes_H
+#define HALru_Classes_H
 
 #ifdef __cplusplus
   extern "C" {
 #endif
 
-#include "HALru.h"
-
-//! Macro: Float Numbers
 /*!
-  These macros is to use float types in print functions on AVR microcontrolers.
+  HAL Library
 */
-#define ftoa(fNumber)   (int16_t)(fNumber), (int16_t)(abs(100*(fNumber)))%100
-#define dtoa(fNumber)   (int16_t)(fNumber), (int16_t)(abs(10000*(fNumber)))%10000
+#include <HALru.h>
 
-//! Type Definition: print_t
 /*!
-  This typedef exist for organization purpose.
+  Interface Libraries
 */
-typedef void (*print_t)(volatile uint8_t*, uint8_t);
-
-void vAttachPrintOutput(volatile uint8_t* ui8pOutput, print_t vSendByteFunction);     /*!< void type function. */
-void vDetachPrintOutput(void);                                                        /*!< void type function. */
+#include "./GPIO.h"
+#include "./USART.h"
+#include "./System.h"
 
 #ifdef __cplusplus
   }

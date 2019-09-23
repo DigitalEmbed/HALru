@@ -46,7 +46,7 @@
 
 //! Macro: EXTINT Macros
 /*!
-  This macros are for facilitate the use of this library.
+  These macros are for facilitate the use of this library.
 */
 #define   EXTINT_0                                                              0
 #define   EXTINT_1                                                              1
@@ -62,7 +62,7 @@
 
 //! Macro: Interrupt Mode Macros
 /*!
-  This macros are for facilitate the use of this library.
+  These macros are for facilitate the use of this library.
 */
 #define   LOW_LEVEL_INTERRUPT                                                   0
 #define   LEVEL_CHANGE_INTERRUPT                                                1
@@ -91,10 +91,10 @@
 typedef void(*isr_extint_t)(void*);
 typedef void* args_extint_t;
 
-void vEnableEXTINTInterrupt(uint8_t ui8InterruptPin);                                                         /*!< Void type function. */
-void vDisableEXTINTInterrupt(uint8_t ui8InterruptPin);                                                        /*!< Void type function. */
-void vAttachEXTINTInterrupt(uint8_t ui8InterruptPin, isr_extint_t vInterruptFunction, void* vpArgument);      /*!< Void type function. */
-void vDettachEXTINTInterrupt(uint8_t ui8InterruptPin);                                                        /*!< Void type function. */
+void vEnableEXTINTInterrupt(uint8_t ui8InterruptPin);                                                         /*!< void type function. */
+void vDisableEXTINTInterrupt(uint8_t ui8InterruptPin);                                                        /*!< void type function. */
+void vAttachEXTINTInterrupt(uint8_t ui8InterruptPin, isr_extint_t vInterruptFunction, void* vpArgument);      /*!< void type function. */
+void vDetachEXTINTInterrupt(uint8_t ui8InterruptPin);                                                         /*!< void type function. */
 
 #ifdef __cplusplus
   }

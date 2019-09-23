@@ -43,21 +43,53 @@
 #include <avr/io.h>
 #include <EmbeddedTools.h>
 
+//! Macro: Reset Macros
+/*!
+  This macros are for facilitate the use of this library.
+*/
 #define     WATCHDOG_RESET                                      4
 #define     BROWN_OUT_RESET                                     3
 #define     EXTERNAL_RESET                                      2
 #define     POWER_ON_RESET                                      1
 
+//! Macro: System Reset Forcer
+/*!
+  Forces system reset.
+  /param ui8Mode is a unsigned 8-bit integer. The available modes are: DISABLED_MODE, INTERRUPT_MODE, RESET_MODE and INTERRUPT_RESET_MODE.
+*/
 #define     vForceSystemReset(ui8Mode)                          vEraseBit(SREG, 7);\
                                                                 WDTCSR |= (1 << WDCE) | (1 << WDE);\
                                                                 WDTCSR |= ((ui8Mode & 1) << WDIE) | ((ui8Mode & 2) << WDE);\
                                                                 vSetBit(SREG, 7);\
                                                                 while(1);
 
-#define     ui8WatchdogResetOccurred(ui8ResetReason)            ui8ReadBit(ui8ResetReason, WATCHDOG_RESET)
-#define     ui8BrownOutResetOccurred(ui8ResetReason)            ui8ReadBit(ui8ResetReason, BROWN_OUT_RESET)
-#define     ui8ExternalResetOccurred(ui8ResetReason)            ui8ReadBit(ui8ResetReason, EXTERNAL_RESET)
-#define     ui8PowerOnResetOccurred(ui8ResetReason)             ui8ReadBit(ui8ResetReason, POWER_ON_RESET)
+//! Macro: Watchdog Restart Checker
+/*!
+  Checks if occurred system restart by watchdog.
+  \return Returns 1 in positive case, or 0 in contrary case.
+*/
+#define     ui8WatchdogResetOccurred()                          ui8ReadBit(ui8GetSystemResetReason(), WATCHDOG_RESET)
+
+//! Macro: Brown Out Restart Checker
+/*!
+  Checks if occurred system restart by brown out.
+  \return Returns 1 in positive case, or 0 in contrary case.
+*/
+#define     ui8BrownOutResetOccurred()                          ui8ReadBit(ui8GetSystemResetReason(), BROWN_OUT_RESET)
+
+//! Macro: External Restart Checker
+/*!
+  Checks if occurred system restart by reset pin.
+  \return Returns 1 in positive case, or 0 in contrary case.
+*/
+#define     ui8ExternalResetOccurred()                          ui8ReadBit(ui8GetSystemResetReason(), EXTERNAL_RESET)
+
+//! Macro: Power On Restart Checker
+/*!
+  Checks if occurred system restart by power suply on VCC pin.
+  \return Returns 1 in positive case, or 0 in contrary case.
+*/
+#define     ui8PowerOnResetOccurred()                           ui8ReadBit(ui8GetSystemResetReason(), POWER_ON_RESET)
 
 uint8_t ui8GetSystemResetReason(void);
 

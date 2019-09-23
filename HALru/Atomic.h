@@ -42,7 +42,7 @@
 
 //! Macro: Atomic Macros
 /*!
-  This macros are for facilitate the use of this library.
+  These macros are for facilitate the use of this library.
 */
 #define   Atomic                              static volatile uint8_t ui8GlobalInterrupts = 0;\
                                               ui8GlobalInterrupts = ui8ReadBit(SREG, 7);\

@@ -5,12 +5,17 @@
 #include "./Configs.h"
 #include "./Interrupts.h"
 
-volatile uint8_t ui8BeforeStatePCINT[3] = {0};
-volatile uint8_t ui8ActualStatePCINT[3] = {0};
-volatile uint8_t ui8EnabledPCINT = 0;
+volatile uint8_t ui8BeforeStatePCINT[3] = {0};                          /*!< uint8_t type vector. */
+volatile uint8_t ui8ActualStatePCINT[3] = {0};                          /*!< uint8_t type vector. */
+volatile uint8_t ui8EnabledPCINT = 0;                                   /*!< uint8_t type. */
 
-volatile hal_isr_t isrPCINTArray[3][8] = {{{NULL, NULL}}};
+volatile hal_isr_t isrPCINTArray[3][8] = {{{NULL, NULL}}};              /*!< hal_isr_t type array. */
 
+//! Function: PCINT Group Interrupt Enabler
+/*!
+  Enables a PCINT group interruption.
+  \param ui8InterruptPin is a 8-bit pointer integer. It's the GPIO group (IO_GROUP_X).
+*/
 void vEnablePCINTGroup(volatile uint8_t* ui8Group){
   if (ui8Group == &PINB){
     vSetBit(PCICR, 0);
@@ -38,6 +43,11 @@ void vEnablePCINTGroup(volatile uint8_t* ui8Group){
   ui8EnabledPCINT = PCICR & 7;
 }
 
+//! Function: PCINT Group Interrupt Disabler
+/*!
+  Disables a PCINT group interruption.
+  \param ui8InterruptPin is a 8-bit pointer integer. It's the GPIO group (IO_GROUP_X).
+*/
 void vDisablePCINTGroup(volatile uint8_t* ui8Group){
   if (ui8Group == &PINB){
     vEraseBit(PCICR, 0);
@@ -57,6 +67,11 @@ void vDisablePCINTGroup(volatile uint8_t* ui8Group){
   ui8EnabledPCINT = PCICR & 7;
 }
 
+//! Function: PCINT pin Interrupt Enabler
+/*!
+  Enables a PCINT Pin interruption.
+  \param ui8InterruptPin is a 8-bit pointer integer. It's the GPIO pin.
+*/
 void vEnablePCINTPin(uint8_t ui8InterruptPin){
   if (ui8InterruptPin <= 7 && ui8ReadBit(PCMSK0, ui8InterruptPin) == 0){
     vSetBit(PCMSK0, ui8InterruptPin);
@@ -69,6 +84,11 @@ void vEnablePCINTPin(uint8_t ui8InterruptPin){
   }
 }
 
+//! Function: PCINT pin Interrupt Disabler
+/*!
+  Disables a PCINT Pin interruption.
+  \param ui8InterruptPin is a 8-bit pointer integer. It's the GPIO pin.
+*/
 void vDisablePCINTPin(uint8_t ui8InterruptPin){
   if (ui8InterruptPin <= 7 && ui8ReadBit(PCMSK0, ui8InterruptPin) == 1){
     vEraseBit(PCMSK0, ui8InterruptPin);
@@ -81,6 +101,13 @@ void vDisablePCINTPin(uint8_t ui8InterruptPin){
   }
 }
 
+//! Function: PCINT Interrupt Attacher
+/*!
+  Attaches a PCINT interruption function.
+  \param ui8InterruptPin is a 8-bit pointer integer. It's the GPIO pin.
+  \param vInterruptFunction is a function pointer. It's the callback interruption.
+  \param vpArgument is a void pointer. It's the callback argument.
+*/
 void vAttachPCINTInterrupt(uint8_t ui8InterruptPin, void (*vInterruptFunction)(void*), void* vpArgument){
   if (ui8InterruptPin <= 7){
     isrPCINTArray[0][ui8InterruptPin].vInterruptFunction = vInterruptFunction;
@@ -96,10 +123,19 @@ void vAttachPCINTInterrupt(uint8_t ui8InterruptPin, void (*vInterruptFunction)(v
   }
 }
 
-void vDettachPCINTInterrupt(uint8_t ui8InterruptPin){
+//! Function: PCINT Interrupt Detacher
+/*!
+  Detaches a PCINT interruption function.
+  \param ui8InterruptPin is a 8-bit pointer integer. It's the GPIO pin.
+*/
+void vDetachPCINTInterrupt(uint8_t ui8InterruptPin){
   vAttachPCINTInterrupt(ui8InterruptPin, NULL, NULL);
 }
 
+//! Callbacks: PCINT Interruptions
+/*!
+  Callbacks of PCINT hardware interruptions.
+*/
 ISR(PCINT0_vect){
   ui8BeforeStatePCINT[0] = ui8ActualStatePCINT[0];
   ui8ActualStatePCINT[0] = PINB;

@@ -75,7 +75,7 @@
 
 //! Macro: Set Pin Mode
 /*!
-  Set mode of a GPIO pin.
+  Sets mode of a GPIO pin.
   \param ui8pGroup is an undefined parameter. It's the GPIO group pin (IO_GROUP_X).
   \param ui8Pin is an undefined parameter. It's the pin number of a GPIO group (0 to 7).
   \param ui8Mode is an undefined parameter. It's OUTPUT_MODE or INPUT_MODE.
@@ -89,7 +89,7 @@
 
 //! Macro: Enable GPIO PullUp Resistor
 /*!
-  Enable PullUp resistor on a GPIO Pin.
+  Enables PullUp resistor on a GPIO Pin.
   \param ui8pGroup is an undefined parameter. It's the GPIO group pin (IO_GROUP_X).
   \param ui8Pin is an undefined parameter. It's the pin number of a GPIO group (0 to 7).
 */
@@ -97,7 +97,7 @@
 
 //! Macro: Disable GPIO PullUp Resistor
 /*!
-  Enable PullUp resistor on a GPIO Pin.
+  Enables PullUp resistor on a GPIO Pin.
   \param ui8pGroup is an undefined parameter. It's the GPIO group pin (IO_GROUP_X).
   \param ui8Pin is an undefined parameter. It's the pin number of a GPIO group (0 to 7).
 */
@@ -105,7 +105,7 @@
 
 //! Macro: Set GPIO Pin
 /*!
-  Write high logic-level on a GPIO Pin.
+  Writes high logic-level on a GPIO Pin.
   \param ui8pGroup is an undefined parameter. It's the GPIO group pin (IO_GROUP_X).
   \param ui8Pin is an undefined parameter. It's the pin number of a GPIO group (0 to 7).
 */
@@ -114,7 +114,7 @@
 
 //! Macro: Unset GPIO Pin
 /*!
-  Write low logic-level on a GPIO Pin.
+  Writes low logic-level on a GPIO Pin.
   \param ui8pGroup is an undefined parameter. It's the GPIO group pin (IO_GROUP_X).
   \param ui8Pin is an undefined parameter. It's the pin number of a GPIO group (0 to 7).
 */
@@ -122,7 +122,7 @@
 
 //! Macro: Toggle GPIO Pin
 /*!
-  Toggle the logic-level on a GPIO Pin.
+  Toggles the logic-level on a GPIO Pin.
   \param ui8pGroup is an undefined parameter. It's the GPIO group pin (IO_GROUP_X).
   \param ui8Pin is an undefined parameter. It's the pin number of a GPIO group (0 to 7).
 */
@@ -130,7 +130,7 @@
 
 //! Macro: Digital Write on a GPIO Pin
 /*!
-  Write a logic-level on a GPIO Pin.
+  Writes a logic-level on a GPIO Pin.
   \param ui8pGroup is an undefined parameter. It's the GPIO group pin (IO_GROUP_X).
   \param ui8Pin is an undefined parameter. It's the pin number of a GPIO group (0 to 7).
   \param ui8Mode is an undefined parameter. It's HIGH_LEVEL or LOW_LEVEL.
@@ -144,7 +144,7 @@
                                                         
 //! Macro: Digital Read on a GPIO Pin
 /*!
-  Read a logic-level on a GPIO Pin.
+  Reads a logic-level on a GPIO Pin.
   \param ui8pGroup is an undefined parameter. It's the GPIO group pin (IO_GROUP_X).
   \param ui8Pin is an undefined parameter. It's the pin number of a GPIO group (0 to 7).
   \return Returns the logic-level.

@@ -7,7 +7,7 @@
 
 //! Declarations: Private TIMER Declarations
 /*!
-  This macros and variables are for facilitate the use of this library.
+  These macros and variables are for facilitate the use of this library.
   - ActivedTIMERs (For AVR Mega 2560):
       MSB                                      MASTER_TIMER         SUBTIMER_A       SUBTIMER_B    SUBTIMER_C
       [-][-][-][-][-][-][-][-][-][-][-][-]  [5][4][3][2][1][0]  [5][4][3][2][1][0]  [5][4][3][1]  [5][4][3][1]
@@ -38,7 +38,7 @@
 
 //! Function: TIMER Initializer
 /*!
-  Initialize a TIMER.
+  Initializes a TIMER.
   \param ui8pTIMERGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
 */
 void vTIMERInit(volatile uint8_t* ui8pTIMERGroup){
@@ -65,7 +65,7 @@ void vTIMERInit(volatile uint8_t* ui8pTIMERGroup){
 
 //! Function: TIMER Enabler
 /*!
-  Enable a TIMER.
+  Enables a TIMER.
   \param ui8pTIMERGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
   \param ui8SubTimer is a 8-bit integer. It's the sub-timer.
 */
@@ -127,7 +127,7 @@ void vEnableTIMERInterrupt(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTimer
 
 //! Function: TIMER Disabler
 /*!
-  Disable a TIMER.
+  Disables a TIMER.
   \param ui8pTIMERGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
   \param ui8SubTimer is a 8-bit integer. It's the sub-timer.
 */
@@ -189,7 +189,7 @@ void vDisableTIMERInterrupt(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTime
 
 //! Function: TIMER Prescaler Seter
 /*!
-  Set a prescaler TIMER.
+  Sets a prescaler TIMER.
   \param ui8pTIMERGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
   \param ui8SubTimer is a 8-bit integer. It's the prescaler timer.
 */
@@ -207,7 +207,7 @@ void vSetTIMERPrescaler(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8TIMERPresca
 
 //! Function: TIMER Counter Seter
 /*!
-  Set a counter TIMER.
+  Sets a counter TIMER.
   \param ui8pTIMERGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
   \param ui16TIMERLimit is a 16-bit integer. It's the counter timer.
 */
@@ -247,7 +247,7 @@ void vSetTIMERCounterLimit(volatile uint8_t* ui8pTIMERGroup, uint16_t ui16TIMERL
 
 //! Function: TIMER Period (ms) Seter
 /*!
-  Set TIMER period (in ms).
+  Sets TIMER period (in ms).
   \param ui8pTIMERGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
   \param ui16PeriodMS is a 16-bit integer. It's the period value, in miliseconds.
 */
@@ -260,7 +260,7 @@ void vSetTIMERPeriodMS(volatile uint8_t* ui8pTIMERGroup, uint16_t ui16PeriodMS){
 
 //! Function: TIMER Period (us) Seter
 /*!
-  Set TIMER period (in us).
+  Sets TIMER period (in us).
   \param ui8pTIMERGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
   \param ui32PeriodUS is a 32-bit integer. It's the period value, in microseconds.
 */
@@ -283,7 +283,7 @@ void vSetTIMERPeriodUS(volatile uint8_t* ui8pTIMERGroup, uint32_t ui32PeriodUS){
 
 //! Function: TIMER Interrupt Attacher
 /*!
-  Attach a TIMER interruption function.
+  Attaches a TIMER interruption function.
   \param ui8pTIMERGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
   \param ui8SubTimer is a 8-bit integer. It's the prescaler timer.
   \param vInterruptFunction is a function pointer. It's the callback interruption.
@@ -331,19 +331,19 @@ void vAttachTIMERInterrupt(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTimer
   }
 }
 
-//! Function: TIMER Interrupt Dettacher
+//! Function: TIMER Interrupt Detacher
 /*!
-  Dettach a TIMER interruption function.
+  Detaches a TIMER interruption function.
   \param ui8pTIMERGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
   \param ui8SubTimer is a 8-bit integer. It's the prescaler timer.
 */
-void vDettachTIMERInterrupt(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTimer){
+void vDetachTIMERInterrupt(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTimer){
   vAttachTIMERInterrupt(ui8pTIMERGroup, ui8SubTimer, NULL, NULL);
 }
 
 //! Function: TIMER Interrupt Ignorer
 /*!
-  Ignore a TIMER interruption flag.
+  Ignores a TIMER interruption flag.
   \param ui8pTIMERGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
   \param ui8SubTimer is a 8-bit integer. It's the prescaler timer.
 */
@@ -388,7 +388,7 @@ void vIgnoreTIMERRequest(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTimer){
 
 //! Function: TIMER Interrupt Forcer
 /*!
-  Force a TIMER interruption.
+  Forces a TIMER interruption.
   \param ui8pTIMERGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
   \param ui8SubTimer is a 8-bit integer. It's the prescaler timer.
 */

@@ -40,7 +40,7 @@
   extern "C" {
 #endif
 
-//! Configuration: Micro controler configurations
+//! Configuration: Microcontroler configurations
 /*!
   Configure the micro controler here.
 */

@@ -8,7 +8,7 @@
 
 //! Macro: USART Macros
 /*!
-  This macros are for facilitate the use of this library.
+  These macros are for facilitate the use of this library.
 */
 #define     regUCSRA(usrGroup)                                (usrGroup)
 #define     regUBRRL(usrGroup)                                ((volatile uint8_t*) usrGroup + 4)
@@ -16,7 +16,7 @@
 
 //! Declarations: Private USART Declarations
 /*!
-  This macros and variables are for facilitate the use of this library.
+  These macros and variables are for facilitate the use of this library.
 */
 #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
   volatile hal_isr_t isrDataRegisterEmpty[4] = {{NULL, NULL}};
@@ -36,7 +36,7 @@
 
 //! Function: USART Initializer
 /*!
-  Initialize a USART.
+  Initializes an USART.
   \param ui8pGroup is a volatile 8-bit pointer integer. It's the USART group (USART_X).
 */
 void vUSARTInit(volatile uint8_t* ui8pGroup){
@@ -57,7 +57,7 @@ void vUSARTInit(volatile uint8_t* ui8pGroup){
 
 //! Function: USART Interrupt Enabler
 /*!
-  Enable a USART interruption.
+  Enables an USART interruption.
   \param ui8pGroup is a volatile 8-bit pointer integer. It's the USART group (USART_X).
   \param ui8InterruptionType is a 8-bit integer. It's the interruption type.
 */
@@ -90,7 +90,7 @@ void vEnableUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8InterruptionT
 
 //! Function: USART Interrupt Disabler
 /*!
-  Disable a USART interruption.
+  Disables an USART interruption.
   \param ui8pGroup is a volatile 8-bit pointer integer. It's the USART group (USART_X).
   \param ui8InterruptionType is a 8-bit integer. It's the interruption type.
 */
@@ -123,7 +123,7 @@ void vDisableUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8Interruption
 
 //! Function: USART Baud Rate Setter
 /*!
-  Set USART baud rate.
+  Sets USART baud rate.
   \param ui8pGroup is a volatile 8-bit pointer integer. It's the USART group (USART_X).
   \param ui32BaudRate is a 32-bit integer. It's the USART baud rate.
 */
@@ -210,13 +210,13 @@ void vAttachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8InterruptionT
   }
 }
 
-//! Function: USART Interrupt Dettacher
+//! Function: USART Interrupt Detacher
 /*!
-  Dettaches USART interruption function.
+  Detaches USART interruption function.
   \param ui8pGroup is a volatile 8-bit pointer integer. It's the USART group (USART_X).
   \param ui8InterruptionType is a 8-bit integer. It's the interruption type.
 */
-void vDettachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8InterruptionType){
+void vDetachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8InterruptionType){
   vAttachUSARTInterrupt(ui8pGroup, ui8InterruptionType, NULL, NULL);
 }
 

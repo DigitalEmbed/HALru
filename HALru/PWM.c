@@ -3,6 +3,12 @@
 #include <Print.h>
 #include <USART.h>
 
+//! Function: PWM Enabler
+/*!
+  Enables a PWM mode in a TIMER.
+  \param ui8pTIMERGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
+  \param ui8PWMMode is a 8-bit integer. The avaliable modes are: PWM_AUTOMATIC_MODE and PWM_MANUAL_MODE.
+*/
 void vEnablePWMMode(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8PWMMode){
   if (ui8pTIMERGroup == TIMER_0 || ui8pTIMERGroup == TIMER_2){
     vSetBit(*regTCCRA(ui8pTIMERGroup), WGMn0);
@@ -39,6 +45,11 @@ void vEnablePWMMode(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8PWMMode){
   vSetBit(*(regTCCRA(ui8pTIMERGroup)), COMnB1);
 }
 
+//! Function: PWM Disabler
+/*!
+  Disables a PWM mode in a TIMER.
+  \param ui8pTIMERGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
+*/
 void vDisablePWMMode(volatile uint8_t* ui8pTIMERGroup){
   vEraseBit(*regTCCRA(ui8pTIMERGroup), WGMn0);
   vEraseBit(*regTCCRA(ui8pTIMERGroup), WGMn1);
@@ -61,6 +72,12 @@ void vDisablePWMMode(volatile uint8_t* ui8pTIMERGroup){
   }
 }
 
+//! Function: PWM Max Duty Cicle Getter
+/*!
+  Gets pwm max duty cicle.
+  \param ui8pTIMERGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
+  \return Returns pwm max duty cicle.
+*/
 uint16_t ui16GetTIMERMaxDutyCicle(volatile uint8_t* ui8pTIMERGroup){
   if (ui8pTIMERGroup == NULL){
     return 0;
@@ -76,6 +93,13 @@ uint16_t ui16GetTIMERMaxDutyCicle(volatile uint8_t* ui8pTIMERGroup){
   }
 }
 
+//! Function: PWM Max Duty Cicle Getter
+/*!
+  Gets pwm max duty cicle.
+  \param ui8pTIMERGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
+  \param ui8PWMGroup is a unsigned 8-bit pointer integer. The avaliables PWM groups are: PWM_GROUP_X: A, B or C.
+  \param ui16DutyCicle is a unsigned 16-bit pointer integer. It's absolute duty cicle value.
+*/
 void vSetPWMAbsoluteDutyCicle(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8PWMGroup, uint16_t ui16DutyCicle){
   if (ui8pTIMERGroup == TIMER_0 || ui8pTIMERGroup == TIMER_2){
     if (ui8PWMGroup == PWM_GROUP_A){
@@ -113,6 +137,14 @@ void vSetPWMAbsoluteDutyCicle(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8PWMGr
   }
 }
 
+//! Function: PWM Max Duty Cicle Getter
+/*!
+  Gets pwm max duty cicle.
+  \param ui8pTIMERGroup is a volatile 8-bit pointer integer. It's the TIMER group (TIMER_X).
+  \param ui8PWMGroup is a unsigned 8-bit pointer integer. The avaliables PWM groups are: PWM_GROUP_X: A, B or C.
+  \param ui16DutyCicle is a unsigned 16-bit pointer integer. It's relative duty cicle value.
+  \param ui16Resolution is a unsigned 16-bit pointer integer. It's a max duty cicle value.
+*/
 void vSetPWMRelativeDutyCicle(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8PWMGroup, uint16_t ui16DutyCicle, uint16_t ui16Resolution){
   ui16DutyCicle = ((float) (ui16DutyCicle)/(ui16Resolution)) * ui16GetTIMERMaxDutyCicle(ui8pTIMERGroup);
   vSetPWMAbsoluteDutyCicle(ui8pTIMERGroup, ui8PWMGroup, ui16DutyCicle);

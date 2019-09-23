@@ -4,11 +4,11 @@
 print_t vStoredSendByteFunction = NULL;                             /*!< print_t pointer type. */
 volatile uint8_t* ui8pStoredOutput = NULL;                          /*!< volatile 8-bit integer pointer type. */
 
-int iStoredSendByteFunction(char cChar, FILE *fpStream);            /*!< Void type function. */
+int iStoredSendByteFunction(char cChar, FILE *fpStream);            /*!< void type function. */
 
 //! Function: Print Output Function Attacher
 /*!
-  Attach a function to use with printf.
+  Attaches a function to use with printf.
   \param ui8pOutput is a volatile 8-bit pointer integer. It's the hardware communication group (USART_X, SPI_X, I2C_X).
   \param vSendByteFunction is a print_t. It's the send-a-byte address function for hardware communication group.
 */
@@ -22,11 +22,11 @@ void vAttachPrintOutput(volatile uint8_t* ui8pOutput, print_t vSendByteFunction)
   }
 }
 
-//! Function: Print Output Function Dettacher
+//! Function: Print Output Function Detacher
 /*!
-  Dettach a function of printf.
+  Detaches a function of printf.
 */
-void vDettachPrintOutput(void){
+void vDetachPrintOutput(void){
   vStoredSendByteFunction = NULL;
 }
 

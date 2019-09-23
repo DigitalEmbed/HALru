@@ -45,7 +45,7 @@
 
 //! Macro: TIMER Macros
 /*!
-  This macros are for facilitate the use of this library.
+  These macros are for facilitate the use of this library.
 */
 #define     TIMER_0                                           &TCCR0A
 #define     TIMER_1                                           &TCCR1A
@@ -146,7 +146,7 @@
 
 //! Function: TIMER Interrupt Rester
 /*!
-  Reset a TIMER counter.
+  Resets a TIMER counter.
   \param ui8pTIMERGroup is a is an undefined parameter. It's the TIMER group (TIMER_X).
 */
 #define   vResetTIMERCounter(tmrGroup)                        *(regTCNTL(tmrGroup)) = 0;\
@@ -154,22 +154,22 @@
 
 //! Function: TIMER Interrupt Rester
 /*!
-  Reset a TIMER counter.
+  Resets a TIMER counter.
   \param ui8pTIMERGroup is a is an undefined parameter. It's the TIMER group (TIMER_X).
 */
 #define   vSetTIMERFrequencyHZ(tmrGroup, ui32FrequencyHZ)     vSetTIMERPeriodUS(tmrGroup, (1000000/(ui32FrequencyHZ)))
 
-void vTIMERInit(volatile uint8_t* ui8pTIMERGroup);                                                                                         /*!< Void type function. */
-void vEnableTIMERInterrupt(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTimer);                                                         /*!< Void type function. */
-void vDisableTIMERInterrupt(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTimer);                                                        /*!< Void type function. */
-void vSetTIMERPrescaler(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8TIMERPrescaler);                                                      /*!< Void type function. */
-void vSetTIMERCounterLimit(volatile uint8_t* ui8pTIMERGroup, uint16_t ui16TIMERLimit);                                                     /*!< Void type function. */
-void vSetTIMERPeriodMS(volatile uint8_t* ui8pTIMERGroup, uint16_t ui16PeriodMS);                                                           /*!< Void type function. */
-void vSetTIMERPeriodUS(volatile uint8_t* ui8pTIMERGroup, uint32_t ui32PeriodUS);                                                           /*!< Void type function. */
-void vIgnoreTIMERRequest(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTimer);                                                           /*!< Void type function. */
-void vForceTIMERInterrupt(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTimer);                                                          /*!< Void type function. */
-void vAttachTIMERInterrupt(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTimer, void (*vInterruptFunction)(void*), void* vpArgument);    /*!< Void type function. */
-void vDettachTIMERInterrupt(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTimer);                                                        /*!< Void type function. */
+void vTIMERInit(volatile uint8_t* ui8pTIMERGroup);                                                                                          /*!< void type function. */
+void vEnableTIMERInterrupt(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTimer);                                                          /*!< void type function. */
+void vDisableTIMERInterrupt(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTimer);                                                         /*!< void type function. */
+void vSetTIMERPrescaler(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8TIMERPrescaler);                                                       /*!< void type function. */
+void vSetTIMERCounterLimit(volatile uint8_t* ui8pTIMERGroup, uint16_t ui16TIMERLimit);                                                      /*!< void type function. */
+void vSetTIMERPeriodMS(volatile uint8_t* ui8pTIMERGroup, uint16_t ui16PeriodMS);                                                            /*!< void type function. */
+void vSetTIMERPeriodUS(volatile uint8_t* ui8pTIMERGroup, uint32_t ui32PeriodUS);                                                            /*!< void type function. */
+void vIgnoreTIMERRequest(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTimer);                                                            /*!< void type function. */
+void vForceTIMERInterrupt(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTimer);                                                           /*!< void type function. */
+void vAttachTIMERInterrupt(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTimer, void (*vInterruptFunction)(void*), void* vpArgument);     /*!< void type function. */
+void vDetachTIMERInterrupt(volatile uint8_t* ui8pTIMERGroup, uint8_t ui8SubTimer);                                                          /*!< void type function. */
 
 #ifdef __cplusplus
   }

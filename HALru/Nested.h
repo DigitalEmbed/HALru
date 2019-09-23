@@ -44,7 +44,7 @@
 
 //! Macro: Nested Macros
 /*!
-  This macros are for facilitate the use of this library.
+  These macros are for facilitate the use of this library.
 */
 #define   NestedMode                          {\
                                                 vEnableAllInterrupts();\

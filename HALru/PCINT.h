@@ -43,6 +43,10 @@
 #include <stdint.h>
 #include <avr/io.h>
 
+//! Macro: PCINT Pins Macros
+/*!
+  These macros are for facilitate the use of this library.
+*/
 #define   PCINT_0                                     0
 #define   PCINT_1                                     1
 #define   PCINT_2                                     2
@@ -70,16 +74,12 @@
 #define   PCINT_22                                    22
 #define   PCINT_23                                    23
 
-/*#define   PCINT_GROUP_0                               0
-#define   PCINT_GROUP_1                               1
-#define   PCINT_GROUP_2                               2*/
-
-void vEnablePCINTPin(uint8_t ui8InterruptPin);
-void vDisablePCINTPin(uint8_t ui8InterruptPin);
-void vEnablePCINTGroup(volatile uint8_t* ui8Group);
-void vDisablePCINTGroup(volatile uint8_t* ui8Group);
-void vAttachPCINTInterrupt(uint8_t ui8InterruptPin, void (*vInterruptFunction)(void*), void* vpArgument);
-void vDettachPCINTInterrupt(uint8_t ui8InterruptPin);
+void vEnablePCINTPin(uint8_t ui8InterruptPin);                                                                /*!< void type function. */
+void vDisablePCINTPin(uint8_t ui8InterruptPin);                                                               /*!< void type function. */
+void vEnablePCINTGroup(volatile uint8_t* ui8Group);                                                           /*!< void type function. */
+void vDisablePCINTGroup(volatile uint8_t* ui8Group);                                                          /*!< void type function. */
+void vAttachPCINTInterrupt(uint8_t ui8InterruptPin, void (*vInterruptFunction)(void*), void* vpArgument);     /*!< void type function. */
+void vDetachPCINTInterrupt(uint8_t ui8InterruptPin);                                                          /*!< void type function. */
 
 #ifdef __cplusplus
   }

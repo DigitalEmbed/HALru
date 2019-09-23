@@ -46,7 +46,7 @@
 
 //! Macro: USART Macros
 /*!
-  This macros are for facilitate the use of this library.
+  These macros are for facilitate the use of this library.
 */
 #define     USART_0                                           &UCSR0A
 
@@ -107,35 +107,35 @@
 
 //! Macro: Enable RX
 /*!
-  Enable RX for a USART comunication.
+  Enables RX for an USART comunication.
   \param usrGroup is an undefined parameter. It's the gpio group pin (USART_X).
 */
 #define     vEnableRX(usrGroup)                               vSetBit(*regUCSRB(usrGroup), RXENn)
 
 //! Macro: Disable RX
 /*!
-  Disable RX for a USART comunication.
+  Disables RX for an USART comunication.
   \param usrGroup is an undefined parameter. It's the gpio group pin (USART_X).
 */
 #define     vDisableRX(usrGroup)                              vEraseBit(*regUCSRB(usrGroup), RXENn)
 
 //! Macro: Enable TX
 /*!
-  Enable TX for a USART comunication.
+  Enables TX for an USART comunication.
   \param usrGroup is an undefined parameter. It's the gpio group pin (USART_X).
 */
 #define     vEnableTX(usrGroup)                               vSetBit(*regUCSRB(usrGroup), TXENn)
 
 //! Macro: Disable TX
 /*!
-  Disable TX for a USART comunication.
+  Disables TX for an USART comunication.
   \param usrGroup is an undefined parameter. It's the gpio group pin (USART_X).
 */
 #define     vDisableTX(usrGroup)                              vEraseBit(*regUCSRB(usrGroup), TXENn)
 
 //! Macro: Set USART Data Size
 /*!
-  Set size of USART send/receive data.
+  Sets size of USART send/receive data.
   \param usrGroup is an undefined parameter. It's the gpio group pin (USART_X).
   \param ui8DataSize is an undefined parameter. Its the size of USART data.
 */
@@ -150,7 +150,7 @@
 
 //! Macro: Set USART Parity
 /*!
-  Set parity of USART.
+  Sets parity of USART.
   \param usrGroup is an undefined parameter. It's the gpio group pin (USART_X).
   \param ui8Parity is an undefined parameter. Its USART parity.
 */
@@ -160,7 +160,7 @@
 
 //! Macro: Set USART Sync
 /*!
-  Set sync of USART.
+  Sets sync of USART.
   \param usrGroup is an undefined parameter. It's the gpio group pin (USART_X).
   \param ui8Sync is an undefined parameter. Its the USART sync.
 */
@@ -170,7 +170,7 @@
 
 //! Macro: Set USART Stop Bit
 /*!
-  Set stop bit of USART.
+  Sets stop bit of USART.
   \param usrGroup is an undefined parameter. It's the gpio group pin (USART_X).
   \param ui8StopBit is an undefined parameter. Its USART stop bit.
 */
@@ -183,7 +183,7 @@
 
 //! Macro: Set USART Activatio Edge
 /*!
-  Set activation edge of USART.
+  Sets activation edge of USART.
   \param usrGroup is an undefined parameter. It's the gpio group pin (USART_X).
   \param ui8Edge is an undefined parameter. Its USART activation edge.
 */
@@ -196,19 +196,19 @@
 
 //! Macro: Receive USART Byte
 /*!
-  Get received USART data.
+  Gets received USART data.
   \param usrGroup is an undefined parameter. It's the gpio group pin (USART_X).
   \return Returns USART data.
 */
 #define     ui8USARTReceiveByte(usrGroup)                     *regUDR(usrGroup)
 
-void vUSARTInit(volatile uint8_t* ui8pGroup);                                                                                                 /*!< Void type function. */
-void vEnableUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8InterruptionType);                                                         /*!< Void type function. */
-void vDisableUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8InterruptionType);                                                        /*!< Void type function. */
-void vSetUSARTBaudRate(volatile uint8_t* ui8pGroup, uint32_t ui32BaudRate);                                                                   /*!< Void type function. */
-void vUSARTSendByte(volatile uint8_t* ui8pGroup, uint8_t ui8Data);                                                                            /*!< Void type function. */
-void vAttachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8InterruptionType, void (*vInterruptFunction)(void*), void* vpArgument);    /*!< Void type function. */
-void vDettachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8InterruptionType);                                                        /*!< Void type function. */
+void vUSARTInit(volatile uint8_t* ui8pGroup);                                                                                                 /*!< void type function. */
+void vEnableUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8InterruptionType);                                                         /*!< void type function. */
+void vDisableUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8InterruptionType);                                                        /*!< void type function. */
+void vSetUSARTBaudRate(volatile uint8_t* ui8pGroup, uint32_t ui32BaudRate);                                                                   /*!< void type function. */
+void vUSARTSendByte(volatile uint8_t* ui8pGroup, uint8_t ui8Data);                                                                            /*!< void type function. */
+void vAttachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8InterruptionType, void (*vInterruptFunction)(void*), void* vpArgument);    /*!< void type function. */
+void vDetachUSARTInterrupt(volatile uint8_t* ui8pGroup, uint8_t ui8InterruptionType);                                                         /*!< void type function. */
 
 #ifdef __cplusplus
   }

@@ -43,6 +43,10 @@
 #include <stdint.h>
 #include <avr/io.h>
 
+//! Macro: Watchdog Macros
+/*!
+  These macros are for facilitate the use of this library.
+*/
 #define     WHATCHDOG_TIMER_16MS                    0
 #define     WHATCHDOG_TIMER_32MS                    1
 #define     WHATCHDOG_TIMER_64MS                    2
@@ -59,12 +63,16 @@
 #define     RESET_MODE                              2
 #define     INTERRUPT_RESET_MODE                    3
 
+//! Macro: Watchdog Request Ignorer
+/*!
+  Ignores a watchdog request.
+*/
 #define     vIgnoreWatchdogRequest()                vEraseBit(WDTCSR, WDIF)
 
-void vStartWatchdog(uint8_t ui8Mode, uint8_t ui8Time);
-void vStopWatchdog(void);
-void vAttachWatchdogInterrupt(void (*vInterruptFunction)(void*), void* vpArgument);
-void vDettachWatchdogInterrupt(void);
+void vStartWatchdog(uint8_t ui8Mode, uint8_t ui8Time);                                    /*!< void type function. */
+void vStopWatchdog(void);                                                                 /*!< void type function. */
+void vAttachWatchdogInterrupt(void (*vInterruptFunction)(void*), void* vpArgument);       /*!< void type function. */
+void vDetachWatchdogInterrupt(void);                                                      /*!< void type function. */
 
 #ifdef __cplusplus
   }
