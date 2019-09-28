@@ -276,6 +276,7 @@ static void vPublicPrintln(usart_t* usrObjectUSART, const char* cpString, ...){
   va_start(vaArguments, cpString);
   vAttachPrintOutput(usrObjectUSART->ui8pUSARTGroup, &vUSARTSendByte);
   vprintf(cpString, vaArguments);
+  vUSARTSendByte(usrObjectUSART->ui8pUSARTGroup, '\r');
   vUSARTSendByte(usrObjectUSART->ui8pUSARTGroup, '\n');
   va_end(vaArguments);
 }
