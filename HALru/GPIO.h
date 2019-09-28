@@ -149,7 +149,7 @@
   \param ui8Pin is an undefined parameter. It's the pin number of a GPIO group (0 to 7).
   \return Returns the logic-level.
 */
-#define   ui8GPIODigitalRead(ui8pGroup, ui8Pin)                     ui8ReadBit(*regPORT(ui8pGroup), ui8Pin)
+#define   ui8GPIODigitalRead(ui8pGroup, ui8Pin)                     ui8ReadBit(*regPIN(ui8pGroup), ui8Pin)
 
 #ifdef __cplusplus
   }
