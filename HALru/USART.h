@@ -91,8 +91,10 @@
 #define     SYNCHRONOUS                                       1
 #define     SPI_MASTER                                        3
 
-#define     RISING                                            0
-#define     FALLING                                           1
+#define     RISING_EDGE_TX                                    0
+#define     FALLING_EDGE_RX                                   0
+#define     RISING_EDGE_RX                                    1
+#define     FALLING_EDGE_TX                                   1
 
 #define     NO_PARITY                                         0
 #define     PAIR                                              2
@@ -191,7 +193,12 @@
                                                                 vEraseBit(*regUCSRC(usrGroup), UCPOLn);\
                                                               }\
                                                               else {\
-                                                                vSetBit(*regUCSRC(usrGroup), UCPOLn);\
+                                                                if (ui8Egde == RISING_EDGE_TX){\
+                                                                  vEraseBit(*regUCSRC(usrGroup), UCPOLn);\
+                                                                }\
+                                                                else{\
+                                                                  vSetBit(*regUCSRC(usrGroup), UCPOLn);\
+                                                                }\
                                                               }
 
 //! Macro: Receive USART Byte
