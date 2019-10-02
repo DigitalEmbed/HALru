@@ -199,7 +199,7 @@ static void vPublicOddMode(usart_t* usrObjectUSART){
   \param usrObjectUSART is a usart_t "object".
 */
 static void vPublicFallingEdgeMode(usart_t* usrObjectUSART){
-  vSetUSARTActivationEdge(usrObjectUSART->ui8pUSARTGroup, FALLING);
+  vSetUSARTActivationEdge(usrObjectUSART->ui8pUSARTGroup, FALLING_EDGE_TX);
 }
 
 //! Public Method: USART Rising Edge Mode Setter
@@ -208,7 +208,7 @@ static void vPublicFallingEdgeMode(usart_t* usrObjectUSART){
   \param usrObjectUSART is a usart_t "object".
 */
 static void vPublicRisingEdgeMode(usart_t* usrObjectUSART){
-  vSetUSARTActivationEdge(usrObjectUSART->ui8pUSARTGroup, RISING);
+  vSetUSARTActivationEdge(usrObjectUSART->ui8pUSARTGroup, RISING_EDGE_TX);
 }
 
 //! Public Method: USART Stop Bit Setter

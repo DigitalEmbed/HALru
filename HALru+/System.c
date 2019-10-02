@@ -5,12 +5,12 @@
   This macros are for automatizate the confection of this library.
 */
 #define SLEEP_CONFIGURATION_METHOD_LIST\
-  X(SetMode1, SLEEP_IDLE_MODE)\
-  X(SetMode2, SLEEP_ADC_NOISE_REDUCTION_MODE)\
-  X(SetMode3, SLEEP_POWER_DOWN_MODE)\
-  X(SetMode4, SLEEP_POWER_SAVE_MODE)\
-  X(SetMode5, SLEEP_STANDBY_MODE)\
-  X(SetMode6, SLEEP_EXTENDED_STANDBY_MODE)
+  X(SetIdleMode, SLEEP_IDLE_MODE)\
+  X(SetADCNoiseReductionMode, SLEEP_ADC_NOISE_REDUCTION_MODE)\
+  X(SetPowerDownMode, SLEEP_POWER_DOWN_MODE)\
+  X(SetPowerSaveMode, SLEEP_POWER_SAVE_MODE)\
+  X(SetStandByMode, SLEEP_STANDBY_MODE)\
+  X(SetExtendedStandByMode, SLEEP_EXTENDED_STANDBY_MODE)
 
 //! X-Macro: Peripherals Configuration Method List
 /*!
@@ -81,15 +81,15 @@ static uint8_t ui8PublicCheckPowerOn(void);                                     
   System object "constructor".
 */
 const system_manager_t System PROGMEM = {
+  .Sleep = {
+    #define X(MethodName, ui8MacroArgument)\
+      .v##MethodName = &vPublic##MethodName,
+    
+      SLEEP_CONFIGURATION_METHOD_LIST
+    #undef X
+    .vSleep = &vPublicSleep,
+  },
   .Power = {
-    .Sleep = {
-      #define X(MethodName, ui8MacroArgument)\
-        .v##MethodName = &vPublic##MethodName,
-      
-        SLEEP_CONFIGURATION_METHOD_LIST
-      #undef X
-      .vSleep = &vPublicSleep,
-    },
     #define X(MethodName, ui8MacroArgument)\
       .MethodName = {\
         .vTurnOn = &vPublicTurnOn##MethodName,\

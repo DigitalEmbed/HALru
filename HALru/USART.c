@@ -46,7 +46,7 @@ void vUSARTInit(volatile uint8_t* ui8pGroup){
   *regUBRRL(ui8pGroup) = 0;
   *regUBRRH(ui8pGroup) = 0;
   vSetUSARTSync(ui8pGroup, ASYNCHRONOUS);
-  vSetUSARTActivationEdge(ui8pGroup, RISING);
+  vSetUSARTActivationEdge(ui8pGroup, RISING_EDGE_TX);
   vSetUSARTParity(ui8pGroup, NO_PARITY);
   vSetUSARTStopBit(ui8pGroup, 1);
   vSetUSARTDataSize(ui8pGroup, 8);

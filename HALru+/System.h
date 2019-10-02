@@ -57,12 +57,12 @@ typedef struct {
   This is a "class" of sleep_manager_t type.
 */
 typedef struct {
-    void (*vSetMode1)(void);                                                            /*!< void "method". */
-    void (*vSetMode2)(void);                                                            /*!< void "method". */
-    void (*vSetMode3)(void);                                                            /*!< void "method". */
-    void (*vSetMode4)(void);                                                            /*!< void "method". */
-    void (*vSetMode5)(void);                                                            /*!< void "method". */
-    void (*vSetMode6)(void);                                                            /*!< void "method". */
+    void (*vSetIdleMode)(void);                                                         /*!< void "method". */
+    void (*vSetADCNoiseReductionMode)(void);                                            /*!< void "method". */
+    void (*vSetPowerDownMode)(void);                                                    /*!< void "method". */
+    void (*vSetPowerSaveMode)(void);                                                    /*!< void "method". */
+    void (*vSetStandByMode)(void);                                                      /*!< void "method". */
+    void (*vSetExtendedStandByMode)(void);                                              /*!< void "method". */
     void (*vSleep)(void);                                                               /*!< void "method". */
 } sleep_manager_t;
 
@@ -71,7 +71,6 @@ typedef struct {
   This is a "class" of power_manager_t type.
 */
 typedef struct {
-    sleep_manager_t Sleep;                                                              /*!< Sleep manager "object". */
     peripheral_manager_t AllPeripherals;                                                /*!< AllPeripherals manager "object". */
     peripheral_manager_t ADConverter;                                                   /*!< ADConverter manager "object". */
     peripheral_manager_t USART0;                                                        /*!< USART0 manager "object". */
@@ -141,6 +140,7 @@ typedef struct {
   power_manager_t Power;                                                                /*!< Power manager "object". */
   watchdog_manager_t Watchdog;                                                          /*!< Watchdog manager "object". */
   reset_manager_t Reset;                                                                /*!< Reset manager "object". */
+  sleep_manager_t Sleep;                                                                /*!< Sleep manager "object". */
 } system_manager_t;
 
 extern const system_manager_t System PROGMEM;                                           /*!< System manager "object". */

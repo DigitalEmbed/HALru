@@ -193,7 +193,7 @@
                                                                 vEraseBit(*regUCSRC(usrGroup), UCPOLn);\
                                                               }\
                                                               else {\
-                                                                if (ui8Egde == RISING_EDGE_TX){\
+                                                                if (ui8Edge == RISING_EDGE_TX){\
                                                                   vEraseBit(*regUCSRC(usrGroup), UCPOLn);\
                                                                 }\
                                                                 else{\
