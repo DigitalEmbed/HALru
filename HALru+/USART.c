@@ -260,8 +260,9 @@ static uint8_t ui8PublicRead(usart_t* usrObjectUSART){
 static void vPublicPrint(usart_t* usrObjectUSART, const char* cpString, ...){
   va_list vaArguments;
   va_start(vaArguments, cpString);
-  vAttachPrintOutput(usrObjectUSART->ui8pUSARTGroup, &vUSARTSendByte);
+  vAttachPrintOutput((void*) usrObjectUSART->ui8pUSARTGroup, (void (*)(void*, uint8_t)) &vUSARTSendByte);
   vprintf(cpString, vaArguments);
+  vDetachPrintOutput();
   va_end(vaArguments);
 }
 
@@ -274,8 +275,9 @@ static void vPublicPrint(usart_t* usrObjectUSART, const char* cpString, ...){
 static void vPublicPrintln(usart_t* usrObjectUSART, const char* cpString, ...){
   va_list vaArguments;
   va_start(vaArguments, cpString);
-  vAttachPrintOutput(usrObjectUSART->ui8pUSARTGroup, &vUSARTSendByte);
+  vAttachPrintOutput((void*) usrObjectUSART->ui8pUSARTGroup, (void (*)(void*, uint8_t)) &vUSARTSendByte);
   vprintf(cpString, vaArguments);
+  vDetachPrintOutput();
   vUSARTSendByte(usrObjectUSART->ui8pUSARTGroup, '\r');
   vUSARTSendByte(usrObjectUSART->ui8pUSARTGroup, '\n');
   va_end(vaArguments);
