@@ -47,16 +47,16 @@
 /*!
   These macros are for facilitate the use of this library.
 */
-#define     WHATCHDOG_TIMER_16MS                    0
-#define     WHATCHDOG_TIMER_32MS                    1
-#define     WHATCHDOG_TIMER_64MS                    2
-#define     WHATCHDOG_TIMER_125MS                   3
-#define     WHATCHDOG_TIMER_250MS                   4
-#define     WHATCHDOG_TIMER_500MS                   5
-#define     WHATCHDOG_TIMER_1S                      6
-#define     WHATCHDOG_TIMER_2S                      7
-#define     WHATCHDOG_TIMER_4S                      8
-#define     WHATCHDOG_TIMER_8S                      9
+#define     WATCHDOG_TIMER_16MS                     0
+#define     WATCHDOG_TIMER_32MS                     1
+#define     WATCHDOG_TIMER_64MS                     2
+#define     WATCHDOG_TIMER_125MS                    3
+#define     WATCHDOG_TIMER_250MS                    4
+#define     WATCHDOG_TIMER_500MS                    5
+#define     WATCHDOG_TIMER_1S                       6
+#define     WATCHDOG_TIMER_2S                       7
+#define     WATCHDOG_TIMER_4S                       8
+#define     WATCHDOG_TIMER_8S                       9
 
 #define     DISABLED_MODE                           0
 #define     INTERRUPT_MODE                          1
